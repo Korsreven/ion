@@ -39,9 +39,10 @@ mesh::Vertices Line::GetVertices() const noexcept
 
 //Public
 
-Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible) :
+Line::Line(std::optional<std::string> name, const Vector3 &a, const Vector3 &b,
+	const Color &color, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
 
 	a_{a},
 	b_{b}
@@ -49,9 +50,10 @@ Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible)
 	//Empty
 }
 
-Line::Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible) :
+Line::Line(std::optional<std::string> name, const Vector3 &a, const Vector3 &b,
+	const Color &color, real thickness, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::Lines, detail::line_vertices(a, b, color), color, visible},
 
 	a_{a},
 	b_{b}

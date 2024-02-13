@@ -13,6 +13,9 @@ File:	IonAnimatedSprite.h
 #ifndef ION_ANIMATED_SPRITE_H
 #define ION_ANIMATED_SPRITE_H
 
+#include <optional>
+#include <string>
+
 #include "IonSprite.h"
 #include "graphics/materials/IonMaterial.h"
 #include "graphics/textures/IonAnimation.h"
@@ -43,30 +46,38 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			///@brief Constructs a new animated sprite with the given material and visibility
-			explicit AnimatedSprite(NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, material and visibility
+			AnimatedSprite(std::optional<std::string> name,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given size, material and visibility
-			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, size, material and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given position, size, material and visibility
-			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, position, size, material and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given position, rotation, size, material and visibility
-			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, position, rotation, size, material and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			///@brief Constructs a new animated sprite with the given material, color and visibility
-			AnimatedSprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, material, color and visibility
+			AnimatedSprite(std::optional<std::string> name,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given size, material, color and visibility
-			AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, size, material, color and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given position, size, material, color and visibility
-			AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, position, size, material, color and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new animated sprite with the given position, rotation, size, material, color and visibility
-			AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new animated sprite with the given name, position, rotation, size, material, color and visibility
+			AnimatedSprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
 			/**

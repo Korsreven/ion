@@ -13,6 +13,8 @@ File:	IonTriangle.h
 #ifndef ION_TRIANGLE_H
 #define ION_TRIANGLE_H
 
+#include <optional>
+#include <string>
 #include <tuple>
 
 #include "IonShape.h"
@@ -43,8 +45,9 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new triangle with the given points a b c, color and visibility
-			Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Color &color, bool visible = true);
+			///@brief Constructs a new triangle with the given name, points a b c, color and visibility
+			Triangle(std::optional<std::string> name, const Vector3 &a, const Vector3 &b, const Vector3 &c,
+				const Color &color, bool visible = true);
 
 
 			/**

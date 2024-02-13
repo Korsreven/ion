@@ -138,51 +138,68 @@ void Sprite::MaterialChanged() noexcept
 
 //Public
 
-Sprite::Sprite(NonOwningPtr<materials::Material> material, bool visible) :
-	Sprite{vector3::Zero, vector2::Zero, material, visible}
+Sprite::Sprite(std::optional<std::string> name,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	Sprite{std::move(name), vector3::Zero, vector2::Zero, material, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Sprite{vector3::Zero, size, material, visible}
+Sprite::Sprite(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	Sprite{std::move(name), vector3::Zero, size, material, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Sprite{position, 0.0_r, size, material, visible}
+Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	Sprite{std::move(name), position, 0.0_r, size, material, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	Sprite{position, rotation, size, material, color::White, visible}
+Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	Sprite{std::move(name), position, rotation, size, material, color::White, visible}
 {
 	//Empty
 }
 
 
-Sprite::Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Sprite{vector3::Zero, vector2::Zero, material, color, visible}
+Sprite::Sprite(std::optional<std::string> name,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Sprite{std::move(name), vector3::Zero, vector2::Zero, material, color, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Sprite{vector3::Zero, size, material, color, visible}
+Sprite::Sprite(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Sprite{std::move(name), vector3::Zero, size, material, color, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Sprite{position, 0.0_r, size, material, color, visible}
+Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Sprite{std::move(name), position, 0.0_r, size, material, color, visible}
 {
 	//Empty
 }
 
-Sprite::Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	Rectangle{rectangle::detail::rectangle_vertices(position, rotation, size, color),
+Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Rectangle{std::move(name),
+			  rectangle::detail::rectangle_vertices(position, rotation, size, color),
 			  position, rotation, size, material, color, visible}
 {
 	if (size == vector2::Zero)

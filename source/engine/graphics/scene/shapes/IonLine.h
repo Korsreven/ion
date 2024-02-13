@@ -13,6 +13,8 @@ File:	IonLine.h
 #ifndef ION_LINE_H
 #define ION_LINE_H
 
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "IonShape.h"
@@ -44,11 +46,13 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new line with the given points a b, color and visibility
-			Line(const Vector3 &a, const Vector3 &b, const Color &color, bool visible = true);
+			///@brief Constructs a new line with the given name, points a b, color and visibility
+			Line(std::optional<std::string> name, const Vector3 &a, const Vector3 &b,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new line with the given points a b, color, thickness and visibility
-			Line(const Vector3 &a, const Vector3 &b, const Color &color, real thickness, bool visible = true);
+			///@brief Constructs a new line with the given name, points a b, color, thickness and visibility
+			Line(std::optional<std::string> name, const Vector3 &a, const Vector3 &b,
+				const Color &color, real thickness, bool visible = true);
 
 
 			/**

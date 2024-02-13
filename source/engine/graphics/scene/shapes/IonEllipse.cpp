@@ -60,21 +60,26 @@ mesh::Vertices Ellipse::GetVertices() const noexcept
 
 //Public
 
-Ellipse::Ellipse(const Vector2 &size, const Color &color, bool visible) :
-	Ellipse{vector3::Zero, size, color, visible}
+Ellipse::Ellipse(std::optional<std::string> name, const Vector2 &size,
+	const Color &color, bool visible) :
+
+	Ellipse{std::move(name), vector3::Zero, size, color, visible}
 {
 	//Empty
 }
 
-Ellipse::Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
-	Ellipse{position, 0.0_r, size, color, visible}
+Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	const Color &color, bool visible) :
+
+	Ellipse{std::move(name), position, 0.0_r, size, color, visible}
 {
 	//Empty
 }
 
-Ellipse::Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
+Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	const Color &color, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan,
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan,
 		  detail::ellipse_vertices(position, rotation, size, color, ellipse::detail::default_ellipse_sides), color, visible},
 
 	position_{position},
@@ -85,21 +90,26 @@ Ellipse::Ellipse(const Vector3 &position, real rotation, const Vector2 &size, co
 }
 
 
-Ellipse::Ellipse(const Vector2 &size, const Color &color, int sides, bool visible) :
-	Ellipse{vector3::Zero, size, color, sides, visible}
+Ellipse::Ellipse(std::optional<std::string> name, const Vector2 &size,
+	const Color &color, int sides, bool visible) :
+
+	Ellipse{std::move(name), vector3::Zero, size, color, sides, visible}
 {
 	//Empty
 }
 
-Ellipse::Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible) :
-	Ellipse{position, 0.0_r, size, color, sides, visible}
+Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	const Color &color, int sides, bool visible) :
+
+	Ellipse{std::move(name), position, 0.0_r, size, color, sides, visible}
 {
 	//Empty
 }
 
-Ellipse::Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible) :
+Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	const Color &color, int sides, bool visible) :
 
-	Shape{vertex::vertex_batch::VertexDrawMode::TriangleFan,
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan,
 		  detail::ellipse_vertices(position, rotation, size, color, detail::ellipse_sides(sides)), color, visible},
 
 	position_{position},

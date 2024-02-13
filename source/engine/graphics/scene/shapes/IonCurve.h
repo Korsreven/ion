@@ -14,6 +14,8 @@ File:	IonCurve.h
 #define ION_CURVE_H
 
 #include <cassert>
+#include <optional>
+#include <string>
 #include <vector>
 
 #include "IonShape.h"
@@ -62,18 +64,22 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new curve with the given control points, color and visibility
-			Curve(curve::ControlPoints control_points, const Color &color, bool visible = true);
+			///@brief Constructs a new curve with the given name, control points, color and visibility
+			Curve(std::optional<std::string> name, curve::ControlPoints control_points,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new curve with the given control points, color, thickness and visibility
-			Curve(curve::ControlPoints control_points, const Color &color, real thickness, bool visible = true);
+			///@brief Constructs a new curve with the given name, control points, color, thickness and visibility
+			Curve(std::optional<std::string> name, curve::ControlPoints control_points,
+				const Color &color, real thickness, bool visible = true);
 
 
-			///@brief Constructs a new curve with the given control points, color, smoothness and visibility
-			Curve(curve::ControlPoints control_points, const Color &color, int smoothness, bool visible = true);
+			///@brief Constructs a new curve with the given name, control points, color, smoothness and visibility
+			Curve(std::optional<std::string> name, curve::ControlPoints control_points,
+				const Color &color, int smoothness, bool visible = true);
 
-			///@brief Constructs a new curve with the given control points, color, thickness, smoothness and visibility
-			Curve(curve::ControlPoints control_points, const Color &color, real thickness, int smoothness, bool visible = true);
+			///@brief Constructs a new curve with the given name, control points, color, thickness, smoothness and visibility
+			Curve(std::optional<std::string> name, curve::ControlPoints control_points,
+				const Color &color, real thickness, int smoothness, bool visible = true);
 
 
 			/**

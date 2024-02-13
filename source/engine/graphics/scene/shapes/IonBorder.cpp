@@ -273,45 +273,52 @@ mesh::Vertices Border::GetVertices() const noexcept
 
 //Public
 
-Border::Border(const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible) :
-	Border{vector3::Zero, size, border_size, color, visible}
+Border::Border(std::optional<std::string> name, const Vector2 &size, const Vector2 &border_size,
+	const Color &color, bool visible) :
+
+	Border{std::move(name), vector3::Zero, size, border_size, color, visible}
 {
 	//Empty
 }
 
-Border::Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible) :
-	Border{position, 0.0_r, size, border_size, color, visible}
+Border::Border(std::optional<std::string> name, const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
+	const Color &color, bool visible) :
+
+	Border{std::move(name), position, 0.0_r, size, border_size, color, visible}
 {
 	//Empty
 }
 
-Border::Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible) :
-	Border{position, rotation, size, border_size, BorderCornerStyle::None, color, visible}
+Border::Border(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
+	const Color &color, bool visible) :
+
+	Border{std::move(name), position, rotation, size, border_size, BorderCornerStyle::None, color, visible}
 {
 	//Empty
 }
 
 
-Border::Border(const Vector2 &size, const Vector2 &border_size,
-	border::BorderCornerStyle corner_style, const Color &color, bool visible) :
+Border::Border(std::optional<std::string> name, const Vector2 &size, const Vector2 &border_size,
+	BorderCornerStyle corner_style, const Color &color, bool visible) :
 	
-	Border{vector3::Zero, size, border_size, corner_style, color, visible}
+	Border{std::move(name), vector3::Zero, size, border_size, corner_style, color, visible}
 {
 	//Empty
 }
 
-Border::Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
-	border::BorderCornerStyle corner_style, const Color &color, bool visible) :
+Border::Border(std::optional<std::string> name, const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
+	BorderCornerStyle corner_style, const Color &color, bool visible) :
 	
-	Border{position, 0.0_r, size, border_size, corner_style, color, visible}
+	Border{std::move(name), position, 0.0_r, size, border_size, corner_style, color, visible}
 {
 	//Empty
 }
 
-Border::Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
-	border::BorderCornerStyle corner_style, const Color &color, bool visible) :
+Border::Border(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
+	BorderCornerStyle corner_style, const Color &color, bool visible) :
 	
-	Rectangle{detail::border_vertices(position, rotation, size, border_size, corner_style, color, {}, {}, {}, {}, {}, {}, {}, {}),
+	Rectangle{std::move(name),
+			  detail::border_vertices(position, rotation, size, border_size, corner_style, color, {}, {}, {}, {}, {}, {}, {}, {}),
 			  position, rotation, size, color, visible},
 
 	border_size_{border_size},

@@ -23,37 +23,37 @@ namespace shape::detail
 
 //Protected
 
-Shape::Shape(const mesh::Vertices &vertices, const Color &color, bool visible) :
+Shape::Shape(std::optional<std::string> name, const mesh::Vertices &vertices, const Color &color, bool visible) :
 
-	Mesh{vertices, visible},
+	Mesh{std::move(name), vertices, visible},
 	color_{color}
 {
 	//Empty
 }
 
-Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+Shape::Shape(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 	const Color &color, bool visible ) :
 
-	Mesh{draw_mode, vertices, visible},
+	Mesh{std::move(name), draw_mode, vertices, visible},
 	color_{color}
 {
 	//Empty
 }
 
 
-Shape::Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-	const Color &color, bool visible) :
-
-	Mesh{vertices, material, mesh::MeshTexCoordMode::Auto, visible},
-	color_{color}
-{
-	//Empty
-}
-
-Shape::Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+Shape::Shape(std::optional<std::string> name, const mesh::Vertices &vertices,
 	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Mesh{draw_mode, vertices, material, mesh::MeshTexCoordMode::Auto, visible},
+	Mesh{std::move(name), vertices, material, mesh::MeshTexCoordMode::Auto, visible},
+	color_{color}
+{
+	//Empty
+}
+
+Shape::Shape(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	Mesh{std::move(name), draw_mode, vertices, material, mesh::MeshTexCoordMode::Auto, visible},
 	color_{color}
 {
 	//Empty

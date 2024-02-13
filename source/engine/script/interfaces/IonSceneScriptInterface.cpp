@@ -452,6 +452,7 @@ ClassDefinition get_mesh_class()
 		.AddClass(std::move(vertices))
 
 		.AddProperty("include-bounding-volumes", ParameterType::Boolean)
+		.AddProperty("name", ParameterType::String)
 		.AddProperty("surface-material", ParameterType::String)
 		.AddProperty("tex-coord-mode", {"manual"s, "auto"s});
 }
@@ -1858,6 +1859,14 @@ void create_translating_motion(const script_tree::ObjectNode &object,
 NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
@@ -1877,7 +1886,7 @@ NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::O
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(position, rotation, size,
+	auto animated_sprite = model.CreateMesh<shapes::AnimatedSprite>(std::move(name), position, rotation, size,
 		get_material(material_name, managers), color, visible);
 
 	if (animated_sprite)
@@ -1889,6 +1898,14 @@ NonOwningPtr<shapes::AnimatedSprite> create_animated_sprite(const script_tree::O
 NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
@@ -1922,7 +1939,7 @@ NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object
 				return shapes::border::BorderCornerStyle::None;
 		}();
 
-	auto border = model.CreateMesh<shapes::Border>(position, rotation, size, border_size, corner_style, color, visible);
+	auto border = model.CreateMesh<shapes::Border>(std::move(name), position, rotation, size, border_size, corner_style, color, visible);
 
 	if (border)
 		set_border_properties(object, *border, managers);
@@ -1933,6 +1950,14 @@ NonOwningPtr<shapes::Border> create_border(const script_tree::ObjectNode &object
 NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto color = object
 		.Property("color")[0]
 		.Get<ScriptType::Color>()->Get();
@@ -1954,7 +1979,7 @@ NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
 			control_points.push_back(property[0].Get<ScriptType::Vector3>()->Get());
 	}
 
-	auto curve = model.CreateMesh<shapes::Curve>(std::move(control_points), color, thickness, smoothness, visible);
+	auto curve = model.CreateMesh<shapes::Curve>(std::move(name), std::move(control_points), color, thickness, smoothness, visible);
 
 	if (curve)
 		set_curve_properties(object, *curve, managers);
@@ -1965,6 +1990,14 @@ NonOwningPtr<shapes::Curve> create_curve(const script_tree::ObjectNode &object,
 NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
@@ -1984,7 +2017,7 @@ NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &obje
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto ellipse = model.CreateMesh<shapes::Ellipse>(position, rotation, size, color, sides, visible);
+	auto ellipse = model.CreateMesh<shapes::Ellipse>(std::move(name), position, rotation, size, color, sides, visible);
 
 	if (ellipse)
 		set_ellipse_properties(object, *ellipse, managers);
@@ -1995,6 +2028,14 @@ NonOwningPtr<shapes::Ellipse> create_ellipse(const script_tree::ObjectNode &obje
 NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto a = object
 		.Property("a")[0]
 		.Get<ScriptType::Vector3>()->Get();
@@ -2011,7 +2052,7 @@ NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto line = model.CreateMesh<shapes::Line>(a, b, color, thickness, visible);
+	auto line = model.CreateMesh<shapes::Line>(std::move(name), a, b, color, thickness, visible);
 
 	if (line)
 		set_line_properties(object, *line, managers);
@@ -2022,6 +2063,14 @@ NonOwningPtr<shapes::Line> create_line(const script_tree::ObjectNode &object,
 NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto draw_mode_name = object
 		.Property("draw-mode")[0]
 		.Get<ScriptType::Enumerable>().value_or(""s).Get();
@@ -2038,8 +2087,6 @@ NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 	auto draw_mode =
 		[&]() noexcept
 		{
-			//"points"s, "lines"s, "line-loop"s, "line-strip"s, "triangles"s, "triangle-fan"s, "triangle-strip"s, "quads"s, "polygon"s
-
 			if (draw_mode_name == "points")
 				return graphics::render::vertex::vertex_batch::VertexDrawMode::Points;
 			else if (draw_mode_name == "lines")
@@ -2098,7 +2145,7 @@ NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 				return shapes::mesh::MeshTexCoordMode::Auto;
 		}();
 
-	auto mesh = model.CreateMesh(draw_mode, vertices,
+	auto mesh = model.CreateMesh(std::move(name), draw_mode, vertices,
 		get_material(material_name, managers), tex_coord_mode, visible);
 
 	if (mesh)
@@ -2110,6 +2157,14 @@ NonOwningPtr<shapes::Mesh> create_mesh(const script_tree::ObjectNode &object,
 NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
@@ -2126,7 +2181,7 @@ NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto rectangle = model.CreateMesh<shapes::Rectangle>(position, rotation, size, color, visible);
+	auto rectangle = model.CreateMesh<shapes::Rectangle>(std::move(name), position, rotation, size, color, visible);
 
 	if (rectangle)
 		set_rectangle_properties(object, *rectangle, managers);
@@ -2137,6 +2192,14 @@ NonOwningPtr<shapes::Rectangle> create_rectangle(const script_tree::ObjectNode &
 NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto position = object
 		.Property("position")[0]
 		.Get<ScriptType::Vector3>().value_or(vector3::Zero).Get();
@@ -2156,7 +2219,7 @@ NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto sprite = model.CreateMesh<shapes::Sprite>(position, rotation, size,
+	auto sprite = model.CreateMesh<shapes::Sprite>(std::move(name), position, rotation, size,
 		get_material(material_name, managers), color, visible);
 
 	if (sprite)
@@ -2168,6 +2231,14 @@ NonOwningPtr<shapes::Sprite> create_sprite(const script_tree::ObjectNode &object
 NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &object,
 	Model &model, const ManagerRegister &managers)
 {
+	auto name =
+		[&]() noexcept -> std::optional<std::string>
+		{
+			if (auto &property = object.Property("name"); property)
+				return property[0].Get<ScriptType::String>()->Get();
+			else
+				return {};
+		}();
 	auto a = object
 		.Property("a")[0]
 		.Get<ScriptType::Vector3>()->Get();
@@ -2184,7 +2255,7 @@ NonOwningPtr<shapes::Triangle> create_triangle(const script_tree::ObjectNode &ob
 		.Property("visible")[0]
 		.Get<ScriptType::Boolean>().value_or(true).Get();
 
-	auto triangle = model.CreateMesh<shapes::Triangle>(a, b, c, color, visible);
+	auto triangle = model.CreateMesh<shapes::Triangle>(std::move(name), a, b, c, color, visible);
 
 	if (triangle)
 		set_triangle_properties(object, *triangle, managers);

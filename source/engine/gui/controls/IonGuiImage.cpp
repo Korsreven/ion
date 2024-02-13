@@ -170,7 +170,7 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiImage::CreateImage(NonOwningPtr
 {
 	if (skin_ && skin_->Parts)
 	{
-		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(material);
+		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>({}, material);
 
 		//Position
 		auto [x, y, z] = sprite->Position().XYZ();

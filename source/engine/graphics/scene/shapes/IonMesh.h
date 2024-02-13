@@ -14,6 +14,7 @@ File:	IonMesh.h
 #define ION_MESH_H
 
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "graphics/render/IonRenderPrimitive.h"
@@ -150,34 +151,34 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			///@brief Constructs a new mesh with the given vertices and visibility
-			explicit Mesh(const mesh::Vertices &vertices, bool visible = true);
+			///@brief Constructs a new mesh with the given name, vertices and visibility
+			Mesh(std::optional<std::string> name, const mesh::Vertices &vertices, bool visible = true);
 
-			///@brief Constructs a new mesh with the given vertices, material, tex coord mode and visibility
-			Mesh(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Constructs a new mesh with the given name, vertices, material, tex coord mode and visibility
+			Mesh(std::optional<std::string> name, const mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			///@brief Constructs a new mesh with the given draw mode, vertices and visibility
-			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
+			///@brief Constructs a new mesh with the given name, draw mode, vertices and visibility
+			Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, bool visible = true);
 
-			///@brief Constructs a new mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Constructs a new mesh with the given name, draw mode, vertices, material, tex coord mode and visibility
+			Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			///@brief Constructs a new mesh with the given raw vertex data and visibility
-			explicit Mesh(render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
+			///@brief Constructs a new mesh with the given name, raw vertex data and visibility
+			Mesh(std::optional<std::string> name, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			///@brief Constructs a new mesh with the given raw vertex data, material, tex coord mode and visibility
-			Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
+			///@brief Constructs a new mesh with the given name, raw vertex data, material, tex coord mode and visibility
+			Mesh(std::optional<std::string> name, render_primitive::VertexContainer vertex_data,
+				NonOwningPtr<materials::Material> material, mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
-			///@brief Constructs a new mesh with the given draw mode, raw vertex data and visibility
-			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
+			///@brief Constructs a new mesh with the given name, draw mode, raw vertex data and visibility
+			Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible = true) noexcept;
 
-			///@brief Constructs a new mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
+			///@brief Constructs a new mesh with the given name, draw mode, raw vertex data, material, tex coord mode and visibility
+			Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data,
+				NonOwningPtr<materials::Material> material, mesh::MeshTexCoordMode tex_coord_mode = mesh::MeshTexCoordMode::Auto, bool visible = true) noexcept;
 
 
 			///@brief Default virtual destructor

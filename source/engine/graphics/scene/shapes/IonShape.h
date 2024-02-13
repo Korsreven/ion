@@ -13,6 +13,9 @@ File:	IonShape.h
 #ifndef ION_SHAPE_H
 #define ION_SHAPE_H
 
+#include <optional>
+#include <string>
+
 #include "IonMesh.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/utilities/IonColor.h"
@@ -48,24 +51,25 @@ namespace ion::graphics::scene::shapes
 			bool update_opacity_ = false;
 
 
-			///@brief Constructs a new shape with the given vertices, color and visibility
+			///@brief Constructs a new shape with the given name, vertices, color and visibility
 			///@details Can only be instantiated by derived
-			Shape(const mesh::Vertices &vertices, const Color &color, bool visible = true);
+			Shape(std::optional<std::string> name, const mesh::Vertices &vertices,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new shape with the given draw mode, vertices, color and visibility
+			///@brief Constructs a new shape with the given name, draw mode, vertices, color and visibility
 			///@details Can only be instantiated by derived
-			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+			Shape(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				const Color &color, bool visible = true);
 
 
-			///@brief Constructs a new texturized shape with the given vertices, material, color and visibility
+			///@brief Constructs a new texturized shape with the given name, vertices, material, color and visibility
 			///@details Can only be instantiated by derived
-			Shape(const mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				const Color &color, bool visible = true);
+			Shape(std::optional<std::string> name, const mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new texturized shape with the given draw mode, vertices, material, color and visibility
+			///@brief Constructs a new texturized shape with the given name, draw mode, vertices, material, color and visibility
 			///@details Can only be instantiated by derived
-			Shape(vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
+			Shape(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const mesh::Vertices &vertices,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 

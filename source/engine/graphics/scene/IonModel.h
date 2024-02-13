@@ -16,6 +16,7 @@ File:	IonModel.h
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -173,34 +174,34 @@ namespace ion::graphics::scene
 				@{
 			*/
 
-			///@brief Creates a mesh with the given vertices and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, bool visible = true);
+			///@brief Creates a mesh with the given name, vertices and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			///@brief Creates a mesh with the given vertices, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Creates a mesh with the given name, vertices, material, tex coord mode and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, const shapes::mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			///@brief Creates a mesh with the given draw mode, vertices and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible = true);
+			///@brief Creates a mesh with the given name, draw mode, vertices and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible = true);
 
-			///@brief Creates a mesh with the given draw mode, vertices, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Creates a mesh with the given name, draw mode, vertices, material, tex coord mode and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices,
+				NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
-			///@brief Creates a mesh with the given raw vertex data and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, bool visible = true);
+			///@brief Creates a mesh with the given name, raw vertex data and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			///@brief Creates a mesh with the given raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material>material,
-				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Creates a mesh with the given name, raw vertex data, material, tex coord mode and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::render_primitive::VertexContainer vertex_data,
+				NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
-			///@brief Creates a mesh with the given draw mode, raw vertex data and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible = true);
+			///@brief Creates a mesh with the given name, draw mode, raw vertex data and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible = true);
 
-			///@brief Creates a mesh with the given draw mode, raw vertex data, material, tex coord mode and visibility
-			NonOwningPtr<shapes::Mesh> CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-				shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
+			///@brief Creates a mesh with the given name, draw mode, raw vertex data, material, tex coord mode and visibility
+			NonOwningPtr<shapes::Mesh> CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data,
+				NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode = shapes::mesh::MeshTexCoordMode::Auto, bool visible = true);
 
 
 			///@brief Creates a mesh as a copy of the given mesh
@@ -216,14 +217,14 @@ namespace ion::graphics::scene
 				@{
 			*/
 
-			///@brief Creates a mesh of type T with the given arguments
+			///@brief Creates a mesh of type T with the given name and arguments
 			template <typename T, typename... Args,
 				typename = std::enable_if_t<std::is_base_of_v<shapes::Shape, T>>>
-			auto CreateMesh(Args &&...args)
+			auto CreateMesh(std::optional<std::string> name, Args &&...args)
 			{
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
-				auto ptr = Create<T>(std::forward<Args>(args)...);
+				auto ptr = Create<T>(std::move(name), std::forward<Args>(args)...);
 				return static_pointer_cast<T>(ptr);
 			}
 
@@ -253,6 +254,21 @@ namespace ion::graphics::scene
 			///@}
 
 			/**
+				@name Meshes - Retrieving
+				@{
+			*/
+
+			///@brief Gets a pointer to a mutable mesh with the given name
+			///@details Returns nullptr if mesh could not be found
+			[[nodiscard]] NonOwningPtr<shapes::Mesh> GetMesh(std::string_view name) noexcept;
+
+			///@brief Gets a pointer to an immutable mesh with the given name
+			///@details Returns nullptr if mesh could not be found
+			[[nodiscard]] NonOwningPtr<const shapes::Mesh> GetMesh(std::string_view name) const noexcept;
+
+			///@}
+
+			/**
 				@name Meshes - Removing
 				@{
 			*/
@@ -262,6 +278,9 @@ namespace ion::graphics::scene
 
 			///@brief Removes a mesh from this model
 			bool RemoveMesh(shapes::Mesh &mesh) noexcept;
+
+			///@brief Removes a mesh with the given name from this model
+			bool RemoveMesh(std::string_view name) noexcept;
 
 			///@}
 	};

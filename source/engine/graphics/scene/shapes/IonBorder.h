@@ -14,10 +14,9 @@ File:	IonBorder.h
 #define ION_BORDER_H
 
 #include <optional>
-#include <utility>
-
-#include <optional>
+#include <string>
 #include <tuple>
+#include <utility>
 
 #include "IonRectangle.h"
 #include "graphics/utilities/IonAabb.h"
@@ -78,26 +77,29 @@ namespace ion::graphics::scene::shapes
 
 		public:
 
-			///@brief Constructs a new border with the given size, border size, color and visibility
-			Border(const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
+			///@brief Constructs a new border with the given name, size, border size, color and visibility
+			Border(std::optional<std::string> name, const Vector2 &size, const Vector2 &border_size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new border with the given position, size, border size, color and visibility
-			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
+			///@brief Constructs a new border with the given name, position, size, border size, color and visibility
+			Border(std::optional<std::string> name, const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new border with the given position, rotation, size, border size, color and visibility
-			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size, const Color &color, bool visible = true);
+			///@brief Constructs a new border with the given name, position, rotation, size, border size, color and visibility
+			Border(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
+				const Color &color, bool visible = true);
 
 
-			///@brief Constructs a new border with the given size, border size, corner style, color and visibility
-			Border(const Vector2 &size, const Vector2 &border_size,
+			///@brief Constructs a new border with the given name, size, border size, corner style, color and visibility
+			Border(std::optional<std::string> name, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			///@brief Constructs a new border with the given position, size, border size, corner style, color and visibility
-			Border(const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
+			///@brief Constructs a new border with the given name, position, size, border size, corner style, color and visibility
+			Border(std::optional<std::string> name, const Vector3 &position, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
-			///@brief Constructs a new border with the given position, rotation, size, border size, corner style, color and visibility
-			Border(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
+			///@brief Constructs a new border with the given name, position, rotation, size, border size, corner style, color and visibility
+			Border(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
 				border::BorderCornerStyle corner_style, const Color &color, bool visible = true);
 
 

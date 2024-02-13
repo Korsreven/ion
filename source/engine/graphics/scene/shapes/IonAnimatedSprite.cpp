@@ -22,52 +22,67 @@ namespace animated_sprite::detail
 } //animated_sprite::detail
 
 
-AnimatedSprite::AnimatedSprite(NonOwningPtr<materials::Material> material, bool visible) :
-	AnimatedSprite{vector3::Zero, vector2::Zero, material, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	AnimatedSprite{std::move(name), vector3::Zero, vector2::Zero, material, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	AnimatedSprite{vector3::Zero, size, material, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	AnimatedSprite{std::move(name), vector3::Zero, size, material, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	AnimatedSprite{position, 0.0_r, size, material, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	AnimatedSprite{std::move(name), position, 0.0_r, size, material, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible) :
-	AnimatedSprite{position, rotation, size, material, color::White, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, bool visible) :
+
+	AnimatedSprite{std::move(name), position, rotation, size, material, color::White, visible}
 {
 	//Empty
 }
 
 
-AnimatedSprite::AnimatedSprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	AnimatedSprite{vector3::Zero, vector2::Zero, material, color, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	AnimatedSprite{std::move(name), vector3::Zero, vector2::Zero, material, color, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	AnimatedSprite{vector3::Zero, size, material, color, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	AnimatedSprite{std::move(name), vector3::Zero, size, material, color, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
-	AnimatedSprite{position, 0.0_r, size, material, color, visible}
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+
+	AnimatedSprite{std::move(name), position, 0.0_r, size, material, color, visible}
 {
 	//Empty
 }
 
-AnimatedSprite::AnimatedSprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
+AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Sprite{position, rotation, size, nullptr, color, visible},
+	Sprite{std::move(name), position, rotation, size, nullptr, color, visible},
 
 	diffuse_animation_{material && material->DiffuseMap().first ?
 		make_owning<textures::Animation>(*material->DiffuseMap().first) : nullptr},

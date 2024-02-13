@@ -238,49 +238,49 @@ void Model::Elapse(duration time) noexcept
 	Meshes - Creating
 */
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, const shapes::mesh::Vertices &vertices, bool visible)
 {
-	return Create(vertices, visible);
+	return Create(std::move(name), vertices, visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, const shapes::mesh::Vertices &vertices,
+	NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	return Create(vertices, material, tex_coord_mode, visible);
+	return Create(std::move(name), vertices, material, tex_coord_mode, visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, bool visible)
 {
-	return Create(draw_mode, vertices, visible);
+	return Create(std::move(name), draw_mode, vertices, visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices, NonOwningPtr<materials::Material> material,
-	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, const shapes::mesh::Vertices &vertices,
+	NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	return Create(draw_mode, vertices, material, tex_coord_mode, visible);
+	return Create(std::move(name), draw_mode, vertices, material, tex_coord_mode, visible);
 }
 
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::render_primitive::VertexContainer vertex_data, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::render_primitive::VertexContainer vertex_data, bool visible)
 {
-	return Create(std::move(vertex_data), visible);
+	return Create(std::move(name), std::move(vertex_data), visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::render_primitive::VertexContainer vertex_data,
+	NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	return Create(std::move(vertex_data), material, tex_coord_mode, visible);
+	return Create(std::move(name), std::move(vertex_data), material, tex_coord_mode, visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, bool visible)
 {
-	return Create(draw_mode, std::move(vertex_data), visible);
+	return Create(std::move(name), draw_mode, std::move(vertex_data), visible);
 }
 
-NonOwningPtr<shapes::Mesh> Model::CreateMesh(render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
+NonOwningPtr<shapes::Mesh> Model::CreateMesh(std::optional<std::string> name, render::vertex::vertex_batch::VertexDrawMode draw_mode, render::render_primitive::VertexContainer vertex_data,
+	NonOwningPtr<materials::Material> material, shapes::mesh::MeshTexCoordMode tex_coord_mode, bool visible)
 {
-	return Create(draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
+	return Create(std::move(name), draw_mode, std::move(vertex_data), material, tex_coord_mode, visible);
 }
 
 
@@ -292,6 +292,21 @@ NonOwningPtr<shapes::Mesh> Model::CreateMesh(const shapes::Mesh &mesh)
 NonOwningPtr<shapes::Mesh> Model::CreateMesh(shapes::Mesh &&mesh)
 {
 	return Create(std::move(mesh));
+}
+
+
+/*
+	Meshes - Retrieving
+*/
+
+NonOwningPtr<shapes::Mesh> Model::GetMesh(std::string_view name) noexcept
+{
+	return Get(name);
+}
+
+NonOwningPtr<const shapes::Mesh> Model::GetMesh(std::string_view name) const noexcept
+{
+	return Get(name);
 }
 
 
@@ -315,6 +330,11 @@ void Model::ClearMeshes() noexcept
 bool Model::RemoveMesh(shapes::Mesh &mesh) noexcept
 {
 	return Remove(mesh);
+}
+
+bool Model::RemoveMesh(std::string_view name) noexcept
+{
+	return Remove(name);
 }
 
 } //ion::graphics::scene

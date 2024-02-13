@@ -13,6 +13,8 @@ File:	IonRectangle.h
 #ifndef ION_RECTANGLE_H
 #define ION_RECTANGLE_H
 
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "IonShape.h"
@@ -61,14 +63,16 @@ namespace ion::graphics::scene::shapes
 			Vector2 size_;
 
 
-			///@brief Constructs a new rectangle with the given vertices, position, rotation, size, color and visibility
+			///@brief Constructs a new rectangle with the given name, vertices, position, rotation, size, color and visibility
 			///@details Can only be instantiated by derived
-			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+			Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
+				const Vector3 &position, real rotation, const Vector2 &size,
 				const Color &color, bool visible = true);
 
-			///@brief Constructs a new texturized rectangle with the given vertices, position, rotation, size, material, color and visibility
+			///@brief Constructs a new texturized rectangle with the given name, vertices, position, rotation, size, material, color and visibility
 			///@details Can only be instantiated by derived
-			Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+			Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
+				const Vector3 &position, real rotation, const Vector2 &size,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
@@ -76,14 +80,17 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new rectangle with the given size, color and visibility
-			Rectangle(const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new rectangle with the given name, size, color and visibility
+			Rectangle(std::optional<std::string> name, const Vector2 &size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new rectangle with the given position, size, color and visibility
-			Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new rectangle with the given name, position, size, color and visibility
+			Rectangle(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new rectangle with the given position, rotation, size, color and visibility
-			Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new rectangle with the given name, position, rotation, size, color and visibility
+			Rectangle(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				const Color &color, bool visible = true);
 
 
 			/**

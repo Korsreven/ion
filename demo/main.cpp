@@ -1626,17 +1626,17 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Aura
 		auto aura_model = scene_manager->CreateModel("ship_aura_model");
 		auto aura_sprite = aura_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.432_r, 0.45_r}, aura});
+			{}, {0.432_r, 0.45_r}, aura});
 		aura_sprite->FillOpacity(0.65_r);
 
 		//Brick wall
 		auto background_model = scene_manager->CreateModel("background_model");
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.75_r, 1.75_r}, brick_wall}); //Center
+			{}, {1.75_r, 1.75_r}, brick_wall}); //Center
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Left
+			{}, {-1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Left
 		background_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Right
+			{}, {1.75_r, 0.0_r, 0.0_r}, {1.75_r, 1.75_r}, brick_wall}); //Right
 
 		//Camera
 		auto frustum = ion::graphics::render::Frustum::Orthographic(
@@ -1648,9 +1648,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Cloud
 		auto cloud_model = scene_manager->CreateModel("cloud_model");
 		cloud_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
+			{}, {-1.0_r, 0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Left
 		cloud_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
+			{}, {1.0_r, -0.4_r, 0.0_r}, {1.1627182_r, 1.25_r}, cloud}); //Right
 
 		//FPS
 		auto fps = scene_manager->CreateText("fps", fps_text);
@@ -1692,7 +1692,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Logo
 		auto logo_model = scene_manager->CreateModel("logo_model");
 		logo_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{1.0_r, 0.5_r}, logo});
+			{}, {1.0_r, 0.5_r}, logo});
 		logo_model->AddRenderPass(ion::graphics::render::RenderPass{});
 
 		//Player ear
@@ -1701,14 +1701,14 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Pyramid (egyptian)
 		auto pyramid_egyptian_model = scene_manager->CreateModel("pyramid_egyptian");
 		pyramid_egyptian_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.5_r, 0.5_r}, pyramid_egyptian});
+			{}, {0.5_r, 0.5_r}, pyramid_egyptian});
 		pyramid_egyptian_model->QueryFlags(2); //Tag egyptian pyramid as 2
 		//pyramid_egyptian_model->ShowBoundingVolumes(true);
 
 		//Pyramid (mayan)
 		auto pyramid_mayan_model = scene_manager->CreateModel("pyramid_mayan");
 		pyramid_mayan_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.5_r, 0.5_r}, pyramid_mayan});
+			{}, {0.5_r, 0.5_r}, pyramid_mayan});
 		pyramid_mayan_model->QueryFlags(4); //Tag mayan pyramid as 4
 		//pyramid_mayan_model->ShowBoundingVolumes(true);
 
@@ -1719,7 +1719,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Ship
 		auto ship_model = scene_manager->CreateModel("ship_model");
 		ship_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.4_r, 0.4_r}, ship});
+			{}, {0.4_r, 0.4_r}, ship});
 		ship_model->BoundingVolumeExtent({{0.3_r, 0.2_r}, {0.7_r, 0.8_r}});
 		ship_model->QueryFlags(1); //Tag ship as 1
 		ship_model->QueryMask(2 | 4); //Ship can colide with both pyramids
@@ -1728,7 +1728,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		//Star
 		auto star_model = scene_manager->CreateModel("ship_star_model");
 		star_model->CreateMesh(ion::graphics::scene::shapes::Sprite{
-			{0.05_r, 0.05_r}, star});
+			{}, {0.05_r, 0.05_r}, star});
 		star_model->AddRenderPass(ion::graphics::render::RenderPass{});
 
 
@@ -2333,7 +2333,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto gui_background = scene_manager->CreateModel();
 		gui_background->CreateMesh(ion::graphics::scene::shapes::Rectangle{
-			{5.25_r, 2.0_r}, Color{0.0_r, 0.0_r, 0.0_r, 0.75_r}});
+			{}, {5.25_r, 2.0_r}, Color{0.0_r, 0.0_r, 0.0_r, 0.75_r}});
 		gui_background->AddRenderPass(ion::graphics::render::RenderPass{});
 
 

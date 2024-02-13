@@ -176,29 +176,32 @@ void Mesh::MaterialChanged() noexcept
 
 //Public
 
-Mesh::Mesh(const Vertices &vertices, bool visible) :
-	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, vertices, visible}
+Mesh::Mesh(std::optional<std::string> name, const Vertices &vertices, bool visible) :
+	Mesh{std::move(name), vertex::vertex_batch::VertexDrawMode::Triangles, vertices, visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(const Vertices &vertices, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) :
+Mesh::Mesh(std::optional<std::string> name, const Vertices &vertices,
+	NonOwningPtr<materials::Material> material, MeshTexCoordMode tex_coord_mode, bool visible) :
 
-	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, vertices, material, tex_coord_mode, visible}
+	Mesh{std::move(name), vertex::vertex_batch::VertexDrawMode::Triangles, vertices, material, tex_coord_mode, visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, bool visible) :
+Mesh::Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, bool visible) :
+
+	managed::ManagedObject<Model>{std::move(name)},
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible}
 {
 	VertexData(detail::vertices_to_vertex_data(vertices));
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) :
+Mesh::Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &vertices,
+	NonOwningPtr<materials::Material> material, MeshTexCoordMode tex_coord_mode, bool visible) :
 	
+	managed::ManagedObject<Model>{std::move(name)},
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible},
 	tex_coord_mode_{tex_coord_mode}
 {
@@ -207,29 +210,32 @@ Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, const Vertices &verti
 }
 
 
-Mesh::Mesh(render_primitive::VertexContainer vertex_data, bool visible) noexcept :
-	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), visible}
+Mesh::Mesh(std::optional<std::string> name, render_primitive::VertexContainer vertex_data, bool visible) noexcept :
+	Mesh{std::move(name), vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
+Mesh::Mesh(std::optional<std::string> name, render_primitive::VertexContainer vertex_data,
+	NonOwningPtr<materials::Material> material, MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
 
-	Mesh{vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
+	Mesh{std::move(name), vertex::vertex_batch::VertexDrawMode::Triangles, std::move(vertex_data), material, tex_coord_mode, visible}
 {
 	//Empty
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible) noexcept :
+Mesh::Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, bool visible) noexcept :
+
+	managed::ManagedObject<Model>{std::move(name)},
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible}
 {
 	VertexData(std::move(vertex_data));
 }
 
-Mesh::Mesh(vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data, NonOwningPtr<materials::Material> material,
-	MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
+Mesh::Mesh(std::optional<std::string> name, vertex::vertex_batch::VertexDrawMode draw_mode, render_primitive::VertexContainer vertex_data,
+	NonOwningPtr<materials::Material> material, MeshTexCoordMode tex_coord_mode, bool visible) noexcept :
 
+	managed::ManagedObject<Model>{std::move(name)},
 	RenderPrimitive{draw_mode, detail::get_vertex_declaration(), visible},
 	tex_coord_mode_{tex_coord_mode}
 {

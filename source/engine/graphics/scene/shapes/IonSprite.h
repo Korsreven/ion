@@ -14,6 +14,7 @@ File:	IonSprite.h
 #define ION_SPRITE_H
 
 #include <optional>
+#include <string>
 #include <utility>
 
 #include "IonRectangle.h"
@@ -68,30 +69,38 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new sprite with the given material and visibility
-			explicit Sprite(NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new sprite with the given name, material and visibility
+			 Sprite(std::optional<std::string> name,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new sprite with the given size, material and visibility
-			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new sprite with the given name, size, material and visibility
+			Sprite(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new sprite with the given position, size, material and visibility
-			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new sprite with the given name, position, size, material and visibility
+			Sprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
-			///@brief Constructs a new sprite with the given position, rotation, size, material and visibility
-			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, bool visible = true);
+			///@brief Constructs a new sprite with the given name, position, rotation, size, material and visibility
+			Sprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, bool visible = true);
 
 
-			///@brief Constructs a new sprite with the given material, color and visibility
-			Sprite(NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new sprite with the given name, material, color and visibility
+			Sprite(std::optional<std::string> name,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new sprite with the given size, material, color and visibility
-			Sprite(const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new sprite with the given name, size, material, color and visibility
+			Sprite(std::optional<std::string> name, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new sprite with the given position, size, material, color and visibility
-			Sprite(const Vector3 &position, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new sprite with the given name, position, size, material, color and visibility
+			Sprite(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
-			///@brief Constructs a new sprite with the given position, rotation, size, material, color and visibility
-			Sprite(const Vector3 &position, real rotation, const Vector2 &size, NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
+			///@brief Constructs a new sprite with the given name, position, rotation, size, material, color and visibility
+			Sprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
 			/**

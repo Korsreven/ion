@@ -549,7 +549,7 @@ NonOwningPtr<graphics::scene::shapes::Sprite> GuiListBox::CreateIcon(NonOwningPt
 {
 	if (skin_ && skin_->Parts)
 	{
-		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>(vector2::Zero, material);
+		auto sprite = skin_->Parts->CreateMesh<graphics::scene::shapes::Sprite>({}, vector2::Zero, material);
 		sprite->IncludeBoundingVolumes(false);
 
 		//Position

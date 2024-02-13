@@ -13,6 +13,9 @@ File:	IonEllipse.h
 #ifndef ION_ELLIPSE_H
 #define ION_ELLIPSE_H
 
+#include <optional>
+#include <string>
+
 #include "IonShape.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
@@ -54,24 +57,30 @@ namespace ion::graphics::scene::shapes
 
 		public:
 		
-			///@brief Constructs a new ellipse with the given size, color and visibility
-			Ellipse(const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, size, color and visibility
+			Ellipse(std::optional<std::string> name, const Vector2 &size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new ellipse with the given position, size, color and visibility
-			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, position, size, color and visibility
+			Ellipse(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				const Color &color, bool visible = true);
 
-			///@brief Constructs a new ellipse with the given position, rotation, size, color and visibility
-			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, position, rotation, size, color and visibility
+			Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				const Color &color, bool visible = true);
 
 
-			///@brief Constructs a new ellipse with the given size, color, sides and visibility
-			Ellipse(const Vector2 &size, const Color &color, int sides, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, size, color, sides and visibility
+			Ellipse(std::optional<std::string> name, const Vector2 &size,
+				const Color &color, int sides, bool visible = true);
 
-			///@brief Constructs a new ellipse with the given position, size, color, sides and visibility
-			Ellipse(const Vector3 &position, const Vector2 &size, const Color &color, int sides, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, position, size, color, sides and visibility
+			Ellipse(std::optional<std::string> name, const Vector3 &position, const Vector2 &size,
+				const Color &color, int sides, bool visible = true);
 
-			///@brief Constructs a new ellipse with the given position, rotation, size, color, sides and visibility
-			Ellipse(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, int sides, bool visible = true);
+			///@brief Constructs a new ellipse with the given name, position, rotation, size, color, sides and visibility
+			Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
+				const Color &color, int sides, bool visible = true);
 
 
 			/**

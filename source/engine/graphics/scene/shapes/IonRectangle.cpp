@@ -42,10 +42,11 @@ mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const 
 
 //Protected
 
-Rectangle::Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+Rectangle::Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
+	const Vector3 &position, real rotation, const Vector2 &size,
 	const Color &color, bool visible) :
 
-	Shape{vertices, color, visible},
+	Shape{std::move(name), vertices, color, visible},
 	
 	position_{position},
 	rotation_{rotation},
@@ -54,10 +55,11 @@ Rectangle::Rectangle(const mesh::Vertices &vertices, const Vector3 &position, re
 	//Empty
 }
 
-Rectangle::Rectangle(const mesh::Vertices &vertices, const Vector3 &position, real rotation, const Vector2 &size,
+Rectangle::Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
+	const Vector3 &position, real rotation, const Vector2 &size,
 	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Shape{vertices, material, color, visible},
+	Shape{std::move(name), vertices, material, color, visible},
 	
 	position_{position},
 	rotation_{rotation},
@@ -75,20 +77,20 @@ mesh::Vertices Rectangle::GetVertices() const noexcept
 
 //Public
 
-Rectangle::Rectangle(const Vector2 &size, const Color &color, bool visible) :
-	Rectangle{vector3::Zero, size, color, visible}
+Rectangle::Rectangle(std::optional<std::string> name, const Vector2 &size, const Color &color, bool visible) :
+	Rectangle{std::move(name), vector3::Zero, size, color, visible}
 {
 	//Empty
 }
 
-Rectangle::Rectangle(const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
-	Rectangle{position, 0.0_r, size, color, visible}
+Rectangle::Rectangle(std::optional<std::string> name, const Vector3 &position, const Vector2 &size, const Color &color, bool visible) :
+	Rectangle{std::move(name), position, 0.0_r, size, color, visible}
 {
 	//Empty
 }
 
-Rectangle::Rectangle(const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
-	Rectangle{detail::rectangle_vertices(position, rotation, size, color), position, rotation, size, color, visible}
+Rectangle::Rectangle(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
+	Rectangle{std::move(name), detail::rectangle_vertices(position, rotation, size, color), position, rotation, size, color, visible}
 {
 	//Empty
 }
