@@ -13,6 +13,9 @@ File:	IonAffectorManager.h
 #ifndef ION_AFFECTOR_MANAGER_H
 #define ION_AFFECTOR_MANAGER_H
 
+#include <string>
+#include <string_view>
+
 #include "IonAffector.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
@@ -148,6 +151,12 @@ namespace ion::graphics::particles::affectors
 			auto RemoveAffector(Affector &affector) noexcept
 			{
 				return Remove(affector);
+			}
+
+			///@brief Removes an affector with the given name from this manager
+			auto RemoveAffector(std::string_view name) noexcept
+			{
+				return Remove(name);
 			}
 
 			///@}

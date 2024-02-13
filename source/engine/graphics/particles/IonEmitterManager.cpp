@@ -79,4 +79,9 @@ bool EmitterManager::RemoveEmitter(Emitter &Emitter) noexcept
 	return Remove(Emitter);
 }
 
+bool EmitterManager::RemoveEmitter(std::string_view name) noexcept
+{
+	return Remove(name);
+}
+
 } //ion::graphics::particles

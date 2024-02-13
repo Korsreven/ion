@@ -13,6 +13,9 @@ File:	IonEmitterManager.h
 #ifndef ION_EMITTER_MANAGER_H
 #define ION_EMITTER_MANAGER_H
 
+#include <string>
+#include <string_view>
+
 #include "IonEmitter.h"
 #include "managed/IonObjectManager.h"
 #include "memory/IonNonOwningPtr.h"
@@ -118,6 +121,9 @@ namespace ion::graphics::particles
 
 			///@brief Removes an emitter from this manager
 			bool RemoveEmitter(Emitter &Emitter) noexcept;
+
+			///@brief Removes an emitter with the given name from this manager
+			bool RemoveEmitter(std::string_view name) noexcept;
 
 			///@}
 	};
