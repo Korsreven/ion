@@ -228,9 +228,12 @@ void Model::Elapse(duration time) noexcept
 	for (auto &mesh : Meshes())
 		mesh.Elapse(time);
 
-	//Update emissive light intensity
+	//Update emissive lights
 	for (auto &[mesh, light] : emissive_meshes_)
+	{
 		light->Intensity(mesh->BaseOpacity() * mesh->Opacity());
+		light->Visible(mesh->Visible());
+	}
 }
 
 
