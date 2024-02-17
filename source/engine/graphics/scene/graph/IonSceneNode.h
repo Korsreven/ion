@@ -355,7 +355,9 @@ namespace ion::graphics::scene::graph
 			void NotifyRemoved() noexcept;
 
 			void NotifyUpdate() noexcept;
-			void NotifyUpdateZ() noexcept;		
+			void NotifyUpdateZ() noexcept;
+
+			void NotifyReroot() noexcept;
 
 			///@}
 

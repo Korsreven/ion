@@ -86,7 +86,7 @@ namespace ion::graphics::scene
 			///@brief See ObjectManager<T>::Created for more details
 			void Created(shapes::Mesh &mesh) noexcept override;
 
-			///@brief See ObjectManager<T>::removed for more details
+			///@brief See ObjectManager<T>::Removed for more details
 			void Removed(shapes::Mesh &mesh) noexcept override;
 
 			///@}

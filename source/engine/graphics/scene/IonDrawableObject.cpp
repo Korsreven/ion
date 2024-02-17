@@ -42,9 +42,10 @@ void DrawableObject::AddPrimitive(render::RenderPrimitive &primitive)
 			primitive.RenderPasses(render_passes_);
 
 		primitive.Opacity(opacity_);
-
-		renderer->AddPrimitive(primitive);
 		render_primitives_.push_back(&primitive);
+
+		if (AttachedToSceneGraph())
+			renderer->AddPrimitive(primitive);
 	}
 }
 

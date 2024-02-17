@@ -154,6 +154,21 @@ void SceneNode::NotifyUpdateZ() noexcept
 }
 
 
+void SceneNode::NotifyReroot() noexcept
+{
+	for (auto &object : attached_objects_)
+		std::visit(
+			[&](auto &&object) noexcept
+			{
+				object->ParentNode(nullptr);
+				object->ParentNode(this);
+			}, object);
+
+	for (auto &child_node : child_nodes_)
+		child_node->NotifyReroot(); //Recursive
+}
+
+
 /*
 	Updating
 */
@@ -321,14 +336,17 @@ void SceneNode::AttachNode(SceneNode *node)
 	
 	node->NotifyUpdate();
 	node->NotifyUpdateZ();
+	node->NotifyReroot();
 }
 
 void SceneNode::DetachNode(SceneNode *node)
 {
 	node->Tidy();
 	node->parent_node_ = nullptr;
+
 	node->NotifyUpdate();
 	node->NotifyUpdateZ();
+	node->NotifyReroot();
 }
 
 
@@ -768,7 +786,7 @@ OwningPtr<SceneNode> SceneNode::Orphan(SceneNode &child_node) noexcept
 		DetachNode(iter->get());
 
 		auto node = std::move(*iter); //Extend lifetime
-		child_nodes_.erase(iter);	
+		child_nodes_.erase(iter);
 		return node;
 	}
 	else

@@ -91,6 +91,7 @@ namespace ion::graphics::scene
 
 
 			render::Renderer* ParentRenderer() const noexcept;
+			graph::SceneNode* SceneGraphRootNode() const noexcept;
 
 
 			/**
@@ -137,6 +138,9 @@ namespace ion::graphics::scene
 			*/
 
 			void Detach() noexcept;
+
+			void AttachedToNode();
+			void DetachedFromNode() noexcept;
 
 			///@}
 
@@ -296,7 +300,14 @@ namespace ion::graphics::scene
 			///@brief Sets parent node of this movable object to the given node
 			inline void ParentNode(graph::SceneNode *scene_node) noexcept
 			{
-				parent_node_ = scene_node;
+				if (parent_node_ != scene_node)
+				{
+					if (parent_node_)
+						DetachedFromNode();
+
+					if ((parent_node_ = scene_node))
+						AttachedToNode();
+				}
 			}
 
 			///@brief Sets the custom user data for this movable object to the given data
@@ -390,6 +401,9 @@ namespace ion::graphics::scene
 			{
 				return parent_node_.Get();
 			}
+
+			///@brief Returns true if this movable object is attached to the scene graph
+			[[nodiscard]] bool AttachedToSceneGraph() const noexcept;
 
 			///@brief Returns a mutable reference to the custom user data for this movable object
 			[[nodiscard]] inline auto& UserData() noexcept

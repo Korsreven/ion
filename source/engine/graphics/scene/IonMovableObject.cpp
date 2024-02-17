@@ -44,6 +44,17 @@ render::Renderer* MovableObject::ParentRenderer() const noexcept
 	return nullptr;
 }
 
+graph::SceneNode* MovableObject::SceneGraphRootNode() const noexcept
+{
+	if (auto scene_manager = Owner(); scene_manager)
+	{
+		if (auto scene_graph = scene_manager->Owner(); scene_graph)
+			return &scene_graph->RootNode();
+	}
+
+	return nullptr;
+}
+
 
 /*
 	Bounding volumes
@@ -169,6 +180,25 @@ void MovableObject::Detach() noexcept
 }
 
 
+void MovableObject::AttachedToNode()
+{
+	if (auto renderer = ParentRenderer(); renderer && AttachedToSceneGraph())
+	{
+		for (auto &primitive : AllRenderPrimitives())
+			renderer->AddPrimitive(*primitive);
+	}
+}
+
+void MovableObject::DetachedFromNode() noexcept
+{
+	if (auto renderer = ParentRenderer(); renderer && AttachedToSceneGraph())
+	{
+		for (auto &primitive : AllRenderPrimitives())
+			renderer->RemovePrimitive(*primitive);
+	}
+}
+
+
 //Public
 
 MovableObject::MovableObject(std::optional<std::string> name, bool visible) noexcept :
@@ -189,6 +219,18 @@ MovableObject::~MovableObject() noexcept
 /*
 	Observers
 */
+
+bool MovableObject::AttachedToSceneGraph() const noexcept
+{
+	if (parent_node_)
+	{
+		if (auto root_node = SceneGraphRootNode(); root_node)
+			return &parent_node_->RootNode() == root_node;
+	}
+
+	return false;
+}
+
 
 RenderPrimitiveRange MovableObject::AllRenderPrimitives() noexcept
 {
