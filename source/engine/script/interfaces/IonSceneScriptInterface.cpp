@@ -1099,6 +1099,9 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 				timeline.Attach(node_animation,
 								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()},
 								property[2].Get<ScriptType::Boolean>()->Get());
+			else if (property.NumberOfArguments() == 2)
+				timeline.Attach(node_animation,
+								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()});
 			else
 				timeline.Attach(node_animation);
 		}
@@ -1111,6 +1114,9 @@ void set_node_animation_timeline_properties(const script_tree::ObjectNode &objec
 				timeline.Attach(node_animation_group,
 								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()},
 								property[2].Get<ScriptType::Boolean>()->Get());
+			else if (property.NumberOfArguments() == 2)
+				timeline.Attach(node_animation_group,
+								duration{property[1].Get<ScriptType::FloatingPoint>()->As<real>()});
 			else
 				timeline.Attach(node_animation_group);
 		}
