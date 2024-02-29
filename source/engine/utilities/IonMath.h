@@ -94,23 +94,22 @@ namespace ion::utilities::math
 		}
 
 		template <typename Iterator>
-		/*constexpr*/ auto median(Iterator first, Iterator last) noexcept
+		constexpr auto median(Iterator first, Iterator last) noexcept
 		{
 			auto count = std::distance(first, last);
 			auto middle = first + count / 2;
 
 			std::nth_element(first, middle, last);
-			auto middle_value = *middle;
 
 			//Even
 			if (count % 2 == 0)
 			{
-				std::nth_element(first, middle - 1, last);
-				return (*(middle - 1) + middle_value) / static_cast<typename Iterator::value_type>(2);
+				auto middle_first = std::max_element(first, middle);
+				return std::midpoint(*middle_first, *middle);
 			}
 			//Odd
 			else
-				return middle_value;
+				return *middle;
 		}
 
 		template <typename Iterator>
@@ -432,7 +431,7 @@ namespace ion::utilities::math
 	///@brief Returns the median of all numbers in the given range [first, last)
 	///@details If range is empty, it returns nullopt
 	template <typename Iterator>
-	[[nodiscard]] /*constexpr*/ auto Median(Iterator first, Iterator last) noexcept
+	[[nodiscard]] constexpr auto Median(Iterator first, Iterator last) noexcept
 		-> std::optional<decltype(detail::median(first, last))>
 	{
 		static_assert(std::is_base_of_v<std::random_access_iterator_tag,
@@ -447,7 +446,7 @@ namespace ion::utilities::math
 	///@brief Returns the median of all numbers in the given container
 	///@details If container is empty, it returns nullopt
 	template <typename Container>
-	[[nodiscard]] /*constexpr*/ auto Median(Container &container) noexcept
+	[[nodiscard]] constexpr auto Median(Container &container) noexcept
 	{
 		return Median(std::begin(container), std::end(container));
 	}
