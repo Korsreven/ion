@@ -18,6 +18,7 @@ File:	IonSceneNode.h
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -127,17 +128,10 @@ namespace ion::graphics::scene::graph
 			template <typename Compare = node_comparator>
 			inline void remove_node(node_container &from_nodes, SceneNode *node, Compare compare = Compare{}) noexcept
 			{
-				//Search for first scene node with equal z-order
-				if (auto first = std::lower_bound(std::begin(from_nodes), std::end(from_nodes), node, compare);
-					first != std::end(from_nodes) && !compare(node, *first)) //Found z-order
-				{
-					//Search for first scene node with greater z-order
-					auto last = std::upper_bound(first, std::end(from_nodes), node, compare);
-
-					//Search for exact scene node in range [first, last)
-					if (first = std::find(first, last, node); first != last) //Found exact
-						from_nodes.erase(first);
-				}
+				if (auto iter = std::lower_bound(std::begin(from_nodes), std::end(from_nodes), node, compare);
+					iter != std::end(from_nodes) && !compare(node, *iter)) //Found exact
+					
+					from_nodes.erase(iter);
 			}
 
 			template <typename Compare = node_comparator>
@@ -152,33 +146,10 @@ namespace ion::graphics::scene::graph
 					return;
 				}
 
-				//Search for first scene node with equal z-order
-				if (auto first = std::lower_bound(std::begin(from_nodes), std::end(from_nodes), nodes.front(), compare);
-					first != std::end(from_nodes) && !compare(nodes.front(), *first)) //Found z-order
-				{
-					//Search for first scene node with greater z-order
-					auto last = std::upper_bound(first, std::end(from_nodes), nodes.back(), compare);
-
-					for (auto iter = first; auto &node : nodes)
-					{
-						//Search for each exact scene node in range [first, last)
-						//Range is narrowed for each node found
-						if (iter = std::find(iter, last, node); iter != last) //Found exact
-						{
-							*iter = nullptr; //Tag
-							++iter;
-						}
-					}
-
-					//Erase all tagged in range [first, last)
-					from_nodes.erase(
-						std::remove_if(first, last,
-							[](auto &node) noexcept
-							{
-								return !node;
-							}),
-						last);
-				}
+				node_container result;
+				std::set_difference(std::begin(from_nodes), std::end(from_nodes),
+					std::begin(nodes), std::end(nodes), std::back_inserter(result), compare);
+				from_nodes = std::move(result);
 			}
 
 			///@}
@@ -238,32 +209,10 @@ namespace ion::graphics::scene::graph
 					return;
 				}
 
-				if (auto first = std::lower_bound(std::begin(from_objects), std::end(from_objects), objects.front(), compare);
-					first != std::end(from_objects) && !compare(objects.front(), *first)) //Found first exact
-				{
-					//Search for first object with greater z-order
-					auto last = std::upper_bound(first, std::end(from_objects), objects.back(), compare);
-
-					for (auto iter = first; auto &object : objects)
-					{
-						//Search for each exact object in range [first, last)
-						//Range is narrowed for each object found
-						if (iter = std::find(iter, last, object); iter != last) //Found
-						{
-							*iter = nullptr; //Tag
-							++iter;
-						}
-					}
-
-					//Erase all tagged in range [first, last)
-					from_objects.erase(
-						std::remove_if(first, last,
-							[](auto &object) noexcept
-							{
-								return !object;
-							}),
-						last);
-				}
+				Container result;
+				std::set_difference(std::begin(from_objects), std::end(from_objects),
+					std::begin(objects), std::end(objects), std::back_inserter(result), compare);
+				from_objects = std::move(result);
 			}
 
 
@@ -464,7 +413,7 @@ namespace ion::graphics::scene::graph
 				if (rhs.need_z_update_)
 					rhs.UpdateZ();
 
-				return derived_position_.Z() < rhs.derived_position_.Z();
+				return std::pair{derived_position_.Z(), this} < std::pair{rhs.derived_position_.Z(), &rhs};
 			}
 
 			///@}
