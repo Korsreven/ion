@@ -16,11 +16,8 @@ File:	IonSceneQuery.h
 #include <algorithm>
 #include <optional>
 #include <utility>
-#include <variant>
 #include <vector>
 
-#include "graphics/scene/IonCamera.h"
-#include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonAabb.h"
@@ -75,11 +72,8 @@ namespace ion::graphics::scene::query
 				//Check if node is eligible
 				if (!only_visible || node.Visible())
 				{
-					for (auto &attached_object : node.AttachedObjects())
+					for (auto &object : node.GetAttachedObjects())
 					{
-						auto object =
-							std::visit([](auto &&x) noexcept -> MovableObject* { return x; }, attached_object);
-
 						//Check if object is eligible
 						if (is_object_eligible(*object, mask, type_mask, only_visible))
 							objects.emplace_back(object, true); //Eligible for querying

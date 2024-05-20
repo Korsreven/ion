@@ -14,7 +14,6 @@ File:	IonSceneGraph.cpp
 
 #include <algorithm>
 #include <utility>
-#include <variant>
 
 #include "graphics/IonGraphicsAPI.h"
 #include "graphics/render/IonViewport.h"
@@ -474,15 +473,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			NotifyNodeRenderStarted(node);
 
 		//For each attached object
-		for (auto &attached_object : node.AttachedObjects())
+		for (auto &object : node.GetAttachedObjects())
 		{
-			auto object =
-				std::visit(
-					[=](auto &&object) noexcept -> MovableObject*
-					{
-						return object;
-					}, attached_object);
-
 			auto object_visible = node_visible && object->Visible();
 
 			//Elapse and prepare object

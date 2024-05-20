@@ -42,6 +42,28 @@ bool node_comparator::operator()(const SceneNode *x, const SceneNode *y) const n
 
 
 /*
+	Objects
+*/
+
+MovableObject* get_movable_object(const AttachableObject &object) noexcept
+{
+	return std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
+}
+
+MovableObject* get_movable_object_if(const AttachableObject &object, std::string_view name_or_alias) noexcept
+{
+	if (std::visit([&name_or_alias](auto &&object) noexcept
+		{
+			return object && (object->Name() == name_or_alias || object->Alias() == name_or_alias);
+		}, object))
+
+		return get_movable_object(object);
+	else
+		return nullptr;
+}
+
+
+/*
 	Searching
 */
 
@@ -107,6 +129,16 @@ node_container depth_first_search(const SceneNode &node, DepthFirstTraversal tra
 	}
 
 	return result;
+}
+
+node_container search(const SceneNode &node, SearchStrategy strategy)
+{
+	//DFS
+	if (strategy == SearchStrategy::DepthFirst)
+		return detail::depth_first_search(node, DepthFirstTraversal::PreOrder);
+	//BFS
+	else
+		return detail::breadth_first_search(node);
 }
 
 
@@ -404,10 +436,7 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
 			[&](auto &obj) noexcept
 			{
-				return
-					std::visit([](auto &&obj) noexcept -> MovableObject* { return obj; }, obj)
-					==
-					std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
+				return detail::get_movable_object(obj) == detail::get_movable_object(object);
 			});
 
 	//Object found
@@ -848,17 +877,7 @@ NonOwningPtr<const SceneNode> SceneNode::GetChildNode(int index) const noexcept
 
 NonOwningPtr<SceneNode> SceneNode::GetDescendantNode(std::string_view name, SearchStrategy strategy) noexcept
 {
-	auto nodes =
-		[&]()
-		{
-			//DFS
-			if (strategy == SearchStrategy::DepthFirst)
-				return detail::depth_first_search(*this, DepthFirstTraversal::PreOrder);
-			//BFS
-			else
-				return detail::breadth_first_search(*this);
-		}();
-
+	auto nodes = detail::search(*this, strategy);
 	auto iter =
 		std::find_if(std::begin(nodes), std::end(nodes),
 			[&](auto &node) noexcept
@@ -954,7 +973,7 @@ bool SceneNode::RemoveChildNode(std::string_view name) noexcept
 
 
 /*
-	Attachable objects
+	Attachable objects - Attaching/detaching
 */
 
 bool SceneNode::AttachObject(MovableObject &object)
@@ -994,6 +1013,104 @@ void SceneNode::DetachAllObjects() noexcept
 	DetachObjectsFromNode(attached_objects_);
 	attached_objects_.clear();
 	attached_objects_.shrink_to_fit();
+}
+
+
+/*
+	Attachable objects - Retrieving
+*/
+
+MovableObject* SceneNode::GetAttachedObject(std::string_view name_or_alias) const noexcept
+{
+	for (auto &object : AttachedObjects())
+	{
+		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)	
+			return movable_object;
+	}
+
+	return nullptr;
+}
+
+MovableObject* SceneNode::GetAttachedObject(int index) const noexcept
+{
+	return index < std::ssize(attached_objects_) ?
+		detail::get_movable_object(attached_objects_[index]) :
+		nullptr;
+}
+
+
+std::vector<MovableObject*> SceneNode::GetAttachedObjects(std::string_view name_or_alias) const noexcept
+{
+	std::vector<MovableObject*> movable_objects;
+
+	for (auto &object : AttachedObjects())
+	{
+		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
+			movable_objects.push_back(movable_object);
+	}
+
+	return movable_objects;
+}
+
+std::vector<MovableObject*> SceneNode::GetAttachedObjects() const noexcept
+{
+	std::vector<MovableObject*> movable_objects;
+	movable_objects.reserve(std::size(AttachedObjects()));
+
+	for (auto &object : AttachedObjects())
+		movable_objects.push_back(detail::get_movable_object(object));
+
+	return movable_objects;
+}
+
+
+MovableObject* SceneNode::SearchAttachedObject(std::string_view name_or_alias, SearchStrategy strategy) const noexcept
+{
+	for (auto &object : AttachedObjects())
+	{
+		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
+			return movable_object;
+	}
+
+	for (auto &node : detail::search(*this, strategy))
+	{
+		for (auto &object : node->AttachedObjects())
+		{
+			if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
+				return movable_object;
+		}
+	}
+
+	return nullptr;
+}
+
+std::vector<MovableObject*> SceneNode::SearchAttachedObjects(std::string_view name_or_alias, SearchStrategy strategy) const noexcept
+{
+	auto movable_objects = GetAttachedObjects(name_or_alias);
+
+	for (auto &node : detail::search(*this, strategy))
+	{
+		for (auto &object : node->AttachedObjects())
+		{
+			if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
+				movable_objects.push_back(movable_object);
+		}
+	}
+
+	return movable_objects;
+}
+
+std::vector<MovableObject*> SceneNode::GetAttachedObjectsRecursive(SearchStrategy strategy) const noexcept
+{
+	auto movable_objects = GetAttachedObjects();
+
+	for (auto &node : detail::search(*this, strategy))
+	{
+		for (auto &object : node->AttachedObjects())
+			movable_objects.push_back(detail::get_movable_object(object));
+	}
+
+	return movable_objects;
 }
 
 } //ion::graphics::scene::graph

@@ -22,7 +22,6 @@ File:	IonNodeAnimation.cpp
 #include "IonNodeAnimationManager.h"
 #include "IonNodeAnimationTimeline.h"
 #include "adaptors/ranges/IonIterable.h"
-#include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonDrawableObject.h"
 #include "graphics/scene/IonDrawableParticleSystem.h"
 #include "graphics/scene/IonDrawableText.h"
@@ -133,7 +132,7 @@ void elapse_action(NodeAnimation &animation, node_timeline_action &a, duration t
 		if (auto owner = animation.Owner(); owner)
 		{
 			auto &node = owner->ParentNode();
-			auto targets = get_timelines(a.target_name, node);
+			auto targets = search_timelines(a.target_name, node);
 
 			for (auto &timeline : targets)
 			{
@@ -877,7 +876,7 @@ std::pair<std::string_view, std::string_view> split_target_name(std::string_view
 }
 
 
-std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNode &node)
+std::vector<NodeAnimationTimeline*> search_timelines(std::string_view name, SceneNode &node)
 {
 	std::vector<NodeAnimationTimeline*> targets;
 
@@ -901,34 +900,9 @@ std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNo
 	return targets;
 }
 
-std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode &node)
+std::vector<MovableObject*> search_attached_objects(std::string_view name, SceneNode &node)
 {
-	std::vector<MovableObject*> targets;
-
-	//Self
-	for (auto &object : node.AttachedObjects())
-	{
-		if (auto target =
-			std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
-			target && (target->Name() == name || target->Alias() == name))
-				
-			targets.push_back(target);
-	}
-
-	//Descendants
-	for (auto &desc_node : node.DepthFirstSearch())
-	{
-		for (auto &object : desc_node.AttachedObjects())
-		{
-			if (auto target =
-				std::visit([](auto &&object) noexcept -> MovableObject* { return object; }, object);
-				target && (target->Name() == name || target->Alias() == name))
-				
-				targets.push_back(target);
-		}
-	}
-
-	return targets;
+	return node.SearchAttachedObjects(name);
 }
 
 } //node_animation::detail

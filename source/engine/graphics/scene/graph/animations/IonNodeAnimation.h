@@ -482,8 +482,8 @@ namespace ion::graphics::scene::graph::animations
 
 			std::pair<std::string_view, std::string_view> split_target_name(std::string_view name) noexcept;
 
-			std::vector<NodeAnimationTimeline*> get_timelines(std::string_view name, SceneNode &node);
-			std::vector<MovableObject*> get_movable_objects(std::string_view name, SceneNode &node);
+			std::vector<NodeAnimationTimeline*> search_timelines(std::string_view name, SceneNode &node);
+			std::vector<MovableObject*> search_attached_objects(std::string_view name, SceneNode &node);
 
 			template <typename T>
 			std::vector<T*> get_targets(std::string_view name, SceneNode &node)
@@ -492,13 +492,10 @@ namespace ion::graphics::scene::graph::animations
 
 				std::vector<T*> targets;
 
-				if (auto objects = get_movable_objects(name, node); !std::empty(objects))
+				for (auto &object : search_attached_objects(name, node))
 				{
-					for (auto &object : objects)
-					{
-						if (auto target = dynamic_cast<T*>(object); target)
-							targets.push_back(target);
-					}
+					if (auto target = dynamic_cast<T*>(object); target)
+						targets.push_back(target);
 				}
 
 				return targets;

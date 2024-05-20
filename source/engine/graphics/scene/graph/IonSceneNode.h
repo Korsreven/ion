@@ -266,6 +266,10 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
+
+			MovableObject* get_movable_object(const AttachableObject &object) noexcept;
+			MovableObject* get_movable_object_if(const AttachableObject &object, std::string_view name_or_alias) noexcept;
+
 			///@}
 
 			/**
@@ -279,6 +283,7 @@ namespace ion::graphics::scene::graph
 
 			node_container breadth_first_search(const SceneNode &node);
 			node_container depth_first_search(const SceneNode &node, DepthFirstTraversal traversal);
+			node_container search(const SceneNode &node, SearchStrategy strategy);
 
 			///@}
 
@@ -1032,11 +1037,13 @@ namespace ion::graphics::scene::graph
 
 			///@brief Gets a pointer to a mutable descendant node with the given name using the given search strategy
 			///@details Returns nullptr if a descendant node could not be found
-			[[nodiscard]] NonOwningPtr<SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) noexcept;
+			[[nodiscard]] NonOwningPtr<SceneNode> GetDescendantNode(std::string_view name,
+				scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) noexcept;
 
 			///@brief Gets a pointer to an immutable descendant node with the given name using the given search strategy
 			///@details Returns nullptr if a descendant node could not be found
-			[[nodiscard]] NonOwningPtr<const SceneNode> GetDescendantNode(std::string_view name, scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
+			[[nodiscard]] NonOwningPtr<const SceneNode> GetDescendantNode(std::string_view name,
+				scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
 
 
 			///@brief Returns mutable pointers to all child nodes
@@ -1066,7 +1073,7 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
-				@name Attachable objects
+				@name Attachable objects - Attaching/detaching
 				@{
 			*/
 
@@ -1098,6 +1105,42 @@ namespace ion::graphics::scene::graph
 
 			///@brief Detaches all objects attached to this node
 			void DetachAllObjects() noexcept;
+
+			///@}
+
+			/**
+				@name Attachable objects - Retrieving
+				@{
+			*/
+
+			///@brief Gets a pointer to an attached movable object with the given name or alias
+			///@details Returns nullptr if movable object could not be found
+			[[nodiscard]] MovableObject* GetAttachedObject(std::string_view name_or_alias) const noexcept;
+
+			///@brief Gets a pointer to an attached movable object with the given index
+			///@details Returns nullptr if movable object could not be found
+			[[nodiscard]] MovableObject* GetAttachedObject(int index) const noexcept;
+
+
+			///@brief Returns pointers to all attached movable objects with the given name or alias
+			[[nodiscard]] std::vector<MovableObject*> GetAttachedObjects(std::string_view name_or_alias) const noexcept;
+
+			///@brief Returns pointers to all attached movable objects
+			[[nodiscard]] std::vector<MovableObject*> GetAttachedObjects() const noexcept;
+
+
+			///@brief Gets a pointer to the first attached movable object with the given name or alias on this and all descendant nodes
+			///@details Returns nullptr if movable object could not be found
+			[[nodiscard]] MovableObject* SearchAttachedObject(std::string_view name_or_alias,
+				scene_node::SearchStrategy strategy = scene_node::SearchStrategy::BreadthFirst) const noexcept;
+
+			///@brief Returns pointers to all attached movable objects with the given name or alias on this and all descendant nodes
+			[[nodiscard]] std::vector<MovableObject*> SearchAttachedObjects(std::string_view name_or_alias,
+				scene_node::SearchStrategy strategy = scene_node::SearchStrategy::DepthFirst) const noexcept;
+
+			///@brief Returns pointers to all attached movable objects on this and all descendant nodes
+			[[nodiscard]] std::vector<MovableObject*> GetAttachedObjectsRecursive(
+				scene_node::SearchStrategy strategy = scene_node::SearchStrategy::DepthFirst) const noexcept;
 
 			///@}
 	};
