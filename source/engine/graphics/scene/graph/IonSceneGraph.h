@@ -86,9 +86,9 @@ namespace ion::graphics::scene::graph
 			void set_camera_uniforms(const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &shader_program) noexcept;
 			void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
-				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
+				light::detail::light_texture_map &texture_map, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
-				const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
+				light::detail::light_texture_map &texture_map, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_matrix_uniforms(const Matrix4 &projection_mat, const Matrix4 &model_view_mat, shaders::ShaderProgram &shader_program) noexcept;
 			void set_scene_uniforms(real gamma_value, Color ambient_color, shaders::ShaderProgram &shader_program) noexcept;
@@ -145,6 +145,9 @@ namespace ion::graphics::scene::graph
 
 			OwningPtr<light::detail::light_texture> light_texture_;
 			OwningPtr<light::detail::light_texture> emissive_light_texture_;
+
+			light::detail::light_texture_map light_texture_map_;
+			light::detail::light_texture_map emissive_light_texture_map_;
 
 
 			/**

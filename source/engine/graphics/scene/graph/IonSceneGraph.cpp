@@ -80,7 +80,7 @@ void set_fog_uniforms(std::optional<render::Fog> fog, shaders::ShaderProgram &sh
 }
 
 void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
-	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+	light::detail::light_texture_map &texture_map, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
@@ -93,7 +93,7 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_Lights); scene_lights)
-		light::detail::upload_light_data(texture, lights, camera);
+		light::detail::upload_light_data(texture, texture_map, lights, camera);
 	else
 	{
 		auto type = shader_program.GetUniform(shaders::shader_layout::UniformName::Light_Type);
@@ -184,7 +184,7 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 }
 
 void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::light_texture> &texture,
-	const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
+	light::detail::light_texture_map &texture_map, const Camera &camera, shaders::ShaderProgram &shader_program) noexcept
 {
 	using namespace shaders::variables;
 	using namespace ion::utilities;
@@ -197,7 +197,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::
 
 
 	if (auto scene_lights = shader_program.GetUniform(shaders::shader_layout::UniformName::Scene_EmissiveLights); scene_lights)
-		light::detail::upload_emissive_light_data(texture, lights, camera);
+		light::detail::upload_emissive_light_data(texture, texture_map, lights, camera);
 	else
 	{
 		auto position = shader_program.GetUniform(shaders::shader_layout::UniformName::EmissiveLight_Position);
@@ -561,8 +561,8 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			{
 				detail::set_camera_uniforms(*camera, *shader_program);
 				detail::set_fog_uniforms(fog_enabled_ ? fog_ : std::optional<render::Fog>{}, *shader_program);
-				detail::set_light_uniforms(lights_, light_texture_, *camera, *shader_program);
-				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_, *camera, *shader_program);
+				detail::set_light_uniforms(lights_, light_texture_, light_texture_map_, *camera, *shader_program);
+				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_, emissive_light_texture_map_, *camera, *shader_program);
 				detail::set_matrix_uniforms(projection_mat, view_mat, *shader_program);
 				detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
 				shader_programs_.push_back(shader_program.get()); //Only distinct

@@ -31,14 +31,12 @@ using namespace utilities;
 namespace light::detail
 {
 
-light_texture_storage::light_texture_storage(int texture_layer, const light_texture_data &texture_data) noexcept :
-	layer{texture_layer}
+light_texture_storage::light_texture_storage(const light_texture_data &texture_data) noexcept
 {
 	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
 }
 
-light_texture_storage::light_texture_storage(int texture_layer, const emissive_light_texture_data &texture_data) noexcept :
-	layer{texture_layer}
+light_texture_storage::light_texture_storage(const emissive_light_texture_data &texture_data) noexcept
 {
 	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
 }
@@ -88,7 +86,7 @@ std::optional<light_texture> create_emissive_light_texture(const light_pointers 
 }
 
 
-void upload_light_data(OwningPtr<light_texture> &texture,
+void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &texture_map,
 	const light_pointers &lights, const Camera &camera) noexcept
 {
 	//Too many lights to fit inside texture, create new texture (next POT)
@@ -98,7 +96,10 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 			textures::texture_manager::detail::unload_texture(*texture->handle);
 		
 		if (auto new_texture = create_light_texture(lights); new_texture)
+		{
 			texture = make_owning<light_texture>(*new_texture);
+			texture_map.clear();
+		}
 	}
 	
 	if (texture && texture->handle)
@@ -167,15 +168,16 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 
 
 			//Light data has changed
-			if (auto &texture_data = light->TextureData();
-				!texture_data.first || texture_data.second.layer != i ||
-				std::memcmp(std::data(texture_data.second.data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||
+				std::memcmp(std::data(light->TextureData().data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->TextureData({texture, light_texture_storage{i, light_data}});
+
+				light->TextureData(light_data);
+				texture_map[i] = light;
 			}
 
 			++i;
@@ -185,7 +187,7 @@ void upload_light_data(OwningPtr<light_texture> &texture,
 	}
 }
 
-void upload_emissive_light_data(OwningPtr<light_texture> &texture,
+void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture_map &texture_map,
 	const light_pointers &lights, const Camera &camera) noexcept
 {
 	//Too many lights to fit inside texture, create new texture (next POT)
@@ -195,7 +197,10 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 			textures::texture_manager::detail::unload_texture(*texture->handle);
 
 		if (auto new_texture = create_emissive_light_texture(lights); new_texture)
+		{
 			texture = make_owning<light_texture>(*new_texture);
+			texture_map.clear();
+		}
 	}
 	
 	if (texture && texture->handle)
@@ -224,15 +229,16 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture,
 
 
 			//Light data has changed
-			if (auto &texture_data = light->TextureData();
-				!texture_data.first || texture_data.second.layer != i ||
-				std::memcmp(std::data(texture_data.second.data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||
+				std::memcmp(std::data(light->TextureData().data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
 			{
 				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
 					GL_RGBA, type, std::data(light_data));
-				light->TextureData({texture, light_texture_storage{i, light_data}});
+
+				light->TextureData(light_data);
+				texture_map[i] = light;
 			}
 
 			++i;

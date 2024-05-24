@@ -22,6 +22,7 @@ File:	IonLight.h
 #include <vector>
 
 #include "IonMovableObject.h"
+#include "adaptors/IonFlatMap.h"
 #include "graphics/textures/IonTexture.h"
 #include "graphics/textures/IonTextureManager.h"
 #include "graphics/utilities/IonColor.h"
@@ -85,16 +86,15 @@ namespace ion::graphics::scene
 
 			struct light_texture_storage
 			{
-				int layer = 0;
 				light_texture_data data{};
 					//Enough space to store light or emissive light data
 
 				light_texture_storage() = default;
-				light_texture_storage(int texture_layer, const light_texture_data &texture_data) noexcept;
-				light_texture_storage(int texture_layer, const emissive_light_texture_data &texture_data) noexcept;
+				light_texture_storage(const light_texture_data &texture_data) noexcept;
+				light_texture_storage(const emissive_light_texture_data &texture_data) noexcept;
 			};
 
-			using light_texture_with_storage = std::pair<NonOwningPtr<light_texture>, light_texture_storage>;
+			using light_texture_map = adaptors::FlatMap<int, Light*>;
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -112,9 +112,9 @@ namespace ion::graphics::scene
 			std::optional<light_texture> create_light_texture(const light_pointers &lights) noexcept;
 			std::optional<light_texture> create_emissive_light_texture(const light_pointers &lights) noexcept;
 
-			void upload_light_data(OwningPtr<light_texture> &texture,
+			void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &texture_map,
 				const light_pointers &lights, const Camera &camera) noexcept;
-			void upload_emissive_light_data(OwningPtr<light_texture> &texture,
+			void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture_map &texture_map,
 				const light_pointers &lights, const Camera &camera) noexcept;
 		} //detail
 	} //light
@@ -145,7 +145,7 @@ namespace ion::graphics::scene
 
 			bool cast_shadows_ = true;
 			bool update_bounding_volumes_ = true;
-			light::detail::light_texture_with_storage texture_data_;
+			light::detail::light_texture_storage texture_data_;
 
 
 			void PrepareBoundingVolumes() noexcept;
@@ -323,7 +323,7 @@ namespace ion::graphics::scene
 			}
 
 			///@brief Sets the texture data of this light to the given texture data
-			inline void TextureData(const light::detail::light_texture_with_storage &texture_data) noexcept
+			inline void TextureData(const light::detail::light_texture_storage &texture_data) noexcept
 			{
 				texture_data_ = texture_data;
 			}
