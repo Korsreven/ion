@@ -35,8 +35,10 @@ namespace ion::graphics::shaders
 
 		namespace detail
 		{
-			std::optional<int> load_shader(shader::ShaderType shader_type, const std::string &shader_source,
-				const std::filesystem::path &shader_source_path, std::optional<InfoLogLevel> log_level) noexcept;
+			void prepend_defines(std::string &shader_source, const std::string &shader_defines);
+
+			std::optional<int> load_shader(shader::ShaderType shader_type,  const std::string &shader_defines,
+				std::string shader_source, const std::filesystem::path &shader_source_path, std::optional<InfoLogLevel> log_level) noexcept;
 			void unload_shader(int shader_handle) noexcept;
 
 			std::optional<std::string> print_info_log(int shader_handle);

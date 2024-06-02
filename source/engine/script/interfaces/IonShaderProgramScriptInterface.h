@@ -80,6 +80,7 @@ namespace ion::script::interfaces
 
 
 		NonOwningPtr<graphics::shaders::Shader> get_shader(std::string_view name, const ManagerRegister &managers) noexcept;
+		NonOwningPtr<graphics::shaders::ShaderProgram> get_shader_program(std::string_view name, const ManagerRegister &managers) noexcept;
 
 
 		/**
@@ -107,7 +108,8 @@ namespace ion::script::interfaces
 			graphics::shaders::ShaderStruct &shader_struct);
 
 
-		void set_shader_program_properties(const script_tree::ObjectNode &object, graphics::shaders::ShaderProgram &shader_program);
+		void set_shader_program_properties(const script_tree::ObjectNode &object,
+			graphics::shaders::ShaderProgram &shader_program, const ManagerRegister &managers);
 		void set_shader_struct_properties(const script_tree::ObjectNode &object, graphics::shaders::ShaderStruct &shader_struct);
 
 

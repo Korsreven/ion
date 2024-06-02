@@ -33,7 +33,8 @@ ClassDefinition get_shader_class()
 {
 	return ClassDefinition::Create("shader")
 		.AddRequiredProperty("asset-name", ParameterType::String)
-		.AddRequiredProperty("name", ParameterType::String);
+		.AddRequiredProperty("name", ParameterType::String)
+		.AddProperty("defines", ParameterType::String);
 }
 
 ScriptValidator get_shader_validator()
@@ -47,6 +48,16 @@ ScriptValidator get_shader_validator()
 	Tree parsing
 */
 
+void set_shader_properties(const script_tree::ObjectNode &object, graphics::shaders::Shader &shader)
+{
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "defines")
+			shader.Defines(property[0].Get<ScriptType::String>()->Get());
+	}
+}
+
+
 NonOwningPtr<Shader> create_shader(const script_tree::ObjectNode &object,
 	ShaderManager &shader_manager)
 {
@@ -57,7 +68,12 @@ NonOwningPtr<Shader> create_shader(const script_tree::ObjectNode &object,
 		.Property("asset-name")[0]
 		.Get<ScriptType::String>()->Get();
 
-	return shader_manager.CreateShader(std::move(name), asset_name);
+	auto shader = shader_manager.CreateShader(std::move(name), asset_name);
+
+	if (shader)
+		set_shader_properties(object, *shader);
+
+	return shader;
 }
 
 void create_shaders(const ScriptTree &tree,

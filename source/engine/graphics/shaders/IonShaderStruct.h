@@ -32,6 +32,7 @@ namespace ion::graphics::shaders
 		using mapped_members = std::vector<NonOwningPtr<variables::UniformVariable>>;
 
 		std::string get_fully_qualified_name(std::string_view struct_name, std::string_view variable_name, std::optional<int> off) noexcept;
+		std::string_view get_unqualified_name(std::string_view variable_name) noexcept;
 	} //shader_struct::detail
 
 

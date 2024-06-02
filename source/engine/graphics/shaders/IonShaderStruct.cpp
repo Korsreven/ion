@@ -33,6 +33,14 @@ std::string get_fully_qualified_name(std::string_view struct_name, std::string_v
 		return string::Concat(struct_name, '.', variable_name);
 }
 
+std::string_view get_unqualified_name(std::string_view variable_name) noexcept
+{
+	if (auto off = variable_name.find_last_of('.'); off != std::string_view::npos)
+		variable_name.remove_prefix(off + 1);
+
+	return variable_name;
+}
+
 } //shader_struct::detail
 
 //Protected

@@ -14,6 +14,7 @@ File:	IonShaderManager.cpp
 
 #include "graphics/IonGraphicsAPI.h"
 #include "utilities/IonFileUtility.h"
+#include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::shaders
 {
@@ -23,11 +24,39 @@ using namespace shader_manager;
 namespace shader_manager::detail
 {
 
-std::optional<int> load_shader(shader::ShaderType shader_type, const std::string &shader_source,
-	const std::filesystem::path &shader_source_path, std::optional<InfoLogLevel> log_level) noexcept
+void prepend_defines(std::string &shader_source, const std::string &shader_defines)
+{
+	using namespace ion::utilities;
+
+	if (auto parts = string::Split(shader_defines, ","); !std::empty(parts))
+	{
+		std::string defines;
+
+		for (auto &define : parts)
+			defines += string::Concat("#define ", string::Trim(define), '\n');
+
+		size_t off = 0;
+
+		//#version macro should always be on top
+		if (auto off2 = shader_source.find("#version "); off2 != std::string::npos)
+		{
+			if (off2 = shader_source.find('\n', off2); off2 != std::string::npos)
+				off = off2 + 1;
+		}
+		
+		shader_source.insert(std::begin(shader_source) + off, std::begin(defines), std::end(defines));
+	}
+}
+
+
+std::optional<int> load_shader(shader::ShaderType shader_type, const std::string &shader_defines,
+	std::string shader_source, const std::filesystem::path &shader_source_path, std::optional<InfoLogLevel> log_level) noexcept
 {
 	auto shader_handle = 0;
 	auto compile_status = 0;
+
+	if (!std::empty(shader_defines))
+		prepend_defines(shader_source, shader_defines);
 
 	//Compile shader
 	switch (gl::Shader_Support())
@@ -48,7 +77,7 @@ std::optional<int> load_shader(shader::ShaderType shader_type, const std::string
 				return {};
 			}
 
-			auto source_ptr = std::data(shader_source);
+			auto source_ptr = shader_source.c_str();
 			shader_handle = glCreateShader(shader_handle);
 			glShaderSource(shader_handle, 1, &source_ptr, 0); //Set GLSL code
 
@@ -73,7 +102,7 @@ std::optional<int> load_shader(shader::ShaderType shader_type, const std::string
 				return {};
 			}
 
-			auto source_ptr = std::data(shader_source);
+			auto source_ptr = shader_source.c_str();
 			shader_handle = glCreateShaderObjectARB(shader_handle);
 			glShaderSourceARB(shader_handle, 1, &source_ptr, 0); //Set GLSL code
 
@@ -171,12 +200,13 @@ std::optional<std::string> print_info_log(int shader_handle)
 bool ShaderManager::LoadResource(Shader &shader)
 {
 	auto type = shader.Type();
+	auto &defines = shader.Defines();
 	auto &source = shader.FileData();
 	auto &source_path = shader.FilePath();
 
 	if (type && source && source_path)
 	{
-		shader.Handle(detail::load_shader(*type, *source, *source_path, log_level_));
+		shader.Handle(detail::load_shader(*type, defines, *source, *source_path, log_level_));
 		return shader.Handle().has_value();
 	}
 	else

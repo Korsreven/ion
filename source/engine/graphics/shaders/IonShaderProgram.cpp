@@ -319,6 +319,46 @@ NonOwningPtr<ShaderStruct> ShaderProgram::CreateStruct(std::string name, int siz
 }
 
 
+void ShaderProgram::CopyStruct(const ShaderProgram &shader_program, std::string name)
+{
+	if (auto shader_struct = shader_program.GetStruct(name); shader_struct)
+	{
+		if (auto new_shader_struct = CreateStruct(name, shader_struct->Size()); new_shader_struct)
+		{
+			for (auto &uniform : shader_struct->UniformVariables())
+			{
+				if (auto &qualified_name = uniform.Name(); qualified_name)
+				{
+					auto unqualified_name = std::string{shader_struct::detail::get_unqualified_name(*qualified_name)};
+					uniform.Visit(detail::create_uniform_helper<ShaderStruct>{*new_shader_struct, unqualified_name});
+				}
+			}
+		}
+	}
+}
+
+void ShaderProgram::CopyStructs(const ShaderProgram &shader_program)
+{
+	for (auto &shader_struct : shader_program.Structs())
+	{
+		if (auto &struct_name = shader_struct.Name(); struct_name)
+		{
+			if (auto new_shader_struct = CreateStruct(*struct_name, shader_struct.Size()); new_shader_struct)
+			{
+				for (auto &uniform : shader_struct.UniformVariables())
+				{
+					if (auto &qualified_name = uniform.Name(); qualified_name)
+					{
+						auto unqualified_name = std::string{shader_struct::detail::get_unqualified_name(*qualified_name)};
+						uniform.Visit(detail::create_uniform_helper<ShaderStruct>{*new_shader_struct, unqualified_name});
+					}
+				}
+			}
+		}
+	}
+}
+
+
 /*
 	Shader structs - Retrieving
 */
@@ -367,6 +407,20 @@ bool ShaderProgram::RemoveStruct(std::string_view name) noexcept
 
 
 /*
+	Attribute variables - Creating
+*/
+
+void ShaderProgram::CopyAttributes(const ShaderProgram &shader_program)
+{
+	for (auto &attribute : shader_program.AttributeVariables())
+	{
+		if (auto &name = attribute.Name(); name)
+			attribute.Visit(detail::create_attribute_helper<ShaderProgram>{*this, *name});
+	}
+}
+
+
+/*
 	Attribute variables - Retrieving
 */
 
@@ -410,6 +464,20 @@ bool ShaderProgram::RemoveAttribute(variables::AttributeVariable &attribute_vari
 bool ShaderProgram::RemoveAttribute(std::string_view name) noexcept
 {
 	return AttributeVariablesBase::Remove(name);
+}
+
+
+/*
+	Uniform variables - Creating
+*/
+
+void ShaderProgram::CopyUniforms(const ShaderProgram &shader_program)
+{
+	for (auto &uniform : shader_program.UniformVariables())
+	{
+		if (auto &name = uniform.Name(); name)
+			uniform.Visit(detail::create_uniform_helper<ShaderProgram>{*this, *name});
+	}
 }
 
 

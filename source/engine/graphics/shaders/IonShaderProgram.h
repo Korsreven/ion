@@ -25,11 +25,14 @@ File:	IonShaderProgram.h
 #include "memory/IonNonOwningPtr.h"
 #include "resources/IonResource.h"
 #include "variables/IonShaderAttribute.h"
+#include "variables/IonShaderTypes.h"
 #include "variables/IonShaderUniform.h"
 
 namespace ion::graphics::shaders
 {
-	class ShaderProgramManager; //Forward declaration
+	//Forward declarations
+	class ShaderProgram;
+	class ShaderProgramManager;
 
 	namespace shader_program::detail
 	{
@@ -43,6 +46,33 @@ namespace ion::graphics::shaders
 		void remap_uniform(NonOwningPtr<variables::UniformVariable> uniform_variable, ShaderLayout &shader_layout, mapped_uniforms &uniforms) noexcept;
 
 		int get_next_texture_unit(int &next_texture_unit) noexcept;
+
+
+		template <typename T>
+		struct create_attribute_helper
+		{
+			T &owner_;
+			std::string name_;
+
+			template <typename U>
+			inline void operator()(const variables::glsl::attribute<U>&) const noexcept
+			{
+				owner_.CreateAttribute<U>(std::move(name_));
+			}
+		};
+
+		template <typename T>
+		struct create_uniform_helper
+		{
+			T &owner_;
+			std::string name_;
+
+			template <typename U>
+			inline void operator()(const variables::glsl::uniform<U> &value) const noexcept
+			{
+				owner_.CreateUniform<U>(std::move(name_), value.Size());
+			}
+		};
 	} //shader_program::detail
 
 
@@ -292,6 +322,13 @@ namespace ion::graphics::shaders
 			///@brief Creates a struct with the given name and size
 			NonOwningPtr<ShaderStruct> CreateStruct(std::string name, int size = 1);
 
+
+			///@brief Copies a struct from the given shader program with the given name
+			void CopyStruct(const ShaderProgram &shader_program, std::string name);
+
+			///@brief Copies all structs from the given shader program
+			void CopyStructs(const ShaderProgram &shader_program);
+
 			///@}
 
 			/**
@@ -364,6 +401,10 @@ namespace ion::graphics::shaders
 				return static_pointer_cast<variables::Attribute<T>>(ptr);
 			}
 
+
+			///@brief Copies all attribute variables from the given shader program
+			void CopyAttributes(const ShaderProgram &shader_program);
+
 			///@}
 
 			/**
@@ -435,6 +476,10 @@ namespace ion::graphics::shaders
 				auto ptr = UniformVariablesBase::Create(std::move(uniform));
 				return static_pointer_cast<variables::Uniform<T>>(ptr);
 			}
+
+
+			///@brief Copies all uniform variables from the given shader program
+			void CopyUniforms(const ShaderProgram &shader_program);
 
 			///@}
 

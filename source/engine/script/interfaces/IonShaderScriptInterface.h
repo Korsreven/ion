@@ -42,6 +42,9 @@ namespace ion::script::interfaces
 			@{
 		*/
 
+		void set_shader_properties(const script_tree::ObjectNode &object, graphics::shaders::Shader &shader);
+
+
 		NonOwningPtr<graphics::shaders::Shader> create_shader(const script_tree::ObjectNode &object,
 			graphics::shaders::ShaderManager &shader_manager);
 

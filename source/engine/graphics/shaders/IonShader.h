@@ -14,6 +14,7 @@ File:	IonShader.h
 #define ION_SHADER_H
 
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "resources/IonFileResource.h"
@@ -62,6 +63,7 @@ namespace ion::graphics::shaders
 		private:
 
 			std::optional<int> handle_;
+			std::string defines_;
 
 		public:
 
@@ -77,6 +79,13 @@ namespace ion::graphics::shaders
 			inline void Handle(std::optional<int> handle) noexcept
 			{
 				handle_ = handle;
+			}
+
+			///@brief Sets all defines in the shader to the given defines
+			///@details Each define should be comma separated
+			inline void Defines(std::string defines) noexcept
+			{
+				defines_ = std::move(defines);
 			}
 
 			///@}
@@ -98,6 +107,12 @@ namespace ion::graphics::shaders
 			[[nodiscard]] inline auto Handle() const noexcept
 			{
 				return handle_;
+			}
+
+			///@brief Returns all defines in the shader
+			[[nodiscard]] inline auto& Defines() const noexcept
+			{
+				return defines_;
 			}
 
 			///@}

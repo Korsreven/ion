@@ -43,6 +43,20 @@ NonOwningPtr<Shader> get_shader(std::string_view name, const ManagerRegister &ma
 	return nullptr;
 }
 
+NonOwningPtr<ShaderProgram> get_shader_program(std::string_view name, const ManagerRegister &managers) noexcept
+{
+	for (auto &shader_program_manager : managers.ObjectsOf<ShaderProgramManager>())
+	{
+		if (shader_program_manager)
+		{
+			if (auto shader_program = shader_program_manager->GetShaderProgram(name); shader_program)
+				return shader_program;
+		}
+	}
+
+	return nullptr;
+}
+
 
 /*
 	Validator classes
@@ -55,9 +69,13 @@ ClassDefinition get_shader_program_class()
 
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("attribute", {attribute_data_types, ParameterType::String, ParameterType::Integer}, 2)
+		.AddProperty("attributes", ParameterType::String)
 		.AddProperty("fragment-shader", ParameterType::String)
 		.AddProperty("shader-layout", ParameterType::String)
+		.AddProperty("struct", {ParameterType::String, ParameterType::String})
+		.AddProperty("structs", ParameterType::String)
 		.AddProperty("uniform", {uniform_data_types, ParameterType::String, ParameterType::Integer}, 2)
+		.AddProperty("uniforms", ParameterType::String)
 		.AddProperty("vertex-shader", ParameterType::String);
 }
 
@@ -417,7 +435,8 @@ void create_uniform(const script_tree::PropertyNode &property,
 }
 
 
-void set_shader_program_properties(const script_tree::ObjectNode &object, ShaderProgram &shader_program)
+void set_shader_program_properties(const script_tree::ObjectNode &object,
+	ShaderProgram &shader_program, const ManagerRegister &managers)
 {
 	for (auto &obj : object.Objects())
 	{
@@ -429,8 +448,28 @@ void set_shader_program_properties(const script_tree::ObjectNode &object, Shader
 	{
 		if (property.Name() == "attribute")
 			create_attribute(property, shader_program);
+		else if (property.Name() == "attributes")
+		{
+			if (auto program = get_shader_program(property[0].Get<ScriptType::String>()->Get(), managers); program)
+				shader_program.CopyAttributes(*program);
+		}
+		else if (property.Name() == "struct")
+		{
+			if (auto program = get_shader_program(property[0].Get<ScriptType::String>()->Get(), managers); program)
+				shader_program.CopyStruct(*program, property[1].Get<ScriptType::String>()->Get());
+		}
+		else if (property.Name() == "structs")
+		{
+			if (auto program = get_shader_program(property[0].Get<ScriptType::String>()->Get(), managers); program)
+				shader_program.CopyStructs(*program);
+		}
 		else if (property.Name() == "uniform")
 			create_uniform(property, shader_program);
+		else if (property.Name() == "uniforms")
+		{
+			if (auto program = get_shader_program(property[0].Get<ScriptType::String>()->Get(), managers); program)
+				shader_program.CopyUniforms(*program);
+		}
 	}
 }
 
@@ -465,7 +504,7 @@ NonOwningPtr<ShaderProgram> create_shader_program(const script_tree::ObjectNode 
 		shader_program_manager.GetShaderLayout(shader_layout_name));
 
 	if (shader_program)
-		set_shader_program_properties(object, *shader_program);
+		set_shader_program_properties(object, *shader_program, managers);
 
 	return shader_program;
 }
