@@ -114,7 +114,7 @@ movable_object::ShaderProgramRange DrawableObject::AllShaderPrograms() noexcept
 
 void DrawableObject::NotifyRenderPassesChanged([[maybe_unused]] render::RenderPrimitive &primitive) noexcept
 {
-	update_render_passes_ = true;
+	update_shader_programs_ = true;
 }
 
 
@@ -139,7 +139,13 @@ void DrawableObject::Prepare()
 		AddRenderPass(render::RenderPass{default_shader_program});
 	}
 
-	if (update_render_passes_)
+	if (reload_render_passes_)
+	{
+		UpdateRenderPassesOnAllPrimitives(render_passes_);
+		reload_render_passes_ = false;
+	}
+
+	if (update_shader_programs_)
 	{
 		shader_programs_.clear();
 
@@ -158,7 +164,7 @@ void DrawableObject::Prepare()
 			}
 		}
 
-		update_render_passes_ = false;
+		update_shader_programs_ = false;
 	}
 
 	//Set render primitive visibility
@@ -198,7 +204,7 @@ void DrawableObject::Elapse([[maybe_unused]] duration time) noexcept
 void DrawableObject::AddRenderPass(render::RenderPass pass)
 {
 	render_passes_.push_back(std::move(pass));
-	UpdateRenderPassesOnAllPrimitives(render_passes_);
+	reload_render_passes_ = true;
 }
 
 void DrawableObject::AddRenderPasses(render::render_pass::Passes passes)
@@ -208,7 +214,7 @@ void DrawableObject::AddRenderPasses(render::render_pass::Passes passes)
 	else
 		std::move(std::begin(passes), std::end(passes), std::back_inserter(render_passes_));
 
-	UpdateRenderPassesOnAllPrimitives(render_passes_);
+	reload_render_passes_ = true;
 }
 
 
@@ -219,6 +225,7 @@ void DrawableObject::AddRenderPasses(render::render_pass::Passes passes)
 render::RenderPass& DrawableObject::GetRenderPass(int off) noexcept
 {
 	assert(off >= 0 && off < std::ssize(render_passes_));
+	reload_render_passes_ = true; //Render pass could be changed
 	return render_passes_[off];
 }
 
@@ -226,6 +233,11 @@ const render::RenderPass& DrawableObject::GetRenderPass(int off) const noexcept
 {
 	assert(off >= 0 && off < std::ssize(render_passes_));
 	return render_passes_[off];
+}
+
+const render::render_pass::Passes& DrawableObject::GetRenderPasses() const noexcept
+{
+	return render_passes_;
 }
 
 
@@ -237,7 +249,7 @@ void DrawableObject::ClearRenderPasses() noexcept
 {
 	render_passes_.clear();
 	render_passes_.shrink_to_fit();
-	UpdateRenderPassesOnAllPrimitives(render_passes_);
+	reload_render_passes_ = true;
 }
 
 bool DrawableObject::RemoveRenderPass(int off) noexcept
@@ -245,7 +257,7 @@ bool DrawableObject::RemoveRenderPass(int off) noexcept
 	if (off >= 0 && off < std::ssize(render_passes_))
 	{
 		render_passes_.erase(std::begin(render_passes_) + off);
-		UpdateRenderPassesOnAllPrimitives(render_passes_);
+		reload_render_passes_ = true;
 		return true;
 	}
 	else

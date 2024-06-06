@@ -47,7 +47,8 @@ namespace ion::graphics::scene
 			real opacity_ = 1.0_r;
 			render::render_pass::Passes render_passes_;
 
-			bool update_render_passes_ = false;
+			bool reload_render_passes_ = false;
+			bool update_shader_programs_ = false;
 
 		protected:
 
@@ -76,6 +77,7 @@ namespace ion::graphics::scene
 			///@details This can be used directly with a range-based for loop
 			[[nodiscard]] inline auto RenderPasses() noexcept
 			{
+				reload_render_passes_ = true; //One or more render pass could be changed
 				return adaptors::ranges::Iterable<render::render_pass::Passes&>{render_passes_};
 			}
 
@@ -173,6 +175,9 @@ namespace ion::graphics::scene
 
 			///@brief Returns an immutable reference to the render pass at the given offset
 			[[nodiscard]] const render::RenderPass& GetRenderPass(int off) const noexcept;
+
+			///@brief Returns all render passes for this drawable object
+			[[nodiscard]] const render::render_pass::Passes& GetRenderPasses() const noexcept;
 
 			///@}
 
