@@ -584,7 +584,7 @@ namespace ion::graphics::scene::graph
 				if (direction_ != direction)
 				{
 					direction_ = direction;
-					rotation_ = direction.SignedAngleBetween(initial_direction_); //Update rotation
+					rotation_ = initial_direction_.SignedAngleBetween(direction); //Update rotation
 					NotifyUpdate();
 				}
 			}
