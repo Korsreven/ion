@@ -725,9 +725,10 @@ bool check_operator_syntax(lexical_token &token, syntax_context &context, Compil
 						(context.previous_token->name == token_name::Separator &&
 							(context.previous_token->value.front() == ':' ||
 							context.previous_token->value.front() == '(' ||
-							context.previous_token->value.front() == ','))))
-							
-								return token_name::UnaryOperator;
+							context.previous_token->value.front() == ',')) ||
+						!context.inside_function))
+						
+							return token_name::UnaryOperator;
 			
 					[[fallthrough]];
 				}
