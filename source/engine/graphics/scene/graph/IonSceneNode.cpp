@@ -662,7 +662,7 @@ void SceneNode::Scale(const Vector2 &unit) noexcept
 
 void SceneNode::LookAt(const Vector3 &position) noexcept
 {
-	Rotate((position - DerivedPosition()).SignedAngleBetween(DerivedDirection()));
+	Rotate(DerivedDirection().SignedAngleBetween(position - DerivedPosition()));
 }
 
 
