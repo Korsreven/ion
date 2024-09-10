@@ -892,6 +892,43 @@ namespace ion::graphics::scene::graph
 			///@}
 
 			/**
+				@name Transformations - Conversions
+				@{
+			*/
+
+			///@brief Returns the position for this node from the given world position
+			[[nodiscard]] Vector2 ToLocalPosition(const Vector2 &position) const noexcept;
+
+			///@brief Returns the position for this node from the given world position
+			[[nodiscard]] Vector3 ToLocalPosition(const Vector3 &position) const noexcept;
+
+			///@brief Returns the derived position for this node from the given position
+			[[nodiscard]] Vector2 ToDerivedPosition(const Vector2 &position) const noexcept;
+
+			///@brief Returns the derived position for this node from the given position
+			[[nodiscard]] Vector3 ToDerivedPosition(const Vector3 &position) const noexcept;
+
+			///@brief Returns the direction for this node from the given world direction
+			[[nodiscard]] Vector2 ToLocalDirection(const Vector2 &direction) const noexcept;
+
+			///@brief Returns the derived direction for this node from the given direction
+			[[nodiscard]] Vector2 ToDerivedDirection(const Vector2 &direction) const noexcept;
+
+			///@brief Returns the rotation for this node from the given world angle in radians
+			[[nodiscard]] real ToLocalRotation(real angle) const noexcept;
+
+			///@brief Returns the derived rotation for this node from the given angle in radians
+			[[nodiscard]] real ToDerivedRotation(real angle) const noexcept;
+
+			///@brief Returns the scaling for this node from the given world scaling
+			[[nodiscard]] Vector2 ToLocalScaling(const Vector2 &scaling) const noexcept;
+
+			///@brief Returns the derived scaling for this node from the given scaling
+			[[nodiscard]] Vector2 ToDerivedScaling(const Vector2 &scaling) const noexcept;
+
+			///@}
+
+			/**
 				@name Elapse time
 				@{
 			*/
