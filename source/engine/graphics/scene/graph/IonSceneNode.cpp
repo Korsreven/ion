@@ -16,6 +16,7 @@ File:	IonSceneNode.cpp
 #include <cmath>
 #include <type_traits>
 
+#include "IonEngine.h"
 #include "graphics/scene/IonCamera.h"
 #include "graphics/scene/IonLight.h"
 #include "graphics/scene/IonMovableObject.h"
@@ -236,6 +237,13 @@ void SceneNode::Update() const noexcept
 		derived_direction_ = direction_;
 		derived_rotation_ = rotation_;
 		derived_scaling_ = scaling_;
+	}
+
+	if (pixel_aligned_)
+	{
+		auto ppu = Engine::PixelsPerUnit();
+		derived_position_.X(math::Round(derived_position_.X() * ppu) / ppu);
+		derived_position_.Y(math::Round(derived_position_.Y() * ppu) / ppu);
 	}
 
 	need_update_ = false;

@@ -272,6 +272,7 @@ namespace ion::graphics::scene::graph
 			scene_node::NodeRotationOrigin rotation_origin_ = scene_node::NodeRotationOrigin::Parent;
 			bool inherit_rotation_ = true;
 			bool inherit_scaling_ = true;
+			bool pixel_aligned_ = false;
 			bool visible_ = true;
 
 			SceneNode *parent_node_ = nullptr;
@@ -641,6 +642,16 @@ namespace ion::graphics::scene::graph
 				}
 			}
 
+			///@brief Sets whether or not this node should be pixel aligned
+			inline void PixelAligned(bool aligned) noexcept
+			{
+				if (pixel_aligned_ != aligned)
+				{
+					pixel_aligned_ = aligned;
+					NotifyUpdate();
+				}
+			}
+
 			///@brief Sets whether or not this and all descendant nodes should be visible
 			///@details If cascade is set to false, only this node is set
 			inline void Visible(bool visible, bool cascade = true) noexcept
@@ -737,6 +748,12 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto InheritScaling() const noexcept
 			{
 				return inherit_scaling_;
+			}
+
+			///@brief Returns whether or not this node is pixel aligned
+			[[nodiscard]] inline auto PixelAligned() const noexcept
+			{
+				return pixel_aligned_;
 			}
 
 			///@brief Returns whether or not this node is visible
