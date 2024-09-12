@@ -704,22 +704,22 @@ void SceneNode::DerivedScaling(const Vector2 &scaling) noexcept
 	Transformations - Conversions
 */
 
-Vector2 SceneNode::ToLocalPosition(const Vector2 &position) const noexcept
+Vector2 SceneNode::ToLocalPosition(const Vector2 &position, bool as_child) const noexcept
 {
-	return ToLocalPosition(Vector3{position});
+	return ToLocalPosition(Vector3{position}, as_child);
 }
 
-Vector3 SceneNode::ToLocalPosition(const Vector3 &position) const noexcept
+Vector3 SceneNode::ToLocalPosition(const Vector3 &position, bool as_child) const noexcept
 {
-	if (parent_node_)
+	if (auto parent_node = as_child ? this : parent_node_; parent_node)
 	{
 		auto [sx, sy] =
-			parent_node_->DerivedScaling().XY();
+			parent_node->DerivedScaling().XY();
 		auto local_position =
-			(position - parent_node_->DerivedPosition()) / Vector3{sx, sy, 1.0_r};
+			(position - parent_node->DerivedPosition()) / Vector3{sx, sy, 1.0_r};
 
 		if (rotation_origin_ == NodeRotationOrigin::Parent)
-			local_position = Matrix3::Rotation(-parent_node_->DerivedRotation()) * local_position;
+			local_position = Matrix3::Rotation(-parent_node->DerivedRotation()) * local_position;
 
 		return local_position;
 	}
@@ -727,73 +727,73 @@ Vector3 SceneNode::ToLocalPosition(const Vector3 &position) const noexcept
 		return position;
 }
 
-Vector2 SceneNode::ToDerivedPosition(const Vector2 &position) const noexcept
+Vector2 SceneNode::ToDerivedPosition(const Vector2 &position, bool as_child) const noexcept
 {
-	return ToDerivedPosition(Vector3{position});
+	return ToDerivedPosition(Vector3{position}, as_child);
 }
 
-Vector3 SceneNode::ToDerivedPosition(const Vector3 &position) const noexcept
+Vector3 SceneNode::ToDerivedPosition(const Vector3 &position, bool as_child) const noexcept
 {
-	if (parent_node_)
+	if (auto parent_node = as_child ? this : parent_node_; parent_node)
 	{
 		switch (rotation_origin_)
 		{
 			case NodeRotationOrigin::Local:
-			return position * detail::to_scaling3(parent_node_->DerivedScaling()) + parent_node_->DerivedPosition();
+			return position * detail::to_scaling3(parent_node->DerivedScaling()) + parent_node->DerivedPosition();
 
 			case NodeRotationOrigin::Parent:
 			default:
-			return (position * detail::to_scaling3(parent_node_->DerivedScaling())).Deviant(parent_node_->DerivedRotation()) + parent_node_->DerivedPosition();
+			return (position * detail::to_scaling3(parent_node->DerivedScaling())).Deviant(parent_node->DerivedRotation()) + parent_node->DerivedPosition();
 		}
 	}
 	else
 		return position;
 }
 
-Vector2 SceneNode::ToLocalDirection(const Vector2 &direction) const noexcept
+Vector2 SceneNode::ToLocalDirection(const Vector2 &direction, bool as_child) const noexcept
 {
-	if (inherit_rotation_ && parent_node_)
-		return initial_direction_.Deviant(-direction.SignedAngleBetween(parent_node_->DerivedDirection()));
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_rotation_)
+		return initial_direction_.Deviant(-direction.SignedAngleBetween(parent_node->DerivedDirection()));
 	else
 		return direction;
 }
 
-Vector2 SceneNode::ToDerivedDirection(const Vector2 &direction) const noexcept
+Vector2 SceneNode::ToDerivedDirection(const Vector2 &direction, bool as_child) const noexcept
 {
-	if (inherit_rotation_ && parent_node_)
-		return initial_direction_.Deviant(initial_direction_.SignedAngleBetween(direction) + parent_node_->DerivedRotation());
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_rotation_)
+		return initial_direction_.Deviant(initial_direction_.SignedAngleBetween(direction) + parent_node->DerivedRotation());
 	else
 		return direction;
 }
 
-real SceneNode::ToLocalRotation(real angle) const noexcept
+real SceneNode::ToLocalRotation(real angle, bool as_child) const noexcept
 {
-	if (inherit_rotation_ && parent_node_)
-		return angle - parent_node_->DerivedRotation();
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_rotation_)
+		return angle - parent_node->DerivedRotation();
 	else
 		return angle;
 }
 
-real SceneNode::ToDerivedRotation(real angle) const noexcept
+real SceneNode::ToDerivedRotation(real angle, bool as_child) const noexcept
 {
-	if (inherit_rotation_ && parent_node_)
-		return angle + parent_node_->DerivedRotation();
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_rotation_)
+		return angle + parent_node->DerivedRotation();
 	else
 		return angle;
 }
 
-Vector2 SceneNode::ToLocalScaling(const Vector2 &scaling) const noexcept
+Vector2 SceneNode::ToLocalScaling(const Vector2 &scaling, bool as_child) const noexcept
 {
-	if (inherit_scaling_ && parent_node_)
-		return scaling / parent_node_->DerivedScaling();
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_scaling_)
+		return scaling / parent_node->DerivedScaling();
 	else
 		return scaling;
 }
 
-Vector2 SceneNode::ToDerivedScaling(const Vector2 &scaling) const noexcept
+Vector2 SceneNode::ToDerivedScaling(const Vector2 &scaling, bool as_child) const noexcept
 {
-	if (inherit_scaling_ && parent_node_)
-		return scaling * parent_node_->DerivedScaling();
+	if (auto parent_node = as_child ? this : parent_node_; parent_node && inherit_scaling_)
+		return scaling * parent_node->DerivedScaling();
 	else
 		return scaling;
 }
