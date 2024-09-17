@@ -968,7 +968,7 @@ void GuiControl::UpdateCaption() noexcept
 		//Caption text
 		if (auto &text = skin_->Caption->Get(); text)
 		{
-			auto area_size = detail::get_inner_size(*skin_, false).value_or(vector2::Zero);
+			auto area_size = detail::get_inner_size(*skin_, false).value_or(size_.value_or(vector2::Zero));
 			auto border_size = detail::get_border_size(*skin_, false).value_or(vector2::Zero);
 			auto center = detail::get_content_area(*skin_, false).value_or(aabb::Zero).Center();
 
