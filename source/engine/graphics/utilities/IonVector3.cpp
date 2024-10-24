@@ -216,6 +216,11 @@ Vector3 Vector3::Lerp(const Vector3 &vector, real amount) const noexcept
 	else if (amount >= 1.0_r)
 		return vector;
 
+	return LerpUnclamped(vector, amount);
+}
+
+Vector3 Vector3::LerpUnclamped(const Vector3 &vector, real amount) const noexcept
+{
 	//Do linear interpolation
 	return {math::Lerp(x_, vector.x_, amount),
 			math::Lerp(y_, vector.y_, amount),
@@ -229,6 +234,11 @@ Vector3 Vector3::Slerp(Vector3 vector, real amount) const noexcept
 	else if (amount >= 1.0_r)
 		return vector;
 
+	return SlerpUnclamped(vector, amount);
+}
+
+Vector3 Vector3::SlerpUnclamped(Vector3 vector, real amount) const noexcept
+{
 	//Do spherical linear interpolation
 	auto dot = DotProduct(vector);
 
@@ -240,7 +250,7 @@ Vector3 Vector3::Slerp(Vector3 vector, real amount) const noexcept
 
 	//Fixed potential acos domain error and division by zero
 	if (dot > 1.0_r - math::Epsilon)
-		return Lerp(vector, amount);
+		return LerpUnclamped(vector, amount);
 	else
 	{
 		auto angle = std::acos(dot);

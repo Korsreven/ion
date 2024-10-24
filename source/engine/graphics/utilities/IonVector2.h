@@ -435,9 +435,15 @@ namespace ion::graphics::utilities
 
 			///@brief Returns a vector based on linear interpolation between this and the given vector
 			[[nodiscard]] Vector2 Lerp(const Vector2 &vector, real amount) const noexcept;
+
+			///@brief Returns a vector based on linear interpolation between this and the given vector
+			[[nodiscard]] Vector2 LerpUnclamped(const Vector2 &vector, real amount) const noexcept;
 			
 			///@brief Returns a vector based on spherical linear interpolation between this and the given vector
 			[[nodiscard]] Vector2 Slerp(Vector2 vector, real amount) const noexcept;
+
+			///@brief Returns a vector based on spherical linear interpolation between this and the given vector
+			[[nodiscard]] Vector2 SlerpUnclamped(Vector2 vector, real amount) const noexcept;
 
 			///@}
 
