@@ -57,7 +57,7 @@ namespace ion::graphics::shaders
 			template <typename U>
 			inline void operator()(const variables::glsl::attribute<U>&) const noexcept
 			{
-				owner_.CreateAttribute<U>(std::move(name_));
+				owner_.template CreateAttribute<U>(std::move(name_));
 			}
 		};
 
@@ -70,7 +70,7 @@ namespace ion::graphics::shaders
 			template <typename U>
 			inline void operator()(const variables::glsl::uniform<U> &value) const noexcept
 			{
-				owner_.CreateUniform<U>(std::move(name_), value.Size());
+				owner_.template CreateUniform<U>(std::move(name_), value.Size());
 			}
 		};
 	} //shader_program::detail
