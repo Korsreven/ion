@@ -19,6 +19,7 @@ File:	IonSceneGraph.h
 #include <vector>
 
 #include "IonSceneNode.h"
+#include "events/IonCallback.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonSceneGraphListener.h"
 #include "events/listeners/IonSceneNodeListener.h"
@@ -130,7 +131,8 @@ namespace ion::graphics::scene::graph
 			Color ambient_color_ = color::White; //No ambient
 			std::optional<render::Fog> fog_; //No fog
 			bool fog_enabled_ = true;
-			bool lighting_enabled_ = true;		
+			bool lighting_enabled_ = true;
+			std::optional<events::Callback<void, const SceneGraph&, shaders::ShaderProgram&>> on_set_user_uniforms_;
 
 			SceneNode root_node_;
 			render::Renderer renderer_;
@@ -307,6 +309,19 @@ namespace ion::graphics::scene::graph
 				lighting_enabled_ = enabled;
 			}
 
+
+			///@brief Sets the on set user uniforms callback
+			inline void OnSetUserUniforms(events::Callback<void, const SceneGraph&, shaders::ShaderProgram&> on_set_user_uniforms) noexcept
+			{
+				on_set_user_uniforms_ = on_set_user_uniforms;
+			}
+
+			///@brief Sets the on set user uniforms callback
+			inline void OnSetUserUniforms(std::nullopt_t) noexcept
+			{
+				on_set_user_uniforms_ = {};
+			}
+
 			///@}
 
 			/**
@@ -407,6 +422,13 @@ namespace ion::graphics::scene::graph
 			[[nodiscard]] inline auto EmissiveLightTextureHandle() const noexcept
 			{
 				return emissive_light_texture_ ? emissive_light_texture_->handle : std::nullopt;
+			}
+
+
+			///@brief Returns the on set user uniforms callback
+			[[nodiscard]] inline auto OnSetUserUniforms() const noexcept
+			{
+				return on_set_user_uniforms_;
 			}
 
 			///@}

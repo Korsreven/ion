@@ -565,6 +565,11 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 				detail::set_emissive_light_uniforms(emissive_lights_, emissive_light_texture_, emissive_light_texture_map_, *camera, *shader_program);
 				detail::set_matrix_uniforms(projection_mat, view_mat, *shader_program);
 				detail::set_scene_uniforms(gamma_, ambient_color_, *shader_program);
+
+				//User callback
+				if (on_set_user_uniforms_)
+					(*on_set_user_uniforms_)(*this, *shader_program);
+
 				shader_programs_.push_back(shader_program.get()); //Only distinct
 			}
 		}
