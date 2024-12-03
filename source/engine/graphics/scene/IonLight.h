@@ -135,6 +135,7 @@ namespace ion::graphics::scene
 			Color diffuse_color_ = color::White;
 			Color specular_color_ = color::DarkGray;
 			real intensity_ = 1.0_r;
+			real fade_intensity_ = 1.0_r;
 
 			real attenuation_constant_ = 1.0_r;
 			real attenuation_linear_ = 0.0_r;
@@ -297,6 +298,14 @@ namespace ion::graphics::scene
 				intensity_ = intensity;
 			}
 
+			///@brief Sets the fade intensity of the light given off by this light source to the given value
+			///@details This is in use by the built in fading system. See NodeAnimation::FadingMotionType::LightIntensity for more details
+			///To set a custom user intensity, consider calling Light::Intensity instead
+			inline void FadeIntensity(real intensity) noexcept
+			{
+				fade_intensity_ = intensity;
+			}
+
 
 			///@brief Sets the attenuation to the given values
 			///@details These values only applies for lights of type point and spot light
@@ -386,6 +395,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Intensity() const noexcept
 			{
 				return intensity_;
+			}
+
+			///@brief Returns the fade intensity of the light given off by this light source
+			[[nodiscard]] inline auto FadeIntensity() const noexcept
+			{
+				return fade_intensity_;
 			}
 
 

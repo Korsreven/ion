@@ -88,7 +88,16 @@ void DrawableObject::Opacity(real opacity) noexcept
 	if (opacity_ != opacity)
 	{
 		opacity_ = opacity;
-		UpdateOpacityOnAllPrimitives(opacity);
+		UpdateOpacityOnAllPrimitives(opacity_ * fade_opacity_);
+	}
+}
+
+void DrawableObject::FadeOpacity(real opacity) noexcept
+{
+	if (fade_opacity_ != opacity)
+	{
+		fade_opacity_ = opacity;
+		UpdateOpacityOnAllPrimitives(opacity_ * fade_opacity_);
 	}
 }
 

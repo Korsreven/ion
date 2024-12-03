@@ -141,19 +141,19 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 			if (ambient)
 			{
 				auto [r, g, b, a] = light->AmbientColor().RGBA();
-				(*ambient)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+				(*ambient)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity() * light->FadeIntensity()};
 			}
 
 			if (diffuse)
 			{
 				auto [r, g, b, a] = light->DiffuseColor().RGBA();
-				(*diffuse)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+				(*diffuse)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity() * light->FadeIntensity()};
 			}
 
 			if (specular)
 			{
 				auto [r, g, b, a] = light->SpecularColor().RGBA();
-				(*specular)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+				(*specular)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity() * light->FadeIntensity()};
 			}
 
 
@@ -224,7 +224,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::
 			if (color)
 			{
 				auto [r, g, b, a] = light->DiffuseColor().RGBA();
-				(*color)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity()};
+				(*color)[i].Get<glsl::vec4>() = Color{r, g, b, a * light->Intensity() * light->FadeIntensity()};
 			}
 
 

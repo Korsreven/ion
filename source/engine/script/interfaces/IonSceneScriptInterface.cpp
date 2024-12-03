@@ -611,6 +611,7 @@ ClassDefinition get_drawable_object_class()
 {
 	return ClassDefinition::Create("drawable-object", "movable-object")
 		.AddClass(get_render_pass_class())
+		.AddProperty("fade-opacity", ParameterType::FloatingPoint)
 		.AddProperty("opacity", ParameterType::FloatingPoint);
 }
 
@@ -641,6 +642,7 @@ ClassDefinition get_light_class()
 		.AddProperty("cutoff", {ParameterType::FloatingPoint, ParameterType::FloatingPoint})
 		.AddProperty("diffuse-color", ParameterType::Color)
 		.AddProperty("direction", ParameterType::Vector3)
+		.AddProperty("fade-intensity", ParameterType::FloatingPoint)
 		.AddProperty("intensity", ParameterType::FloatingPoint)
 		.AddProperty("position", ParameterType::Vector3)
 		.AddProperty("radius", ParameterType::FloatingPoint)
@@ -1261,7 +1263,9 @@ void set_drawable_object_properties(const script_tree::ObjectNode &object, Drawa
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "opacity")
+		if (property.Name() == "fade-opacity")
+			drawable_object.FadeOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
+		else if (property.Name() == "opacity")
 			drawable_object.Opacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 	}
 }
@@ -1325,6 +1329,8 @@ void set_light_properties(const script_tree::ObjectNode &object, Light &light)
 			light.DiffuseColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "direction")
 			light.Direction(property[0].Get<ScriptType::Vector3>()->Get());
+		else if (property.Name() == "fade-intensity")
+			light.FadeIntensity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "intensity")
 			light.Intensity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "position")

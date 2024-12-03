@@ -45,6 +45,7 @@ namespace ion::graphics::scene
 		private:
 
 			real opacity_ = 1.0_r;
+			real fade_opacity_ = 1.0_r;
 			render::render_pass::Passes render_passes_;
 
 			bool reload_render_passes_ = false;
@@ -98,6 +99,11 @@ namespace ion::graphics::scene
 			///@brief Sets the opacity of this drawable object to the given opacity
 			void Opacity(real opacity) noexcept;
 
+			///@brief Sets the fade opacity of this drawable object to the given opacity
+			///@details This is in use by the built in fading system. See NodeAnimation::FadingMotionType::Opacity for more details
+			///To set a custom user opacity, consider calling DrawableObject::Opacity instead
+			void FadeOpacity(real opacity) noexcept;
+
 			///@}
 
 			/**
@@ -109,6 +115,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Opacity() const noexcept
 			{
 				return opacity_;
+			}
+
+			///@brief Returns the fade opacity of this drawable object
+			[[nodiscard]] inline auto FadeOpacity() const noexcept
+			{
+				return fade_opacity_;
 			}
 
 

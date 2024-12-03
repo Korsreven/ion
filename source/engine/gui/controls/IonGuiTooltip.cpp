@@ -284,10 +284,10 @@ void GuiTooltip::SetOpacity(real percent) noexcept
 	if (skin_)
 	{
 		if (skin_->Parts)
-			skin_->Parts->Opacity(percent);
+			skin_->Parts->FadeOpacity(percent);
 
 		if (skin_->Caption)
-			skin_->Caption->Opacity(percent);
+			skin_->Caption->FadeOpacity(percent);
 	}
 
 	opacity_ = percent;

@@ -138,7 +138,7 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[8] = r;
 				light_data[9] = g;
 				light_data[10] = b;
-				light_data[11] = a * light->Intensity();
+				light_data[11] = a * light->Intensity() * light->FadeIntensity();
 			}
 
 			{
@@ -146,7 +146,7 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[12] = r;
 				light_data[13] = g;
 				light_data[14] = b;
-				light_data[15] = a * light->Intensity();
+				light_data[15] = a * light->Intensity() * light->FadeIntensity();
 			}
 
 			{
@@ -154,7 +154,7 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[16] = r;
 				light_data[17] = g;
 				light_data[18] = b;
-				light_data[19] = a * light->Intensity();
+				light_data[19] = a * light->Intensity() * light->FadeIntensity();
 			}
 
 			auto [constant, linear, quadratic] = light->Attenuation();
@@ -225,7 +225,7 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture
 			light_data[4] = r;
 			light_data[5] = g;
 			light_data[6] = b;
-			light_data[7] = a * light->Intensity();
+			light_data[7] = a * light->Intensity() * light->FadeIntensity();
 
 
 			//Light data has changed

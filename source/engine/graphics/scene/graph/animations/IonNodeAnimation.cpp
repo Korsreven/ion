@@ -533,7 +533,7 @@ void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, du
 					auto targets = get_targets<DrawableObject>(m.target_name, node);
 
 					for (auto &object : targets)
-						object->Opacity(object->Opacity() + delta);
+						object->FadeOpacity(object->FadeOpacity() + delta);
 
 					break;
 				}
@@ -554,7 +554,7 @@ void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, du
 						case FadingMotionType::LightIntensity:
 						{
 							for (auto &light : targets)
-								light->Intensity(light->Intensity() + delta);
+								light->FadeIntensity(light->FadeIntensity() + delta);
 
 							break;
 						}
