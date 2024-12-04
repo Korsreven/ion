@@ -41,7 +41,7 @@ void DrawableObject::AddPrimitive(render::RenderPrimitive &primitive)
 		if (std::empty(primitive.RenderPasses()))
 			primitive.RenderPasses(render_passes_);
 
-		primitive.Opacity(opacity_);
+		primitive.Opacity(opacity_ * fade_opacity_);
 		render_primitives_.push_back(&primitive);
 
 		if (AttachedToSceneGraph())
