@@ -112,14 +112,22 @@ void affect_particles(affector::detail::particle_range particles, const color_st
 		//Fade
 		if (to->ToColor)
 		{
-			percent = (1.0_r - percent) / (to->Percent - from->Percent);
+			percent = (percent - from->Percent) / (to->Percent - from->Percent);
 
 			//from -> to
 			if (from->ToColor)
 				particle.FillColor(from->ToColor->MixCopy(*(to->ToColor), percent));
 			//current -> to
 			else
-				particle.FillColor(particle.FillColor().MixCopy(*(to->ToColor), percent));
+			{
+				auto previous_percent = particle.PreviousLifetimePercent();
+				previous_percent = (previous_percent - from->Percent) / (to->Percent - from->Percent);
+
+				if (previous_percent <= 0.0_r)
+					particle.FromColor(particle.FillColor());
+
+				particle.FillColor(particle.FromColor().MixCopy(*(to->ToColor), percent));
+			}
 		}
 	}
 }

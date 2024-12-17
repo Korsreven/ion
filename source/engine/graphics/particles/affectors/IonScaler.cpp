@@ -112,14 +112,22 @@ void affect_particles(affector::detail::particle_range particles, const size_ste
 		//Scale
 		if (to->Size)
 		{
-			percent = (1.0_r - percent) / (to->Percent - from->Percent);
+			percent = (percent - from->Percent) / (to->Percent - from->Percent);
 
 			//from -> to
 			if (from->Size)
 				particle.Size(from->Size->Lerp(*(to->Size), percent));
 			//current -> to
 			else
-				particle.Size(particle.Size().Lerp(*(to->Size), percent));
+			{
+				auto previous_percent = particle.PreviousLifetimePercent();
+				previous_percent = (previous_percent - from->Percent) / (to->Percent - from->Percent);
+
+				if (previous_percent <= 0.0_r)
+					particle.FromSize(particle.Size());
+
+				particle.Size(particle.FromSize().Lerp(*(to->Size), percent));
+			}
 		}
 	}
 }

@@ -39,7 +39,7 @@ namespace ion::graphics::particles
 		private:
 
 			Vector3 position_;
-			Vector2 direction_; //Length represents velocity		
+			Vector2 direction_; //Length represents velocity
 			real rotation_ = 0.0_r;
 			Vector2 size_;
 			real mass_ = 0.0_r;
@@ -47,6 +47,9 @@ namespace ion::graphics::particles
 			Cumulative<duration> lifetime_;
 
 			Vector2 initial_direction_;
+			real previous_lifetime_percent_ = 0.0_r;
+			Color from_color_;
+			Vector2 from_size_;
 
 		public:
 
@@ -115,6 +118,21 @@ namespace ion::graphics::particles
 				lifetime_.Limit(lifetime);
 			}
 
+
+			///@brief Sets the from color of the particle to the given color
+			///@details This is used for interpolation purposes by affectors::ColorFader
+			inline void FromColor(const Color &color) noexcept
+			{
+				from_color_ = color;
+			}
+
+			///@brief Sets the from size of the particle to the given vector
+			///@details This is used for interpolation purposes by affectors::Scaler
+			inline void FromSize(const Vector2 &size) noexcept
+			{
+				from_size_ = size;
+			}
+
 			///@}
 
 			/**
@@ -177,6 +195,27 @@ namespace ion::graphics::particles
 				return lifetime_.Percent();
 			}
 
+			///@brief Returns the previous lifetime percent of the particle in range [0.0, 1.0]
+			[[nodiscard]] inline auto PreviousLifetimePercent() const noexcept
+			{
+				return previous_lifetime_percent_;
+			}
+
+
+			///@brief Returns the from color of the particle
+			///@details This is used for interpolation purposes by affectors::ColorFader
+			[[nodiscard]] inline auto& FromColor() const noexcept
+			{
+				return from_color_;
+			}
+
+			///@brief Returns the from size of the particle
+			///@details This is used for interpolation purposes by affectors::Scaler
+			[[nodiscard]] inline auto& FromSize() const noexcept
+			{
+				return from_size_;
+			}
+
 			///@}
 
 			/**
@@ -188,6 +227,8 @@ namespace ion::graphics::particles
 			///@details This function is typically called each frame, with the time in seconds since last frame
 			inline auto Evolve(duration time) noexcept
 			{
+				previous_lifetime_percent_ = lifetime_.Percent();
+
 				if (lifetime_ += time)
 					return false;
 				else
