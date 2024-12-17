@@ -130,8 +130,10 @@ void DrawableParticleSystem::ReloadPrimitives()
 	if (particle_system_)
 	{
 		auto parent_node = ParentNode();
-		auto node_rotation = parent_node ? parent_node->Rotation() : 0.0_r;
-		auto node_scaling = parent_node ? parent_node->Scaling() : vector2::UnitScale;
+		auto node_rotation = parent_node && particle_system_->InheritNodeRotation() ?
+			parent_node->Rotation() : 0.0_r;
+		auto node_scaling = parent_node && particle_system_->InheritNodeScaling() ?
+			parent_node->Scaling() : vector2::UnitScale;
 
 		detail::get_emitter_primitives(*particle_system_, vertex_metrics_,
 			node_rotation, node_scaling, emitter_primitives_);

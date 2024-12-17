@@ -46,6 +46,8 @@ ParticleSystem ParticleSystem::Clone() const
 {
 	auto particle_system = ParticleSystem{*name_};
 	particle_system.particle_primitive_ = particle_primitive_;
+	particle_system.inherit_node_rotation_ = inherit_node_rotation_;
+	particle_system.inherit_node_scaling_ = inherit_node_scaling_;
 	
 	//Clone emitters
 	for (auto &emitter : Emitters())

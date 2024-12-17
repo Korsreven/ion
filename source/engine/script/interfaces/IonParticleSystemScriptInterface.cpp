@@ -97,6 +97,8 @@ ClassDefinition get_particle_system_class()
 
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("emitting", ParameterType::Boolean)
+		.AddProperty("inherit-node-rotation", ParameterType::Boolean)
+		.AddProperty("inherit-node-scaling", ParameterType::Boolean)
 		.AddProperty("render-primitive", {"point"s, "rectangle"s});
 }
 
@@ -303,6 +305,10 @@ void set_particle_system_properties(const script_tree::ObjectNode &object, Parti
 			else
 				particle_system.StopAll();
 		}
+		else if (property.Name() == "inherit-node-rotation")
+			particle_system.InheritNodeRotation(property[0].Get<ScriptType::Boolean>()->Get());
+		else if (property.Name() == "inherit-node-scaling")
+			particle_system.InheritNodeScaling(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "render-primitive")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
