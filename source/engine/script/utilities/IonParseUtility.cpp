@@ -27,21 +27,30 @@ namespace detail
 
 std::optional<graphics::utilities::Color> hex_as_color(std::string_view str) noexcept
 {
-	auto value =
+	auto [value, digit] =
 		[&]() noexcept
 		{
 			//HTML hexadecimal prefix (#)
 			if (!std::empty(str) && str.front() == '#')
-				return codec::DecodeFrom<uint32>(str.substr(1, std::size(str) - 1), 16);
+				return std::pair{codec::DecodeFrom<uint32>(str.substr(1, std::size(str) - 1), 16), std::ssize(str) - 1};
 
 			//Numeric value
 			else
-				return convert::To<uint32>(str);
+				return std::pair{convert::To<uint32>(str), 8};
 		}();
 
-	return value ?
-		std::make_optional(Color::Hex(*value)) :
-		std::nullopt;
+	if (value)
+	{
+		switch (digit)
+		{
+			case 8: return Color::Hex32(*value);
+			case 6: return Color::Hex24(*value);
+			case 4: return Color::Hex32Short(*value);
+			case 3: return Color::Hex24Short(*value);
+		}
+	}
+	
+	return {};
 }
 
 std::optional<graphics::utilities::Color> rgb_as_color(std::string_view str) noexcept

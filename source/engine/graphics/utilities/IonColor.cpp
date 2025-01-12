@@ -181,20 +181,40 @@ Color Color::CMYK(real cyan, real magenta, real yellow, real black, real alpha) 
 	return {r, g, b, alpha};
 }
 
-Color Color::Hex(uint32 value) noexcept
+Color Color::Hex24(uint32 value) noexcept
 {
-	return {detail::hex_to_red(value),
-			detail::hex_to_green(value),
-			detail::hex_to_blue(value),
-			detail::hex_to_alpha(value)};
+	auto [r, g, b] = detail::hex24_to_rgb(value);
+	return {r, g, b};
 }
 
-Color Color::Hex(uint32 value, real alpha) noexcept
+Color Color::Hex24(uint32 value, real alpha) noexcept
 {
-	return {detail::hex_to_red(value),
-			detail::hex_to_green(value),
-			detail::hex_to_blue(value),
-			alpha};
+	auto [r, g, b] = detail::hex24_to_rgb(value);
+	return {r, g, b, alpha};
+}
+
+Color Color::Hex32(uint32 value) noexcept
+{
+	auto [r, g, b, a] = detail::hex32_to_rgb(value);
+	return {r, g, b, a};
+}
+
+Color Color::Hex24Short(uint32 value) noexcept
+{
+	auto [r, g, b] = detail::hex24_short_to_rgb(value);
+	return {r, g, b};
+}
+
+Color Color::Hex24Short(uint32 value, real alpha) noexcept
+{
+	auto [r, g, b] = detail::hex24_short_to_rgb(value);
+	return {r, g, b, alpha};
+}
+
+Color Color::Hex32Short(uint32 value) noexcept
+{
+	auto [r, g, b, a] = detail::hex32_short_to_rgb(value);
+	return {r, g, b, a};
 }
 
 Color Color::HSL(real hue, real saturation, real lightness, real alpha) noexcept

@@ -37,60 +37,34 @@ namespace ion::graphics::utilities
 		constexpr auto max_hex_quartet = 0xffffffff_ui32;
 
 
-		constexpr auto hex_to_red(uint32 value) noexcept
+		constexpr auto hex24_to_rgb(uint32 value) noexcept
 		{
-			if (value > max_hex_triplet)
-				return (value >> 24) / 255.0_r; //Hex quartet (rgba)
-			else if (value > max_hex_four_digit)
-				return (value >> 16) / 255.0_r; //Hex triplet (rgb)
-
-			//Shorthand
-			else if (value > max_hex_three_digit)
-				return (((value >> 12) << 4) | (value >> 12)) / 255.0_r; //Four-digit (rgba)
-			else
-				return (((value >> 8) << 4) | (value >> 8)) / 255.0_r; //Three-digit (rgb)
+			return std::tuple{(value >> 16) / 255.0_r,
+							  (value >> 8 & 0xff) / 255.0_r,
+							  (value & 0xff) / 255.0_r};
 		}
 
-		constexpr auto hex_to_green(uint32 value) noexcept
+		constexpr auto hex32_to_rgb(uint32 value) noexcept
 		{
-			if (value > max_hex_triplet)
-				return (value >> 16 & 0xff) / 255.0_r; //Hex quartet (rgba)
-			else if (value > max_hex_four_digit)
-				return (value >> 8 & 0xff) / 255.0_r; //Hex triplet (rgb)
-
-			//Shorthand
-			else if (value > max_hex_three_digit)
-				return (((value >> 8 & 0xf) << 4) | (value >> 8 & 0xf)) / 255.0_r; //Four-digit (rgba)
-			else
-				return (((value >> 4 & 0xf) << 4) | (value >> 4 & 0xf)) / 255.0_r; //Three-digit (rgb)
+			return std::tuple{(value >> 24) / 255.0_r,
+							  (value >> 16 & 0xff) / 255.0_r,
+							  (value >> 8 & 0xff) / 255.0_r,
+							  (value & 0xff) / 255.0_r};
 		}
 
-		constexpr auto hex_to_blue(uint32 value) noexcept
+		constexpr auto hex24_short_to_rgb(uint32 value) noexcept
 		{
-			if (value > max_hex_triplet)
-				return (value >> 8 & 0xff) / 255.0_r; //Hex quartet (rgba)
-			else if (value > max_hex_four_digit)
-				return (value & 0xff) / 255.0_r; //Hex triplet (rgb)
-
-			//Shorthand
-			else if (value > max_hex_three_digit)
-				return (((value >> 4 & 0xf) << 4) | (value >> 4 & 0xf)) / 255.0_r; //Four-digit (rgba)
-			else
-				return (((value & 0xf) << 4) | (value & 0xf)) / 255.0_r; //Three-digit (rgb)
+			return std::tuple{(((value >> 8) << 4) | (value >> 8)) / 255.0_r,
+							  (((value >> 4 & 0xf) << 4) | (value >> 4 & 0xf)) / 255.0_r,
+							  (((value & 0xf) << 4) | (value & 0xf)) / 255.0_r};
 		}
 
-		constexpr auto hex_to_alpha(uint32 value) noexcept
+		constexpr auto hex32_short_to_rgb(uint32 value) noexcept
 		{
-			if (value > max_hex_triplet)
-				return (value & 0xff) / 255.0_r; //Hex quartet (rgba)
-			else if (value > max_hex_four_digit)
-				return 1.0_r; //Hex triplet (rgb)
-
-			//Shorthand
-			else if (value > max_hex_three_digit)
-				return (((value & 0xf) << 4) | (value & 0xf)) / 255.0_r; //Four-digit (rgba)
-			else
-				return 1.0_r; //Three-digit (rgb)
+			return std::tuple{(((value >> 12) << 4) | (value >> 12)) / 255.0_r,
+							  (((value >> 8 & 0xf) << 4) | (value >> 8 & 0xf)) / 255.0_r,
+							  (((value >> 4 & 0xf) << 4) | (value >> 4 & 0xf)) / 255.0_r,
+							  (((value & 0xf) << 4) | (value & 0xf)) / 255.0_r};
 		}
 
 
@@ -158,16 +132,29 @@ namespace ion::graphics::utilities
 			///@details The given values should be in range [0.0, 1.0]
 			[[nodiscard]] static Color CMYK(real cyan, real magenta, real yellow, real black, real alpha = 1.0_r) noexcept;
 
-			///@brief Returns a new color from the given hex value
+			///@brief Returns a new color from the given hex24 value
 			///@details A hex triplet value contains only the RGB channels (the alpha channel is set to 1.0).
-			///A hex quartet value contains all channels in order RGBA.
-			///A shorthand hex value contains three or four-digit, one for each channel (0xff0 -> 0xffff00)
-			[[nodiscard]] static Color Hex(uint32 value) noexcept;
+			[[nodiscard]] static Color Hex24(uint32 value) noexcept;
 
-			///@brief Returns a new color from the given hex and alpha values
-			///@details Take only the RGB channels from the given hex value (triplet, quartet or shorthand).
-			///The alpha channel is set to the given alpha instead
-			[[nodiscard]] static Color Hex(uint32 value, real alpha) noexcept;
+			///@brief Returns a new color from the given hex24 and alpha values
+			///@details A hex triplet value contains only the RGB channels (the alpha channel is set to 1.0).
+			[[nodiscard]] static Color Hex24(uint32 value, real alpha) noexcept;
+
+			///@brief Returns a new color from the given hex32 value
+			///@details A hex quartet value contains all channels in order RGBA.
+			[[nodiscard]] static Color Hex32(uint32 value) noexcept;
+
+			///@brief Returns a new color from the given hex24 shorthand value
+			///@details A shorthand hex24 value contains three-digit, one for each channel (0xff0 -> 0xffff00)
+			[[nodiscard]] static Color Hex24Short(uint32 value) noexcept;
+
+			///@brief Returns a new color from the given hex24 shorthand and alpha values
+			///@details A shorthand hex24 value contains three-digit, one for each channel (0xff0 -> 0xffff00)
+			[[nodiscard]] static Color Hex24Short(uint32 value, real alpha) noexcept;
+
+			///@brief Returns a new color from the given hex 32 shorthand value
+			///@details A shorthand hex32 value contains four-digit, one for each channel (0xff0f -> 0xffff00ff)
+			[[nodiscard]] static Color Hex32Short(uint32 value) noexcept;
 
 			///@brief Returns a new color from the given HSL values
 			///@details Hue should be degrees in range [0.0, 360.0).
@@ -675,22 +662,17 @@ namespace ion::graphics::utilities
 			/**
 				@name User defined literals (UDLs)
 				For hex triplet (rgb) and quartet (rgba) value to color
-				For shorthand hex three-digit (rgb) and four-digit (rgba) value to color
 				@{
 			*/
 
 			inline auto operator""_rgb(unsigned long long value) noexcept
 			{
-				assert((value > detail::max_hex_four_digit && value <= detail::max_hex_triplet) ||
-					   value <= detail::max_hex_three_digit); //Shorthand
-				return Color::Hex(static_cast<uint32>(value));
+				return Color::Hex24(static_cast<uint32>(value));
 			}
 
 			inline auto operator""_rgba(unsigned long long value) noexcept
 			{
-				assert((value > detail::max_hex_triplet && value <= detail::max_hex_quartet) ||
-					   (value > detail::max_hex_three_digit && value <= detail::max_hex_four_digit)); //Shorthand
-				return Color::Hex(static_cast<uint32>(value));
+				return Color::Hex32(static_cast<uint32>(value));
 			}
 
 			///@}
