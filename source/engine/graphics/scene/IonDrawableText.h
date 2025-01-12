@@ -158,17 +158,19 @@ namespace ion::graphics::scene
 			fonts::text::TextVerticalAlignment vertical_alignment, int font_size, real line_height, int total_lines, const Vector3 &position) noexcept;
 
 		render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
-			const Vector3 &position, real rotation, const Vector2 &scaling,
-			const Color &color, const Vector3 &origin);
+			const Vector3 &position, real rotation, const Vector2 &scaling, const Color &color, const Vector3 &origin,
+			bool sub_pixel_correction);
 		render::render_primitive::VertexContainer get_decoration_vertex_data(
-			const Vector3 &position, real rotation, const Vector2 &size,
-			const Color &color, const Vector3 &origin, real delta_z);
+			const Vector3 &position, real rotation, const Vector2 &size, const Color &color, const Vector3 &origin,
+			real delta_z, bool sub_pixel_correction);
 
 		void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 			int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
-			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
+			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
+			bool sub_pixel_correction);
 		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
-			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives);
+			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
+			bool sub_pixel_correction);
 
 		///@}
 	} //drawable_text::detail
@@ -181,6 +183,7 @@ namespace ion::graphics::scene
 
 			Vector3 position_;
 			real rotation_ = 0.0_r;
+			bool sub_pixel_correction_ = true;
 
 			std::optional<fonts::Text> text_;
 			NonOwningPtr<fonts::Text> initial_text_;
@@ -240,6 +243,16 @@ namespace ion::graphics::scene
 				}
 			}
 
+			///@brief Sets whether or not this text sub pixel correction is enabled
+			inline void SubPixelCorrection(bool enabled) noexcept
+			{
+				if (sub_pixel_correction_ != enabled)
+				{
+					sub_pixel_correction_ = enabled;
+					reload_primitives_ = true;
+				}
+			}
+
 
 			///@brief Reverts to the initial text
 			void Revert();
@@ -261,6 +274,12 @@ namespace ion::graphics::scene
 			[[nodiscard]] inline auto Rotation() const noexcept
 			{
 				return rotation_;
+			}
+
+			///@brief Returns whether or not this text has sub pixel correction enabled
+			[[nodiscard]] inline auto SubPixelCorrection() const noexcept
+			{
+				return sub_pixel_correction_;
 			}
 
 

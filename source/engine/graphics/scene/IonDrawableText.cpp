@@ -281,8 +281,8 @@ real get_glyph_vertical_position(const std::optional<Vector2> &area_size, const 
 
 
 render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index, const fonts::font::GlyphMetric &metric,
-	const Vector3 &position, real rotation, const Vector2 &scaling,
-	const Color &color, const Vector3 &origin)
+	const Vector3 &position, real rotation, const Vector2 &scaling, const Color &color, const Vector3 &origin,
+	bool sub_pixel_correction)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [r, g, b, a] = color.RGBA();
@@ -295,11 +295,14 @@ render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index
 	auto width = metric.Width * scaling.X();
 	auto height = metric.Height * scaling.Y();
 
-	//Floor/ceil values (glyphs may appear blurry if positioned off-pixel)
-	x = std::floor(x);
-	y = std::floor(y);
-	width = std::ceil(width);
-	height = std::ceil(height);
+	//Correct for sub-pixel rendering (glyphs may appear blurry if positioned off-pixel)
+	if (sub_pixel_correction)
+	{
+		x = std::floor(x);
+		y = std::floor(y);
+		width = std::ceil(width);
+		height = std::ceil(height);
+	}
 
 	auto ppu = Engine::PixelsPerUnit();
 	x /= ppu;
@@ -356,19 +359,23 @@ render::render_primitive::VertexContainer get_glyph_vertex_data(real glyph_index
 }
 
 render::render_primitive::VertexContainer get_decoration_vertex_data(
-	const Vector3 &position, real rotation, const Vector2 &size,
-	const Color &color, const Vector3 &origin, real delta_z)
+	const Vector3 &position, real rotation, const Vector2 &size, const Color &color, const Vector3 &origin,
+	real delta_z, bool sub_pixel_correction)
 {
 	auto [x, y, z] = position.XYZ();
 	auto [width, height] = size.XY();
 	auto [r, g, b, a] = color.RGBA();
 
-	//Floor/ceil values (decorations may appear blurry if positioned off-pixel)
-	x = std::floor(x);
-	y = std::floor(y);
 	z += delta_z;
-	width = std::ceil(width);
-	height = std::ceil(height);
+
+	//Correct for sub-pixel rendering  (decorations may appear blurry if positioned off-pixel)
+	if (sub_pixel_correction)
+	{
+		x = std::floor(x);
+		y = std::floor(y);
+		width = std::ceil(width);
+		height = std::ceil(height);
+	}
 
 	auto ppu = Engine::PixelsPerUnit();
 	x /= ppu;
@@ -423,7 +430,8 @@ render::render_primitive::VertexContainer get_decoration_vertex_data(
 
 void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 	int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
-	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives)
+	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
+	bool sub_pixel_correction)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -446,8 +454,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					auto decoration_size = Vector2{text_block.Size->X(), font_size + (line_margin * 4.0_r + line_thickness * 4.0_r)};
 
 					auto vertex_data = get_decoration_vertex_data(
-						decoration_position, rotation, decoration_size,
-						*background_color, origin, -Engine::ZEpsilon());
+						decoration_position, rotation, decoration_size, *background_color, origin,
+						-Engine::ZEpsilon(), sub_pixel_correction);
 
 					//New primitive
 					if (!decoration_primitives.second)
@@ -486,8 +494,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					if (*decoration == fonts::text::TextDecoration::LineThrough)
 					{
 						auto vertex_data = get_decoration_vertex_data(
-							decoration_position, rotation, decoration_size,
-							decoration_color, origin, Engine::ZEpsilon());
+							decoration_position, rotation, decoration_size, decoration_color, origin,
+							Engine::ZEpsilon(), sub_pixel_correction);
 
 						//New primitive
 						if (!decoration_primitives.first)
@@ -500,8 +508,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					else //Back decoration
 					{
 						auto vertex_data = get_decoration_vertex_data(
-							decoration_position, rotation, decoration_size,
-							decoration_color, origin, -Engine::ZEpsilon());
+							decoration_position, rotation, decoration_size, decoration_color, origin,
+							-Engine::ZEpsilon(), sub_pixel_correction);
 
 						//New primitive
 						if (!decoration_primitives.second)
@@ -521,8 +529,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					{
 						auto vertex_data =
 							get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
-								position, rotation, scaling,
-								foreground_color, origin);
+								position, rotation, scaling, foreground_color, origin,
+								sub_pixel_correction);
 						auto iter = std::end(glyph_primitives);
 
 						if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
@@ -559,7 +567,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 }
 
 void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
-	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives)
+	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
+	bool sub_pixel_correction)
 {
 	auto line_height = text.LineHeight();
 
@@ -617,7 +626,7 @@ void get_text_primitives(const fonts::Text &text, Vector3 position, real rotatio
 			for (auto &block : iter->Blocks)
 				get_block_primitives(block, text,
 					font_size, glyph_count, glyph_position, rotation, origin,
-					glyph_primitives, decoration_primitives);
+					glyph_primitives, decoration_primitives, sub_pixel_correction);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -635,7 +644,7 @@ void DrawableText::ReloadPrimitives()
 
 	if (text_)
 		detail::get_text_primitives(*text_, position_, rotation_,
-			glyph_primitives_, decoration_primitives_);
+			glyph_primitives_, decoration_primitives_, sub_pixel_correction_);
 
 	//Glyphs
 	glyph_primitives_.erase_if(

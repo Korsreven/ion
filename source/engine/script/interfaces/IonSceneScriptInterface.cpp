@@ -630,7 +630,8 @@ ClassDefinition get_drawable_text_class()
 		.AddRequiredClass(std::move(text))
 
 		.AddProperty("position", ParameterType::Vector3)
-		.AddProperty("rotation", ParameterType::FloatingPoint);
+		.AddProperty("rotation", ParameterType::FloatingPoint)
+		.AddProperty("sub-pixel-correction", ParameterType::Boolean);
 }
 
 ClassDefinition get_light_class()
@@ -1305,6 +1306,8 @@ void set_drawable_text_properties(const script_tree::ObjectNode &object, Drawabl
 			text.Position(property[0].Get<ScriptType::Vector3>()->Get());
 		else if (property.Name() == "rotation")
 			text.Rotation(utilities::math::ToRadians(property[0].Get<ScriptType::FloatingPoint>()->As<real>()));
+		else if (property.Name() == "sub-pixel-correction")
+			text.SubPixelCorrection(property[0].Get<ScriptType::Boolean>()->Get());
 	}
 }
 
