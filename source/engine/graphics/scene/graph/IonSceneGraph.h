@@ -353,7 +353,14 @@ namespace ion::graphics::scene::graph
 				return ambient_color_;
 			}
 
-			///@brief Returns the fog effect for this scene
+			///@brief Returns a mutable reference to the fog effect for this scene
+			///@details Returns nullopt if the scene has no fog effect
+			[[nodiscard]] inline auto& FogEffect() noexcept
+			{
+				return fog_;
+			}
+
+			///@brief Returns an immutable reference to the fog effect for this scene
 			///@details Returns nullopt if the scene has no fog effect
 			[[nodiscard]] inline auto& FogEffect() const noexcept
 			{
