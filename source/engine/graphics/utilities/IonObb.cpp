@@ -72,7 +72,8 @@ bool Obb::intersects_one_way(const Obb &obb) const noexcept
 	//Axes
 	for (auto &axis : axes)
 	{
-		axis /= axis.SquaredLength();
+		if (auto length = axis.SquaredLength(); length > 0.0_r)
+			axis /= length;
 
 		auto dot_min = std::numeric_limits<real>::max(); //max value
 		auto dot_max = -std::numeric_limits<real>::max(); //min value
