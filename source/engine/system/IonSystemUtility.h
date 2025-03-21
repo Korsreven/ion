@@ -135,6 +135,7 @@ namespace ion::system::utilities
 			DisplaySettingFrequencies frequencies) noexcept;
 		std::optional<std::string> key_button_name(KeyButton button) noexcept;
 		std::optional<std::string> local_time(TimeFormat format) noexcept;
+		std::optional<std::string> local_time(int hour, int minute, int second, TimeFormat format) noexcept;
 		std::optional<PowerStatus> power_status() noexcept;
 	} //detail
 
@@ -227,6 +228,9 @@ namespace ion::system::utilities
 
 	///@brief Returns the system time, formatted using the default locale
 	[[nodiscard]] std::optional<std::string> Time(TimeFormat format = TimeFormat::HHMMSS) noexcept;
+
+	///@brief Returns a custom time, formatted using the default locale
+	[[nodiscard]] std::optional<std::string> Time(int hour, int minute, int second, TimeFormat format = TimeFormat::HHMMSS) noexcept;
 
 	///@}
 } //ion::system::utilities

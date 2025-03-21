@@ -401,6 +401,19 @@ std::optional<std::string> local_time(TimeFormat format) noexcept
 	#ifdef ION_WIN32
 	SYSTEMTIME system_time;
 	GetLocalTime(&system_time);
+	return local_time(system_time.wHour, system_time.wMinute, system_time.wSecond, format);
+	#else
+	return {};
+	#endif
+}
+
+std::optional<std::string> local_time(int hour, int minute, int second, TimeFormat format) noexcept
+{
+	#ifdef ION_WIN32
+	SYSTEMTIME system_time = {};
+	system_time.wHour = static_cast<WORD>(hour);
+	system_time.wMinute = static_cast<WORD>(minute);
+	system_time.wSecond = static_cast<WORD>(second);
 
 	auto flags = 0;		
 	switch (format)
@@ -584,6 +597,14 @@ std::optional<PowerStatus> Power() noexcept
 std::optional<std::string> Time(TimeFormat format) noexcept
 {
 	return detail::local_time(format);
+}
+
+std::optional<std::string> Time(int hour, int minute, int second, TimeFormat format) noexcept
+{
+	hour = std::clamp(hour, 0, 23);
+	minute = std::clamp(minute, 0, 59);
+	second = std::clamp(second, 0, 59);
+	return detail::local_time(hour, minute, second, format);
 }
 
 } //ion::system::utilities
