@@ -871,8 +871,14 @@ namespace ion::graphics::scene::graph
 			///@brief Translates this node by the given unit
 			void Translate(const Vector3 &unit) noexcept;
 
+			///@brief Translates this node by the given unit relative to the given direction
+			void Translate(const Vector3 &unit, const Vector2 &direction) noexcept;
+
 			///@brief Translates this node by the given unit
 			void Translate(real unit) noexcept;
+
+			///@brief Translates this node by the given unit relative to the given direction
+			void Translate(real unit, const Vector2 &direction) noexcept;
 
 			///@brief Rotates this node by the given angle in radians
 			void Rotate(real angle) noexcept;

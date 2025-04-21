@@ -358,6 +358,7 @@ namespace ion::graphics::scene::graph::animations
 				moving_amount x;
 				moving_amount y;
 				moving_amount z;
+				Vector2 direction;
 
 				inline void Reset() noexcept
 				{
@@ -709,8 +710,18 @@ namespace ion::graphics::scene::graph::animations
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time = 0.0_sec,
 				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
 
+			///@brief Adds a translation motion to this node animation with the given unit, direction and total duration
+			void AddTranslation(const Vector3 &unit, const Vector2 &direction, duration total_duration, duration start_time = 0.0_sec,
+				node_animation::MotionTechnique technique = node_animation::MotionTechniqueType::Linear);
+
 			///@brief Adds a translation motion to this node animation with the given unit and total duration
 			void AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
+				node_animation::MotionTechnique technique_x,
+				node_animation::MotionTechnique technique_y,
+				node_animation::MotionTechnique technique_z);
+
+			///@brief Adds a translation motion to this node animation with the given unit, direction and total duration
+			void AddTranslation(const Vector3 &unit, const Vector2 &direction, duration total_duration, duration start_time,
 				node_animation::MotionTechnique technique_x,
 				node_animation::MotionTechnique technique_y,
 				node_animation::MotionTechnique technique_z);

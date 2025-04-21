@@ -641,14 +641,24 @@ const Sphere& SceneNode::WorldBoundingSphere(bool derive) const noexcept
 
 void SceneNode::Translate(const Vector3 &unit) noexcept
 {
+	Translate(unit, direction_);
+}
+
+void SceneNode::Translate(const Vector3 &unit, const Vector2 &direction) noexcept
+{
 	if (unit != vector3::Zero)
-		Position(position_ + unit.Deviant(vector2::UnitY.SignedAngleBetween(direction_)));
+		Position(position_ + unit.Deviant(vector2::UnitY.SignedAngleBetween(direction)));
 }
 
 void SceneNode::Translate(real unit) noexcept
 {
+	Translate(unit, direction_);
+}
+
+void SceneNode::Translate(real unit, const Vector2 &direction) noexcept
+{
 	if (unit != 0.0_r)
-		Position(position_ + direction_ * unit);
+		Position(position_ + direction * unit);
 }
 
 void SceneNode::Rotate(real angle) noexcept

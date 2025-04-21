@@ -511,7 +511,12 @@ void elapse_motion(NodeAnimation &animation, translating_motion &m, duration tim
 		unit != vector3::Zero)
 	{
 		if (auto owner = animation.Owner(); owner)
-			owner->ParentNode().Translate(unit);
+		{
+			if (m.direction != vector2::Zero)
+				owner->ParentNode().Translate(unit, m.direction);
+			else
+				owner->ParentNode().Translate(unit);
+		}
 	}
 }
 
@@ -1290,6 +1295,12 @@ void NodeAnimation::AddScaling(const Vector2 &unit, duration total_duration, dur
 void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
 	MotionTechnique technique)
 {
+	AddTranslation(unit, vector2::Zero, total_duration, start_time, technique);
+}
+
+void NodeAnimation::AddTranslation(const Vector3 &unit, const Vector2 &direction, duration total_duration, duration start_time,
+	MotionTechnique technique)
+{
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
@@ -1297,7 +1308,8 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 		{start_time, total_duration},
 		{0.0_r, unit.X(), technique.type, technique.method},
 		{0.0_r, unit.Y(), technique.type, technique.method},
-		{0.0_r, unit.Z(), technique.type, technique.method}};
+		{0.0_r, unit.Z(), technique.type, technique.method},
+		direction};
 
 	//Insert sorted
 	motions_.insert(
@@ -1311,6 +1323,12 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration, duration start_time,
 	MotionTechnique technique_x, MotionTechnique technique_y, MotionTechnique technique_z)
 {
+	AddTranslation(unit, vector2::Zero, total_duration, start_time, technique_x, technique_y, technique_z);
+}
+
+void NodeAnimation::AddTranslation(const Vector3 &unit, const Vector2 &direction, duration total_duration, duration start_time,
+	MotionTechnique technique_x, MotionTechnique technique_y, MotionTechnique technique_z)
+{
 	assert(total_duration > 0.0_sec);
 	assert(start_time >= 0.0_sec);
 
@@ -1318,7 +1336,8 @@ void NodeAnimation::AddTranslation(const Vector3 &unit, duration total_duration,
 		{start_time, total_duration},
 		{0.0_r, unit.X(), technique_x.type, technique_x.method},
 		{0.0_r, unit.Y(), technique_y.type, technique_y.method},
-		{0.0_r, unit.Z(), technique_z.type, technique_z.method}};
+		{0.0_r, unit.Z(), technique_z.type, technique_z.method},
+		direction};
 
 	//Insert sorted
 	motions_.insert(

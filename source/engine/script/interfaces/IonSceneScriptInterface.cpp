@@ -386,6 +386,7 @@ ClassDefinition get_translating_class()
 	return ClassDefinition::Create("translation")
 		.AddRequiredProperty("total-duration", ParameterType::FloatingPoint)
 		.AddRequiredProperty("unit", ParameterType::Vector3)
+		.AddProperty("direction", ParameterType::Vector2)
 		.AddProperty("motion-technique", {motion_technique_types, motion_technique_types, motion_technique_types}, 1)
 		.AddProperty("start-time", ParameterType::FloatingPoint);
 }
@@ -591,7 +592,7 @@ ClassDefinition get_scene_node_class()
 		.AddProperty("rotation-origin", {"parent"s, "local"s})
 		.AddProperty("scale", ParameterType::Vector2)
 		.AddProperty("scaling", ParameterType::Vector2)
-		.AddProperty("translate", ParameterType::Vector3)
+		.AddProperty("translate", {ParameterType::Vector3, ParameterType::Vector2}, 1)
 		.AddProperty("visible", {ParameterType::Boolean, ParameterType::Boolean}, 1);
 }
 
@@ -1174,7 +1175,12 @@ void set_scene_node_properties(const script_tree::ObjectNode &object, graph::Sce
 		else if (property.Name() == "scaling")
 			scene_node.Scaling(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "translate")
-			scene_node.Translate(property[0].Get<ScriptType::Vector3>()->Get());
+		{
+			if (property.NumberOfArguments() == 2)
+				scene_node.Translate(property[0].Get<ScriptType::Vector3>()->Get(), property[1].Get<ScriptType::Vector2>()->Get());
+			else
+				scene_node.Translate(property[0].Get<ScriptType::Vector3>()->Get());
+		}
 		else if (property.Name() == "visible")
 		{
 			if (property.NumberOfArguments() == 2)
@@ -1847,6 +1853,9 @@ void create_translating_motion(const script_tree::ObjectNode &object,
 	auto total_duration = duration{object
 		.Property("total-duration")[0]
 		.Get<ScriptType::FloatingPoint>()->As<real>()};
+	auto direction = object
+		.Property("direction")[0]
+		.Get<ScriptType::Vector2>().value_or(vector2::Zero).Get();
 	auto start_time = duration{object
 		.Property("start-time")[0]
 		.Get<ScriptType::FloatingPoint>().value_or(0.0).As<real>()};
@@ -1867,7 +1876,7 @@ void create_translating_motion(const script_tree::ObjectNode &object,
 		get_motion_technique_type(technique_name_z) :
 		technique_x;
 
-	animation.AddTranslation(unit, total_duration, start_time, technique_x, technique_y, technique_z);
+	animation.AddTranslation(unit, direction, total_duration, start_time, technique_x, technique_y, technique_z);
 }
 
 
