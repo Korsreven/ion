@@ -272,6 +272,96 @@ namespace ion::utilities::convert
 			assert(error != std::errc::value_too_large);
 			return std::string(std::data(chars), ptr);
 		}
+
+
+		///@brief Number to Roman numerals conversions
+		inline auto number_to_roman_numerals(short x)
+		{
+			std::string result;
+
+			if (x < 1)
+				return result;
+
+			while (x >= 1000)
+			{
+				result.push_back('M');
+				x -= 1000;
+			}
+
+			if (x >= 900)
+			{
+				result.push_back('C');
+				result.push_back('M');
+				x -= 900;
+			}
+			else if (x >= 500)
+			{
+				result.push_back('D');
+				x -= 500;
+			}
+			else if (x >= 400)
+			{
+				result.push_back('C');
+				result.push_back('D');
+				x -= 400;
+			}
+
+			while (x >= 100)
+			{
+				result.push_back('C');
+				x -= 100;
+			}
+
+			if (x >= 90)
+			{
+				result.push_back('X');
+				result.push_back('C');
+				x -= 90;
+			}
+			else if (x >= 50)
+			{
+				result.push_back('L');
+				x -= 50;
+			}
+			else if (x >= 40)
+			{
+				result.push_back('X');
+				result.push_back('L');
+				x -= 40;
+			}
+
+			while (x >= 10)
+			{
+				result.push_back('X');
+				x -= 10;
+			}
+
+			if (x >= 9)
+			{
+				result.push_back('I');
+				result.push_back('X');
+				x -= 9;
+			}
+			else if (x >= 5)
+			{
+				result.push_back('V');
+				x -= 5;
+			}
+			else if (x >= 4)
+			{
+				result.push_back('I');
+				result.push_back('V');
+				x -= 4;
+			}
+
+			while (x >= 1)
+			{
+				result.push_back('I');
+				--x;
+			}
+
+			return result;
+		}
 	} //detail
 
 
@@ -347,6 +437,20 @@ namespace ion::utilities::convert
 		static_assert(std::is_floating_point_v<T>);
 		assert(precision.value_or(0) >= 0 && precision.value_or(0) <= std::numeric_limits<T>::digits10);
 		return detail::floating_point_to_string(value, precision);
+	}
+
+	///@}
+
+	/**
+		@name Number to Roman numerals
+		Short integers
+		@{
+	*/
+
+	///@brief Converts the given number to Roman numerals
+	[[nodiscard]] inline auto ToRomanNumerals(short value)
+	{
+		return detail::number_to_roman_numerals(value);
 	}
 
 	///@}
