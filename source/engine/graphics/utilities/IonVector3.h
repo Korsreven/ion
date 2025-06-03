@@ -363,6 +363,20 @@ namespace ion::graphics::utilities
 			///@}
 
 			/**
+				@name Abs
+				@{
+			*/
+
+			///@brief Sets each component to the absolute value of the components
+			Vector3& Abs() noexcept;
+
+			///@brief Sets each component to the absolute value of the components
+			///@details Returns the result as a copy
+			[[nodiscard]] Vector3 AbsCopy() const noexcept;
+
+			///@}
+
+			/**
 				@name Angle
 				@{
 			*/

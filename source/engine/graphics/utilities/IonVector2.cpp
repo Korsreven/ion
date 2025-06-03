@@ -63,6 +63,21 @@ Vector2& Vector2::operator=(const Vector3 &vector) noexcept
 
 
 /*
+	Abs
+*/
+
+Vector2& Vector2::Abs() noexcept
+{
+	return *this = AbsCopy();
+}
+
+Vector2 Vector2::AbsCopy() const noexcept
+{
+	return {math::Abs(x_), math::Abs(y_)};
+}
+
+
+/*
 	Angle
 */
 

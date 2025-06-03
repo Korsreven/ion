@@ -339,6 +339,20 @@ namespace ion::graphics::utilities
 			///@}
 
 			/**
+				@name Abs
+				@{
+			*/
+
+			///@brief Sets each component to the absolute value of the components
+			Vector2& Abs() noexcept;
+
+			///@brief Sets each component to the absolute value of the components
+			///@details Returns the result as a copy
+			[[nodiscard]] Vector2 AbsCopy() const noexcept;
+
+			///@}
+
+			/**
 				@name Angle
 				@{
 			*/
@@ -577,6 +591,8 @@ namespace ion::graphics::utilities
 			///@brief Sets each component to one, negative one or zero, depending on the signs of the components
 			///@details Returns the result as a copy
 			[[nodiscard]] Vector2 SignCopy() const noexcept;
+
+			///@}
 	};
 
 
