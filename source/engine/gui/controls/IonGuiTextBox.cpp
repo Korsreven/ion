@@ -730,7 +730,7 @@ void GuiTextBox::UpdateRepeatPhaseDuration() noexcept
 	Content
 */
 
-void GuiTextBox::InsertTextContent([[maybe_unused]] int off, std::string content)
+void GuiTextBox::InsertTextContent([[maybe_unused]] int off, [[maybe_unused]] std::string content)
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
@@ -739,7 +739,7 @@ void GuiTextBox::InsertTextContent([[maybe_unused]] int off, std::string content
 	}
 }
 
-void GuiTextBox::ReplaceTextContent([[maybe_unused]] int first, [[maybe_unused]] int last, std::string content)
+void GuiTextBox::ReplaceTextContent([[maybe_unused]] int first, [[maybe_unused]] int last, [[maybe_unused]] std::string content)
 {
 	if (auto skin = static_cast<TextBoxSkin*>(skin_.get());
 		skin && skin->Text && skin->Text->Get())
