@@ -682,7 +682,7 @@ text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 	text::TextLines lines;
 	text::TextBlocks line_text_blocks;
 
-	for (auto &text_block : text_blocks)
+	for (auto i = 0; auto &text_block : text_blocks)
 	{
 		//Content contains one or more new lines characters
 		//Split text block into multiple copies
@@ -694,7 +694,7 @@ text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 			text_block.Content.clear();
 				//Clear content before duplicating text text_block
 			
-			for (auto i = 0; auto &part : parts)
+			for (auto j = 0; auto &part : parts)
 			{
 				if (!std::empty(part))
 				{
@@ -702,12 +702,15 @@ text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks)
 					line_text_blocks.back().Content = std::move(part);
 				}
 				
-				if (++i < std::ssize(parts))
+				if (++j < std::ssize(parts) ||
+					(i + 1 == std::ssize(text_blocks) && text_block.HardBreak))
 					lines.push_back({std::move(line_text_blocks), text_block.HardBreak});
 			}
 		}
 		else
 			line_text_blocks.push_back(std::move(text_block));
+
+		++i;
 	}
 
 	if (!std::empty(line_text_blocks))
