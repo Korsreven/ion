@@ -291,9 +291,6 @@
     <ClCompile Include="..\source\engine\utilities\IonMath.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\engine\utilities\IonRandom.cpp">
-      <Filter>Source Files\utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\engine\utilities\IonStringUtility.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>

@@ -61,15 +61,18 @@ namespace ion::utilities::random
 		using random_distribution_t = typename random_distribution<T>::type;
 
 
-		///@brief Random generator class for seeding a 32 and 64 bit mersenne twister engine
-		class random_generator final
+		///@brief Random number generator class with a 32 and 64 bit engine
+		template <typename Engine32_t = std::mt19937, typename Engine64_t = std::mt19937_64>
+		class random_number_generator final
 		{
 			private:
 
-				template <typename T, decltype(T::state_size) N = T::state_size>
-				static auto SeedEngine32() noexcept
+				Engine32_t engine32_;
+				Engine64_t engine64_;
+
+				static auto GetSeededEngine32() noexcept
 				{
-					std::array<typename T::result_type, N> data;
+					std::array<Engine32_t::result_type, Engine32_t::state_size> data;
 
 					std::random_device device;
 					std::generate(std::begin(data), std::end(data),
@@ -80,13 +83,12 @@ namespace ion::utilities::random
 					);
 
 					std::seed_seq seed(std::cbegin(data), std::cend(data));
-					return T{seed};
+					return Engine32_t{seed};
 				}
 
-				template <typename T, decltype(T::state_size) N = T::state_size>
-				static auto SeedEngine64() noexcept
+				static auto GetSeededEngine64() noexcept
 				{
-					std::array<typename T::result_type, N> data;
+					std::array<Engine64_t::result_type, Engine64_t::state_size> data;
 
 					std::random_device device;
 					std::generate(std::begin(data), std::end(data),
@@ -97,37 +99,72 @@ namespace ion::utilities::random
 					);
 
 					std::seed_seq seed(std::cbegin(data), std::cend(data));
-					return T{seed};
+					return Engine64_t{seed};
 				}
 
 			public:
 
-				static void Initialize() noexcept;
-
-				static inline auto &Engine32() noexcept
+				random_number_generator() noexcept :
+					engine32_{GetSeededEngine32()},
+					engine64_{GetSeededEngine64()}
 				{
-					static auto engine32{SeedEngine32<std::mt19937>()};
-					return engine32;
+					//Empty
 				}
 
-				static inline auto &Engine64() noexcept
+				random_number_generator(std::random_device::result_type seed) :
+					engine32_{seed},
+					engine64_{static_cast<uint64>(seed)}
 				{
-					static auto engine64{SeedEngine64<std::mt19937_64>()};
-					return engine64;
+					//Empty
+				}
+
+				random_number_generator(Engine32_t::result_type seed32, Engine64_t::result_type seed64) :
+					engine32_{seed32},
+					engine64_{seed64}
+				{
+					//Empty
+				}
+
+
+				inline auto &Engine32() noexcept
+				{
+					return engine32_;
+				}
+
+				inline auto &Engine64() noexcept
+				{
+					return engine64_;
 				}
 
 				template <typename T>
-				static auto Number32(T min, T max) noexcept
+				auto Number32(T min, T max) noexcept
 				{
 					return random_distribution_t<T>{min, max}(Engine32());
 				}
 
 				template <typename T>
-				static auto Number64(T min, T max) noexcept
+				auto Number64(T min, T max) noexcept
 				{
 					return random_distribution_t<T>{min, max}(Engine64());
 				}
 		};
+
+		inline random_number_generator<> default_rng;
+
+
+		///@brief Returns a random number in range [min, max]
+		template <typename T>
+		inline auto get_number(T min, T max, random_number_generator<> &rng) noexcept
+		{
+			static_assert(std::is_arithmetic_v<T>);
+
+			//Use 32 bit engine
+			if constexpr (sizeof(T) <= 4)
+				return rng.Number32(min, max);
+			//Use 64 bit engine
+			else
+				return rng.Number64(min, max);
+		}
 	} //detail
 
 
@@ -140,14 +177,14 @@ namespace ion::utilities::random
 	template <typename T>
 	[[nodiscard]] inline auto Number(T min, T max) noexcept
 	{
-		static_assert(std::is_arithmetic_v<T>);
+		return detail::get_number(min, max, detail::default_rng);
+	}
 
-		//Use 32 bit engine
-		if constexpr (sizeof(T) <= 4)
-			return detail::random_generator::Number32(min, max);
-		//Use 64 bit engine
-		else
-			return detail::random_generator::Number64(min, max);
+	///@brief Returns a random number in range [min, max]
+	template <typename T>
+	[[nodiscard]] inline auto Number(T min, T max, detail::random_number_generator<> &rng) noexcept
+	{
+		return detail::get_number(min, max, rng);
 	}
 
 	///@brief Returns a random number in range [0, max]
@@ -155,6 +192,13 @@ namespace ion::utilities::random
 	[[nodiscard]] inline auto Number(T max) noexcept
 	{
 		return Number(T{0}, max);
+	}
+
+	///@brief Returns a random number in range [0, max]
+	template <typename T>
+	[[nodiscard]] inline auto Number(T max, detail::random_number_generator<> &rng) noexcept
+	{
+		return Number(T{0}, max, rng);
 	}
 
 	///@}
@@ -172,10 +216,24 @@ namespace ion::utilities::random
 		return Number(T{1});
 	}
 
+	///@brief Returns a random floating point number in range [0.0, 1.0]
+	template <typename T>
+	[[nodiscard]] inline auto Number(detail::random_number_generator<> &rng) noexcept
+	{
+		static_assert(std::is_floating_point_v<T>);
+		return Number(T{1}, rng);
+	}
+
 	///@brief Returns a random real number in range [0.0, 1.0]
 	[[nodiscard]] inline auto Number() noexcept
 	{
 		return Number<real>();
+	}
+
+	///@brief Returns a random real number in range [0.0, 1.0]
+	[[nodiscard]] inline auto Number(detail::random_number_generator<> &rng) noexcept
+	{
+		return Number<real>(rng);
 	}
 
 	///@}

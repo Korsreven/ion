@@ -320,7 +320,6 @@
     <ClCompile Include="..\source\engine\utilities\IonCrypto.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonFileUtility.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonMath.cpp" />
-    <ClCompile Include="..\source\engine\utilities\IonRandom.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonStringUtility.cpp" />
     <ClCompile Include="..\source\main.cpp" />
   </ItemGroup>
