@@ -577,61 +577,68 @@ bool SceneNode::AxisAligned() const noexcept
 }
 
 
-const Aabb& SceneNode::WorldAxisAlignedBoundingBox(bool derive) const noexcept
+const Aabb& SceneNode::WorldAxisAlignedBoundingBox(bool derive, bool apply_extent) const noexcept
 {
+	auto &cached_world_aabb = apply_extent ? world_aabb_.first : world_aabb_.second;
+
 	if (derive)
 	{
-		world_aabb_ = {};
+		cached_world_aabb = {};
 
 		//Merge world AABBs
 		for (auto &object : attached_objects_)
-			world_aabb_.Merge(std::visit([&](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(derive); }, object));
+			cached_world_aabb.Merge(std::visit([&](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(derive, apply_extent); }, object));
 
 		for (auto &child_node : child_nodes_)
-			world_aabb_.Merge(child_node->WorldAxisAlignedBoundingBox(derive)); //Recursive
+			cached_world_aabb.Merge(child_node->WorldAxisAlignedBoundingBox(derive, apply_extent)); //Recursive
 	}
 
-	return world_aabb_;
+	return cached_world_aabb;
 }
 
-const Obb& SceneNode::WorldOrientedBoundingBox(bool derive) const noexcept
+const Obb& SceneNode::WorldOrientedBoundingBox(bool derive, bool apply_extent) const noexcept
 {
+	auto &cached_world_obb = apply_extent ? world_obb_.first : world_obb_.second;
+
 	if (derive)
 	{
-		aabb_ = {};
+		auto &cached_aabb = apply_extent ? aabb_.first : aabb_.second;
+		cached_aabb = {};
 
 		//Merge AABBs
 		for (auto &object : attached_objects_)
-			aabb_.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
+			cached_aabb.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
 
 		for (auto &child_node : child_nodes_)
 		{
-			static_cast<void>(child_node->WorldOrientedBoundingBox(derive)); //Recursive
-			aabb_.Merge(child_node->aabb_);
+			static_cast<void>(child_node->WorldOrientedBoundingBox(derive, apply_extent)); //Recursive
+			cached_aabb.Merge(apply_extent ? child_node->aabb_.first : child_node->aabb_.second);
 		}
 
-		world_obb_ = aabb_;
-		world_obb_.Transform(Matrix3::Transformation(FullTransformation()));
+		cached_world_obb = cached_aabb;
+		cached_world_obb.Transform(Matrix3::Transformation(FullTransformation()));
 	}
 
-	return world_obb_;
+	return cached_world_obb;
 }
 
-const Sphere& SceneNode::WorldBoundingSphere(bool derive) const noexcept
+const Sphere& SceneNode::WorldBoundingSphere(bool derive, bool apply_extent) const noexcept
 {
+	auto &cached_world_sphere = apply_extent ? world_sphere_.first : world_sphere_.second;
+
 	if (derive)
 	{
-		world_sphere_ = {};
+		cached_world_sphere = {};
 
 		//Merge world spheres
 		for (auto &object : attached_objects_)
-			world_sphere_.Merge(std::visit([&](auto &&object) noexcept { return object->WorldBoundingSphere(derive); }, object));
+			cached_world_sphere.Merge(std::visit([&](auto &&object) noexcept { return object->WorldBoundingSphere(derive, apply_extent); }, object));
 
 		for (auto &child_node : child_nodes_)
-			world_sphere_.Merge(child_node->WorldBoundingSphere(derive)); //Recursive
+			cached_world_sphere.Merge(child_node->WorldBoundingSphere(derive, apply_extent)); //Recursive
 	}
 
-	return world_sphere_;
+	return cached_world_sphere;
 }
 
 

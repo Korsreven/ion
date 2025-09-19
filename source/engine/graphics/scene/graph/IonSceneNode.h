@@ -292,10 +292,10 @@ namespace ion::graphics::scene::graph
 			mutable Vector2 derived_scaling_;
 			mutable Matrix4 full_tranformation_;
 
-			mutable Aabb aabb_;
-			mutable Aabb world_aabb_;
-			mutable Obb world_obb_;
-			mutable Sphere world_sphere_;
+			mutable std::pair<Aabb, Aabb> aabb_;
+			mutable std::pair<Aabb, Aabb> world_aabb_;
+			mutable std::pair<Obb, Obb> world_obb_;
+			mutable std::pair<Sphere, Sphere> world_sphere_;
 
 			mutable bool need_update_ = true;
 			mutable bool need_z_update_ = true;
@@ -853,13 +853,13 @@ namespace ion::graphics::scene::graph
 
 
 			///@brief Returns the world axis-aligned bounding box (AABB) for objects attached to this and all descendant nodes
-			[[nodiscard]] const Aabb& WorldAxisAlignedBoundingBox(bool derive = true) const noexcept;
+			[[nodiscard]] const Aabb& WorldAxisAlignedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept;
 
 			///@brief Returns the world oriented bounding box (OBB) for objects attached to this and all descendant nodes
-			[[nodiscard]] const Obb& WorldOrientedBoundingBox(bool derive = true) const noexcept;
+			[[nodiscard]] const Obb& WorldOrientedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept;
 
 			///@brief Returns the world bounding sphere for objects attached to this and all descendant nodes
-			[[nodiscard]] const Sphere& WorldBoundingSphere(bool derive = true) const noexcept;
+			[[nodiscard]] const Sphere& WorldBoundingSphere(bool derive = true, bool apply_extent = true) const noexcept;
 
 			///@}
 

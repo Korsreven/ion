@@ -440,34 +440,34 @@ namespace ion::graphics::scene
 			///@brief Returns the world axis-aligned bounding box (AABB) for this movable object
 			[[nodiscard]] inline auto& WorldAxisAlignedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
-				if (derive)
-					apply_extent ?
-					(world_aabb_.first = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent)) :
-					(world_aabb_.second = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent));
+				auto &cached_world_aabb = apply_extent ? world_aabb_.first : world_aabb_.second;
 
-				return apply_extent ? world_aabb_.first : world_aabb_.second;
+				if (derive)
+					cached_world_aabb = DeriveWorldAxisAlignedBoundingBox(aabb_, apply_extent);
+
+				return cached_world_aabb;
 			}
 
 			///@brief Returns the world oriented bounding box (OBB) for this movable object
 			[[nodiscard]] inline auto& WorldOrientedBoundingBox(bool derive = true, bool apply_extent = true) const noexcept
 			{
-				if (derive)
-					apply_extent ?
-					(world_obb_.first = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent)) :
-					(world_obb_.second = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent));
+				auto &cached_world_obb = apply_extent ? world_obb_.first : world_obb_.second;
 
-				return apply_extent ? world_obb_.first : world_obb_.second;
+				if (derive)
+					cached_world_obb = DeriveWorldOrientedBoundingBox(obb_, aabb_, apply_extent);
+
+				return cached_world_obb;
 			}
 
 			///@brief Returns the world bounding sphere for this movable object
 			[[nodiscard]] inline auto& WorldBoundingSphere(bool derive = true, bool apply_extent = true) const noexcept
 			{
-				if (derive)
-					apply_extent ?
-					(world_sphere_.first = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent)) :
-					(world_sphere_.second = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent));
+				auto &cached_world_sphere = apply_extent ? world_sphere_.first : world_sphere_.second;
 
-				return apply_extent ? world_sphere_.first : world_sphere_.second;
+				if (derive)
+					cached_world_sphere = DeriveWorldBoundingSphere(sphere_, aabb_, apply_extent);
+
+				return cached_world_sphere;
 			}
 
 
