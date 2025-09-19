@@ -208,7 +208,7 @@ namespace ion::utilities::random
 		@{
 	*/
 
-	///@brief Returns a random floating point number in range [0.0, 1.0]
+	///@brief Returns a random floating point number in range [0.0, 1.0)
 	template <typename T>
 	[[nodiscard]] inline auto Number() noexcept
 	{
@@ -216,7 +216,7 @@ namespace ion::utilities::random
 		return Number(T{1});
 	}
 
-	///@brief Returns a random floating point number in range [0.0, 1.0]
+	///@brief Returns a random floating point number in range [0.0, 1.0)
 	template <typename T>
 	[[nodiscard]] inline auto Number(detail::random_number_generator<> &rng) noexcept
 	{
@@ -224,13 +224,13 @@ namespace ion::utilities::random
 		return Number(T{1}, rng);
 	}
 
-	///@brief Returns a random real number in range [0.0, 1.0]
+	///@brief Returns a random real number in range [0.0, 1.0)
 	[[nodiscard]] inline auto Number() noexcept
 	{
 		return Number<real>();
 	}
 
-	///@brief Returns a random real number in range [0.0, 1.0]
+	///@brief Returns a random real number in range [0.0, 1.0)
 	[[nodiscard]] inline auto Number(detail::random_number_generator<> &rng) noexcept
 	{
 		return Number<real>(rng);
