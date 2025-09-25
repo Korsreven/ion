@@ -54,7 +54,7 @@ namespace ion::graphics::scene::query
 				@{
 			*/
 
-			ray_scene_query::ResultType Execute(scene_query::detail::query_objects &objects) const noexcept;
+			ray_scene_query::ResultType Execute(scene_query::detail::query_objects &objects, bool derive) const noexcept;
 
 			///@}
 
@@ -122,10 +122,10 @@ namespace ion::graphics::scene::query
 			*/
 
 			///@brief Returns the result of the ray scene query from the given node
-			[[nodiscard]] ray_scene_query::ResultType Execute(SceneNode &node) const noexcept override;
+			[[nodiscard]] ray_scene_query::ResultType Execute(SceneNode &node, bool derive = true) const noexcept override;
 
 			///@brief Returns the result of the ray scene query amongst the given movable objects
-			[[nodiscard]] ray_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects) const noexcept override;
+			[[nodiscard]] ray_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects, bool derive = true) const noexcept override;
 
 			///@}
 	};

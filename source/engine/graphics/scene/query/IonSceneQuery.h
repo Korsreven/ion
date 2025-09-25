@@ -293,10 +293,10 @@ namespace ion::graphics::scene::query
 			*/
 
 			///@brief Returns the result of the scene query from the given node
-			[[nodiscard]] virtual ResultT Execute(SceneNode &node) const noexcept = 0;
+			[[nodiscard]] virtual ResultT Execute(SceneNode &node, bool derive) const noexcept = 0;
 
 			///@brief Returns the result of the scene query amongst the given movable objects
-			[[nodiscard]] virtual ResultT Execute(scene_query::MovableObjects &movable_objects) const noexcept = 0;
+			[[nodiscard]] virtual ResultT Execute(scene_query::MovableObjects &movable_objects, bool derive) const noexcept = 0;
 
 			///@}
 	};

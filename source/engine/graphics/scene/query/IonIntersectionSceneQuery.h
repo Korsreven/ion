@@ -57,7 +57,7 @@ namespace ion::graphics::scene::query
 				@{
 			*/
 
-			intersection_scene_query::ResultType Execute(scene_query::detail::query_objects &objects) const noexcept;
+			intersection_scene_query::ResultType Execute(scene_query::detail::query_objects &objects, bool derive) const noexcept;
 
 			///@}
 
@@ -73,10 +73,10 @@ namespace ion::graphics::scene::query
 			*/
 
 			///@brief Returns the result of the intersection scene query from the given node
-			[[nodiscard]] intersection_scene_query::ResultType Execute(SceneNode &node) const noexcept override;
+			[[nodiscard]] intersection_scene_query::ResultType Execute(SceneNode &node, bool derive = true) const noexcept override;
 
 			///@brief Returns the result of the intersection scene query amongst the given movable objects
-			[[nodiscard]] intersection_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects) const noexcept override;
+			[[nodiscard]] intersection_scene_query::ResultType Execute(scene_query::MovableObjects &movable_objects, bool derive = true) const noexcept override;
 
 			///@}
 	};
