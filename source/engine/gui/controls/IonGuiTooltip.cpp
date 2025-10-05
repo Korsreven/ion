@@ -151,9 +151,6 @@ void GuiTooltip::UpdateCaption() noexcept
 			//Caption text
 			if (auto &text = part->Get(); text)
 			{
-				//Area size
-				text->AreaSize({});
-
 				//Padding
 				text->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
 

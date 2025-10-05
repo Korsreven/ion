@@ -224,6 +224,8 @@ namespace ion::graphics::fonts
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				NonOwningPtr<TypeFace> type_face) const;
 
+			Vector2 GetDisplayedSize(const text::TextLines &text_lines) const noexcept;
+
 		public:
 
 			///@brief Constructs a new (unbounded) text with the given name, content, alignment and a type face
@@ -416,6 +418,9 @@ namespace ion::graphics::fonts
 				return area_size_;
 			}
 
+			///@brief Returns the size of the displayed text
+			[[nodiscard]] Vector2 DisplayedSize() const noexcept;
+
 			///@brief Returns the minimum area size needed to display the content in this text
 			[[nodiscard]] Vector2 MinimumAreaSize() const noexcept;
 
@@ -437,6 +442,9 @@ namespace ion::graphics::fonts
 			{
 				return line_height_factor_;
 			}
+
+			///@brief Returns the line size in pixels at the given line offset
+			[[nodiscard]] Vector2 LineSize(int line_off) const noexcept;
 
 
 			///@brief Returns which line (from the displayed text) to start rendering from

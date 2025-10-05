@@ -89,7 +89,7 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const fonts::Text &text,
 	const Vector2 &position, real rotation) noexcept
 {
 	auto ppu = Engine::PixelsPerUnit();
-	auto size = text.MinimumAreaSize() / ppu;
+	auto size = text.DisplayedSize() / ppu;
 	auto [half_width, half_height] = (size * 0.5_r).XY();
 	auto [x, y] = position.XY();
 

@@ -208,6 +208,35 @@ text::TextLines Text::MakeFormattedLines(text::TextBlocks text_blocks,
 }
 
 
+Vector2 Text::GetDisplayedSize(const text::TextLines &text_lines) const noexcept
+{
+	using namespace graphics::utilities;
+
+	//One or more lines to display
+	if (auto max_lines = max_lines_.value_or(std::ssize(text_lines));
+		!std::empty(text_lines) &&
+		from_line_ < std::ssize(text_lines) && max_lines > 0)
+	{
+		if (from_line_ + max_lines > std::ssize(text_lines))
+			max_lines = std::ssize(text_lines) - from_line_;
+
+		auto area_size = vector2::Zero;
+
+		for (auto iter = std::begin(text_lines) + from_line_,
+			end = iter + max_lines; iter != end; ++iter)
+			area_size.X(std::max(area_size.X(), iter->Size->X()));
+
+		if (auto line_height = LineHeight();
+			line_height && *line_height > 0.0_r)
+			area_size.Y((max_lines - from_line_) * *line_height);
+
+		return (area_size + padding_ * 2.0_r).CeilCopy(vector2::Zero);
+	}
+	else
+		return vector2::Zero;
+}
+
+
 //Public
 
 Text::Text(std::string name, std::string content, text::TextAlignment alignment,
@@ -358,32 +387,17 @@ void Text::Lettering(NonOwningPtr<TypeFace> type_face) noexcept
 	Observers
 */
 
+Vector2 Text::DisplayedSize() const noexcept
+{
+	return GetDisplayedSize(formatted_lines_);
+}
+
 Vector2 Text::MinimumAreaSize() const noexcept
 {
-	using namespace graphics::utilities;
-
-	//One or more lines to display
-	if (auto max_lines = max_lines_.value_or(std::ssize(formatted_lines_));
-		!std::empty(formatted_lines_) &&
-		from_line_ < std::ssize(formatted_lines_) && max_lines > 0)
-	{
-		if (from_line_ + max_lines > std::ssize(formatted_lines_))
-			max_lines = std::ssize(formatted_lines_) - from_line_;
-
-		auto area_size = vector2::Zero;
-
-		for (auto iter = std::begin(formatted_lines_) + from_line_,
-			end = iter + max_lines; iter != end; ++iter)
-			area_size.X(std::max(area_size.X(), iter->Size->X()));
-
-		if (auto line_height = LineHeight();
-			line_height && *line_height > 0.0_r)
-			area_size.Y((max_lines - from_line_) * *line_height);
-
-		return (area_size + padding_ * 2.0_r).CeilCopy(vector2::Zero);
-	}
+	if (area_size_)
+		return GetDisplayedSize(MakeFormattedLines(formatted_blocks_, {}, padding_, type_face_));
 	else
-		return vector2::Zero;
+		return DisplayedSize();
 }
 
 std::optional<real> Text::LineHeight() const noexcept
@@ -395,6 +409,16 @@ std::optional<real> Text::LineHeight() const noexcept
 	}
 	else
 		return {};
+}
+
+Vector2 Text::LineSize(int line_off) const noexcept
+{
+	using namespace graphics::utilities;
+
+	if (line_off >= 0 && line_off < std::ssize(formatted_lines_))
+		return *formatted_lines_[line_off].Size;
+	else
+		return vector2::Zero;
 }
 
 
