@@ -74,7 +74,6 @@ namespace ion::gui::controls
 
 		protected:
 
-			bool auto_size_ = true;
 			bool follow_mouse_cursor_ = false;
 
 			duration hold_time_ = gui_tooltip::detail::default_hold_time;
@@ -100,7 +99,6 @@ namespace ion::gui::controls
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
 
-			virtual void UpdateCaption() noexcept override;
 			void UpdatePosition(Vector2 position) noexcept;
 			void AdjustInView() noexcept;
 
@@ -131,12 +129,6 @@ namespace ion::gui::controls
 				@name Modifiers
 				@{
 			*/
-
-			///@brief Sets whether or not this tooltip should automatically adjust its size
-			inline void AutoSize(bool auto_size) noexcept
-			{
-				auto_size_ = auto_size;
-			}
 
 			///@brief Sets whether or not this tooltip should automatically follow the mouse cursor
 			inline void FollowMouseCursor(bool follow_mouse_cursor) noexcept
@@ -201,12 +193,6 @@ namespace ion::gui::controls
 				@name Observers
 				@{
 			*/
-
-			///@brief Returns whether or not this tooltip should automatically adjust its size
-			[[nodiscard]] inline auto AutoSize() const noexcept
-			{
-				return auto_size_;
-			}
 
 			///@brief Returns whether or not this tooltip should automatically follow the mouse cursor
 			[[nodiscard]] inline auto FollowMouseCursor() const noexcept

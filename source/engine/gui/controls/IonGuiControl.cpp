@@ -12,6 +12,8 @@ File:	IonGuiControl.cpp
 
 #include "IonGuiControl.h"
 
+#include <cmath>
+
 #include "IonEngine.h"
 #include "graphics/scene/IonDrawableText.h"
 #include "graphics/scene/IonModel.h"
@@ -1303,6 +1305,32 @@ std::optional<Vector2> GuiControl::BorderSize() const noexcept
 	{
 		if (auto border_size = detail::get_border_size(*skin_, true); border_size)
 			return *border_size * 0.5_r;
+	}
+
+	return {};
+}
+
+std::optional<Vector2> GuiControl::MinimumSize() const noexcept
+{
+	if (skin_)
+	{
+		if (auto &part = skin_->Caption; part)
+		{
+			//Caption text
+			if (auto &text = part->GetImmutable(); text)
+			{
+				auto size = text->MinimumAreaSize();
+
+				//Make sure there is enough space (rounding errors)
+				//Round up so width and height are even
+				auto [width, height] = size.XY();
+				size = {width + (std::fmod(width, 2.0_r) == 0.0_r ? 2.0_r : 1.0_r),
+						height + (std::fmod(height, 2.0_r) == 0.0_r ? 2.0_r : 1.0_r)};
+
+				return size / Engine::PixelsPerUnit() +
+					detail::get_border_size(*skin_, false).value_or(vector2::Zero);
+			}
+		}
 	}
 
 	return {};

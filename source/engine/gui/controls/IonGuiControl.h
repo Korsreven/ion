@@ -990,6 +990,11 @@ namespace ion::gui::controls
 			///@details Returns nullopt if this control has no border size
 			[[nodiscard]] std::optional<Vector2> BorderSize() const noexcept;
 
+			///@brief Returns the minimum size that this control must be to fully display its caption
+			///@details The returned size assumes that the caption layout is on the inside
+			///Returns nullopt if this control has no caption
+			[[nodiscard]] std::optional<Vector2> MinimumSize() const noexcept;
+
 
 			///@brief Returns the caption text for this control
 			///@details Returns nullopt if this control has no caption

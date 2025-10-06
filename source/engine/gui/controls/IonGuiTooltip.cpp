@@ -12,13 +12,9 @@ File:	IonGuiTooltip.cpp
 
 #include "IonGuiTooltip.h"
 
-#include <cmath>
 #include "IonEngine.h"
 #include "graphics/render/IonViewport.h"
 #include "graphics/scene/IonCamera.h"
-#include "graphics/scene/IonDrawableText.h"
-#include "graphics/scene/IonModel.h"
-#include "graphics/scene/IonSceneManager.h"
 #include "graphics/scene/graph/IonSceneNode.h"
 #include "graphics/utilities/IonAabb.h"
 #include "gui/IonGuiController.h"
@@ -139,52 +135,6 @@ OwningPtr<gui_control::ControlSkin> GuiTooltip::AttuneSkin(OwningPtr<gui_control
 		return skin;
 }
 
-
-void GuiTooltip::UpdateCaption() noexcept
-{
-	static auto need_update = true;
-
-	if (skin_)
-	{
-		if (auto &part = skin_->Caption; part && auto_size_ && need_update)
-		{
-			//Caption text
-			if (auto &text = part->Get(); text)
-			{
-				//Padding
-				text->Padding(caption_padding_.value_or(gui_control::detail::default_caption_padding_size));
-
-				//Content
-				if (caption_)
-					text->Content(*caption_);
-				else
-					text->Clear();
-
-
-				if (auto size = text->MinimumAreaSize(); size != vector2::Zero)
-				{
-					//Make sure there is enough space (rounding errors)
-					//Round up so both width and height are even				
-					size.X(size.X() + (std::fmod(size.X(), 2.0_r) == 0.0_r ? 2.0_r : 1.0_r));
-					size.Y(size.Y() + (std::fmod(size.Y(), 2.0_r) == 0.0_r ? 2.0_r : 1.0_r));
-					
-					auto ppu = Engine::PixelsPerUnit();
-					size /= ppu;
-
-					auto border_size =
-						gui_control::detail::get_border_size(*skin_, false).value_or(vector2::Zero);
-
-					need_update = false;
-					Size(size + border_size);
-					need_update = true;
-					return;
-				}
-			}
-		}
-	}
-
-	GuiLabel::UpdateCaption(); //Use base functionality
-}
 
 void GuiTooltip::UpdatePosition(Vector2 position) noexcept
 {
@@ -333,18 +283,16 @@ void GuiTooltip::UpdatePhaseDuration() noexcept
 //Public
 
 GuiTooltip::GuiTooltip(std::string name, const std::optional<Vector2> &size, std::optional<std::string> text) noexcept :
-
-	GuiLabel{std::move(name), size, std::move(text)},
-	auto_size_{!size}
+	GuiLabel{std::move(name), size, std::move(text)}
 {
+	auto_size_ = !size;
 	DefaultSetup();
 }
 
 GuiTooltip::GuiTooltip(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size, std::optional<std::string> text) :
-
-	GuiLabel{std::move(name), skin, size, std::move(text)},
-	auto_size_{!size}
+	GuiLabel{std::move(name), skin, size, std::move(text)}
 {
+	auto_size_ = !size;
 	DefaultSetup();
 }
 

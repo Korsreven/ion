@@ -44,12 +44,17 @@ namespace ion::gui::controls
 
 		protected:
 
+			bool auto_size_ = false;
+
+
 			/**
 				@name Skins
 				@{
 			*/
 
 			virtual OwningPtr<gui_control::ControlSkin> AttuneSkin(OwningPtr<gui_control::ControlSkin> skin) const override;
+
+			virtual void UpdateCaption() noexcept override;
 
 			///@}
 
@@ -62,6 +67,33 @@ namespace ion::gui::controls
 			///@brief Constructs a label with the given name, skin, size, caption and hit boxes
 			GuiLabel(std::string name, const skins::GuiSkin &skin, const std::optional<Vector2> &size,
 				std::optional<std::string> caption, gui_control::BoundingBoxes hit_boxes = {});
+
+
+			/**
+				@name Modifiers
+				@{
+			*/
+
+			///@brief Sets whether or not this label should automatically adjust its size
+			inline void AutoSize(bool auto_size) noexcept
+			{
+				auto_size_ = auto_size;
+			}
+
+			///@}
+
+			/**
+				@name Observers
+				@{
+			*/
+
+			///@brief Returns whether or not this label should automatically adjust its size
+			[[nodiscard]] inline auto AutoSize() const noexcept
+			{
+				return auto_size_;
+			}
+
+			///@}
 	};
 
 } //ion::gui::controls

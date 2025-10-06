@@ -50,6 +50,28 @@ OwningPtr<gui_control::ControlSkin> GuiLabel::AttuneSkin(OwningPtr<gui_control::
 }
 
 
+void GuiLabel::UpdateCaption() noexcept
+{
+	static auto need_update = true;
+
+	if (auto_size_ && need_update)
+	{
+		GuiControl::UpdateCaption();
+
+		if (auto size = MinimumSize(); size)
+		{
+			need_update = false;
+			Size(*size);
+			need_update = true;
+		}
+
+		return;
+	}
+
+	GuiControl::UpdateCaption(); //Use base functionality
+}
+
+
 //Public
 
 GuiLabel::GuiLabel(std::string name, const std::optional<Vector2> &size,
