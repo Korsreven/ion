@@ -100,8 +100,8 @@ namespace ion::gui::controls
 
 		namespace detail
 		{
-			constexpr auto default_item_height_factor = 2.0_r;
 			constexpr auto default_item_padding_size = 2.0_r;
+			constexpr auto default_item_spacing = 2.0_r;
 			constexpr auto default_selection_padding_size = 0.0_r;
 
 			constexpr auto default_icon_column_width_percent = 0.25_r;
@@ -162,8 +162,8 @@ namespace ion::gui::controls
 		protected:
 		
 			std::optional<int> item_index_;
-			std::optional<real> item_height_factor_;
 			std::optional<Vector2> item_padding_;
+			std::optional<real> item_spacing_;
 			gui_list_box::ListBoxItemLayout item_layout_ = gui_list_box::ListBoxItemLayout::Left;
 			std::optional<Vector2> selection_padding_;
 			
@@ -303,22 +303,22 @@ namespace ion::gui::controls
 			///@brief Sets the item index of this list box to the given index
 			void ItemIndex(std::optional<int> index) noexcept;
 
-			///@brief Sets the item height factor for this list box to the given factor
-			inline void ItemHeightFactor(std::optional<real> factor) noexcept
-			{
-				if (item_height_factor_ != factor)
-				{
-					item_height_factor_ = factor;
-					UpdateLines();
-				}
-			}
-
 			///@brief Sets the item padding for this list box to the given padding
 			inline void ItemPadding(const std::optional<Vector2> &padding) noexcept
 			{
 				if (item_padding_ != padding)
 				{
 					item_padding_ = padding;
+					UpdateLines();
+				}
+			}
+
+			///@brief Sets the item spacing for this list box to the given spacing
+			inline void ItemSpacing(std::optional<real> spacing) noexcept
+			{
+				if (item_spacing_ != spacing)
+				{
+					item_spacing_ = spacing;
 					UpdateLines();
 				}
 			}
@@ -429,18 +429,18 @@ namespace ion::gui::controls
 				return item_index_;
 			}
 
-			///@brief Returns the item height factor for this list box
-			///@details Returns nullopt if no custom item height factor has been set
-			[[nodiscard]] inline auto ItemHeightFactor() const noexcept
-			{
-				return item_height_factor_;
-			}
-
 			///@brief Returns the item padding for this list box
 			///@details Returns nullopt if no custom item padding has been set
 			[[nodiscard]] inline auto ItemPadding() const noexcept
 			{
 				return item_padding_;
+			}
+
+			///@brief Returns the item spacing for this list box
+			///@details Returns nullopt if no custom item spacing has been set
+			[[nodiscard]] inline auto ItemSpacing() const noexcept
+			{
+				return item_spacing_;
 			}
 
 			///@brief Returns the item layout for this list box

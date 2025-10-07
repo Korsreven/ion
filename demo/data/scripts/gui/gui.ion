@@ -140,7 +140,7 @@ gui
 				position: vec2(0.8, 0.25);
 				caption: "My list box";
 				tooltip: "My list box tooltip";
-				item-height-factor: 3.5;
+				item-spacing: 3.5;
 				item-layout: left;
 				icon-layout: left;
 				icon-padding: vec2(10.0);

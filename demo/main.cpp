@@ -2393,11 +2393,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		auto list_box = base_panel->CreateListBox("list_box", Vector2{0.5_r, 0.5_r}, "My list box");
 		list_box->Position({0.8_r, 0.25_r});
-		list_box->Tooltip("My list box tooltip");
-		list_box->ItemHeightFactor(3.5_r);
-		list_box->IconPadding(10.0_r);
+		list_box->Tooltip("My list box tooltip");	
+		list_box->ItemSpacing(3.5_r);
 		list_box->ItemLayout(ion::gui::controls::gui_list_box::ListBoxItemLayout::Left);
 		list_box->IconLayout(ion::gui::controls::gui_list_box::ListBoxIconLayout::Left);
+		list_box->IconPadding(10.0_r);
 		list_box->ShowIcons(true);
 		list_box->AddItems({
 			{"My <b>1st</b> <font color='purple'>item</font>"s, star},

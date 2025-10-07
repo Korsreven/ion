@@ -245,6 +245,7 @@ namespace ion::gui::controls
 		{
 			constexpr auto default_caption_margin_size = 4.0_r;
 			constexpr auto default_caption_padding_size = 2.0_r;
+			constexpr auto default_caption_line_spacing = 2.0_r;
 
 
 			/**
@@ -441,15 +442,16 @@ namespace ion::gui::controls
 			std::optional<Vector2> size_;
 
 			std::optional<std::string> caption_;
-			std::optional<std::string> tooltip_;		
+			std::optional<std::string> tooltip_;
 			std::optional<Vector2> caption_size_;
 			std::optional<Vector2> caption_margin_;
 			std::optional<Vector2> caption_padding_;
+			std::optional<real> caption_line_spacing_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 			gui_control::ControlCaptionOverflow caption_overflow_ = gui_control::ControlCaptionOverflow::Wrap;
 
 			gui_control::ControlState state_ = gui_control::ControlState::Enabled;
-			gui_control::BoundingBoxes hit_boxes_;		
+			gui_control::BoundingBoxes hit_boxes_;
 			NonOwningPtr<SceneNode> skin_node_;
 			
 			std::optional<events::Callback<void, GuiControl&>> on_focus_;
@@ -459,7 +461,7 @@ namespace ion::gui::controls
 			std::optional<events::Callback<void, GuiControl&>> on_click_;
 			std::optional<events::Callback<void, GuiControl&>> on_enter_;
 			std::optional<events::Callback<void, GuiControl&>> on_exit_;
-			std::optional<events::Callback<void, GuiControl&>> on_change_;		
+			std::optional<events::Callback<void, GuiControl&>> on_change_;
 			std::optional<events::Callback<void, GuiControl&>> on_state_change_;
 			std::optional<events::Callback<void, GuiControl&>> on_resize_;
 
@@ -758,6 +760,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@brief Sets the caption line spacing for this control to the given line spacing
+			inline void CaptionLineSpacing(const std::optional<real> &line_spacing) noexcept
+			{
+				if (caption_line_spacing_ != line_spacing)
+				{
+					caption_line_spacing_ = line_spacing;
+					UpdateCaption();
+				}
+			}
+
 			///@brief Sets the caption layout for this control to the given layout
 			inline void CaptionLayout(gui_control::ControlCaptionLayout layout) noexcept
 			{
@@ -1030,6 +1042,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto& CaptionPadding() const noexcept
 			{
 				return caption_padding_;
+			}
+
+			///@brief Returns the caption line spacing for this control
+			///@details Returns nullopt if no custom caption line spacing has been set
+			[[nodiscard]] inline auto& CaptionLineSpacing() const noexcept
+			{
+				return caption_line_spacing_;
 			}
 
 			///@brief Returns the caption layout for this control

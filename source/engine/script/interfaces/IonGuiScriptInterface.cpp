@@ -200,6 +200,7 @@ ClassDefinition get_gui_control_class()
 	return ClassDefinition::Create("control", "component")
 		.AddProperty("caption", ParameterType::String)
 		.AddProperty("caption-layout", control_caption_layouts)
+		.AddProperty("caption-line-spacing", ParameterType::FloatingPoint)
 		.AddProperty("caption-margin", ParameterType::Vector2)
 		.AddProperty("caption-overflow", {"no-wrap"s, "no-wrap-ellipsis"s, "wrap"s})
 		.AddProperty("caption-padding", ParameterType::Vector2)
@@ -233,7 +234,8 @@ ClassDefinition get_gui_image_class()
 
 ClassDefinition get_gui_label_class()
 {
-	return ClassDefinition::Create("label", "control");
+	return ClassDefinition::Create("label", "control")
+		.AddProperty("auto-size", ParameterType::Boolean);
 }
 
 ClassDefinition get_gui_list_box_class()
@@ -244,10 +246,10 @@ ClassDefinition get_gui_list_box_class()
 		.AddProperty("icon-max-size", ParameterType::Vector2)
 		.AddProperty("icon-padding", ParameterType::Vector2)
 		.AddProperty("item", {ParameterType::String, ParameterType::String}, 1)
-		.AddProperty("item-height-factor", ParameterType::FloatingPoint)
 		.AddProperty("item-index", ParameterType::Integer)
 		.AddProperty("item-layout", {"left"s, "center"s, "right"s})
 		.AddProperty("item-padding", ParameterType::Vector2)
+		.AddProperty("item-spacing", ParameterType::FloatingPoint)
 		.AddProperty("selection-padding", ParameterType::Vector2)
 		.AddProperty("show-icons", ParameterType::Boolean);
 }
@@ -328,7 +330,6 @@ ClassDefinition get_gui_text_box_class()
 ClassDefinition get_gui_tooltip_class()
 {
 	return ClassDefinition::Create("tooltip", "control")
-		.AddProperty("auto-size", ParameterType::Boolean)
 		.AddProperty("fade-in-delay", ParameterType::FloatingPoint)
 		.AddProperty("fade-in-time", ParameterType::FloatingPoint)
 		.AddProperty("fade-out-delay", ParameterType::FloatingPoint)
@@ -694,6 +695,8 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 			else if (layout == "outside-bottom-right")
 				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideBottomRight);
 		}
+		else if (property.Name() == "caption-line-spacing")
+			control.CaptionLineSpacing(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "caption-margin")
 			control.CaptionMargin(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "caption-overflow")
@@ -821,7 +824,12 @@ void set_label_properties(const script_tree::ObjectNode &object, controls::GuiLa
 	graphics::scene::SceneManager &scene_manager, const ManagerRegister &managers)
 {
 	set_control_properties(object, label, scene_manager, managers);
-	//No label specific properties yet
+	
+	for (auto &property : object.Properties())
+	{
+		if (property.Name() == "auto-size")
+			label.AutoSize(property[0].Get<ScriptType::Boolean>()->Get());
+	}
 }
 
 void set_list_box_properties(const script_tree::ObjectNode &object, controls::GuiListBox &list_box,
@@ -854,8 +862,6 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 			else
 				items.emplace_back(property[0].Get<ScriptType::String>()->Get());
 		}
-		else if (property.Name() == "item-height-factor")
-			list_box.ItemHeightFactor(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "item-index")
 			list_box.ItemIndex(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "item-layout")
@@ -869,6 +875,8 @@ void set_list_box_properties(const script_tree::ObjectNode &object, controls::Gu
 		}
 		else if (property.Name() == "item-padding")
 			list_box.ItemPadding(property[0].Get<ScriptType::Vector2>()->Get());
+		else if (property.Name() == "item-spacing")
+			list_box.ItemSpacing(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "selection-padding")
 			list_box.SelectionPadding(property[0].Get<ScriptType::Vector2>()->Get());
 		else if (property.Name() == "show-icons")
@@ -1105,9 +1113,7 @@ void set_tooltip_properties(const script_tree::ObjectNode &object, controls::Gui
 
 	for (auto &property : object.Properties())
 	{
-		if (property.Name() == "auto-size")
-			tooltip.AutoSize(property[0].Get<ScriptType::Boolean>()->Get());
-		else if (property.Name() == "fade-in-delay")
+		if (property.Name() == "fade-in-delay")
 			tooltip.FadeInDelay(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});
 		else if (property.Name() == "fade-in-time")
 			tooltip.FadeInTime(duration{property[0].Get<ScriptType::FloatingPoint>()->As<real>()});

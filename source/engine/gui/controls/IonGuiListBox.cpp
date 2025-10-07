@@ -335,9 +335,9 @@ void GuiListBox::UpdateLines() noexcept
 
 				auto ppu = Engine::PixelsPerUnit();
 				text->Overflow(graphics::fonts::text::TextOverflow::WordTruncate);
-				text->AreaSize((*size - icon_column_size) * ppu);
-				text->LineHeightFactor(item_height_factor_.value_or(detail::default_item_height_factor));
+				text->AreaSize((*size - icon_column_size) * ppu);		
 				text->Padding(item_padding_.value_or(detail::default_item_padding_size));
+				text->LineHeightFactor(item_spacing_.value_or(detail::default_item_spacing));
 				text->Alignment(detail::item_layout_to_text_alignment(item_layout_));
 
 				//Refresh content
