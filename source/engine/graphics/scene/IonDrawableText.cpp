@@ -18,9 +18,11 @@ File:	IonDrawableText.cpp
 
 #include "IonEngine.h"
 #include "graphics/fonts/IonFont.h"
+#include "graphics/fonts/IonTextManager.h"
 #include "graphics/fonts/IonTypeFace.h"
 #include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
+#include "graphics/scene/shapes/IonSprite.h"
 #include "query/IonSceneQuery.h"
 
 #undef min
@@ -34,6 +36,7 @@ using namespace graphics::utilities;
 namespace drawable_text::detail
 {
 
+//text_primitive
 //Protected
 
 /*
@@ -56,12 +59,19 @@ text_primitive::text_primitive() :
 }
 
 text_primitive::text_primitive(textures::texture::TextureHandle texture_handle) :
-	render::RenderPrimitive{render::vertex::vertex_batch::VertexDrawMode::Triangles, get_vertex_declaration()}
+	text_primitive()
 {
 	RenderTexture(texture_handle);
 }
 
+text_primitive::text_primitive(NonOwningPtr<materials::Material> material) :
+	text_primitive()
+{
+	RenderMaterial(material);
+}
 
+
+//text_glyph_primitive
 //Public
 
 text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle texture_handle) :
@@ -71,6 +81,7 @@ text_glyph_primitive::text_glyph_primitive(textures::texture::TextureHandle text
 }
 
 
+//text_decoration_primitive
 //Public
 
 text_decoration_primitive::text_decoration_primitive()
@@ -79,9 +90,31 @@ text_decoration_primitive::text_decoration_primitive()
 }
 
 
+//text_image_primitive
+//Public
+
+text_image_primitive::text_image_primitive(NonOwningPtr<materials::Material> material) :
+	text_primitive(material)
+{
+	//Empty
+}
+
+
+//text_glyph_primitive_key
+//Public
+
 bool text_glyph_primitive_key::operator<(const text_glyph_primitive_key &key) const noexcept
 {
 	return std::pair{font, glyph_index} < std::pair{key.font, key.glyph_index};
+}
+
+
+//text_image_primitive_key
+//Public
+
+bool text_image_primitive_key::operator<(const text_image_primitive_key &key) const noexcept
+{
+	return material < key.material;
 }
 
 
@@ -398,40 +431,47 @@ render::render_primitive::VertexContainer get_decoration_vertex_data(
 			//Vertex #1
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r, 0.0_r,
+			0.0_r, 1.0_r, 0.0_r,
 
 			//Vertex #2
 			v2.X(), v2.Y(), v2.Z(),
 			r, g, b, a,
-			0.0_r, 1.0_r, 0.0_r,
+			0.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #3
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			1.0_r, 1.0_r, 0.0_r,
+			1.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #4
 			v3.X(), v3.Y(), v3.Z(),
 			r, g, b, a,
-			1.0_r, 1.0_r, 0.0_r,
+			1.0_r, 0.0_r, 0.0_r,
 
 			//Vertex #5
 			v4.X(), v4.Y(), v4.Z(),
 			r, g, b, a,
-			1.0_r, 0.0_r, 0.0_r,
+			1.0_r, 1.0_r, 0.0_r,
 
 			//Vertex #6
 			v1.X(), v1.Y(), v1.Z(),
 			r, g, b, a,
-			0.0_r, 0.0_r, 0.0_r
+			0.0_r, 1.0_r, 0.0_r
 		};
+}
+
+render::render_primitive::VertexContainer get_image_vertex_data(
+	const Vector3 &position, real rotation, const Vector2 &size, const Color &color, const Vector3 &origin,
+	bool sub_pixel_correction)
+{
+	return get_decoration_vertex_data(position, rotation, size, color, origin, 0.0_r, sub_pixel_correction);
 }
 
 
 void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 	int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
 	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-	bool sub_pixel_correction)
+	text_image_primitives &image_primitives, bool sub_pixel_correction)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -521,42 +561,99 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					}
 				}
 
-				//For each character
-				for (auto c : text_block.Content)
+				//Text image
+				if (text_block.Image)
 				{
-					if (auto glyph_index = fonts::utilities::detail::get_glyph_index(c, *metrics);
-						glyph_index < std::size(*metrics))
+					auto material = fonts::text_manager::detail::get_material(text_block.Image->Source, text.Owner()->MaterialManagers());
+					auto texture_size = material ? shapes::sprite::detail::get_texture_size(*material) : std::nullopt;
+					auto image_size = texture_size.value_or(static_cast<real>(font_size));
+
+					//Width manually set
+					if (auto width = text_block.Image->Width; width)
 					{
-						auto vertex_data =
-							get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
-								position, rotation, scaling, foreground_color, origin,
-								sub_pixel_correction);
-						auto iter = std::end(glyph_primitives);
+						image_size.X(*width);
 
-						if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
+						//Keep aspect ratio
+						if (!text_block.Image->Height)
+							image_size.Y(image_size.Y() * (*width / image_size.X()));
+					}
+
+					//Height manually set
+					if (auto height = text_block.Image->Height; height)
+					{
+						image_size.Y(*height);
+
+						//Keep aspect ratio
+						if (!text_block.Image->Width)
+							image_size.X(image_size.X() * (*height / image_size.Y()));
+					}
+
+					//Scale down to fit
+					if (image_size.Max() > font_size)
+						image_size *= font_size / image_size.Max();
+
+					auto image_x = position.X() +
+						text_block.Size->X() * 0.5_r -
+						image_size.X() * 0.5_r;
+					auto image_position = Vector3{image_x, base_y, position.Z()};
+
+					auto vertex_data =
+						get_image_vertex_data(
+							image_position, rotation, image_size, foreground_color, origin,
+							sub_pixel_correction);
+					auto key = text_image_primitive_key{material.get()};
+						//Group on material
+
+					auto iter = std::end(image_primitives);
+
+					//New primitive
+					if (iter = image_primitives.find(key); iter == std::end(image_primitives))
+						iter = image_primitives.emplace(std::make_pair(key, make_owning<text_image_primitive>(material))).first;
+
+					iter->second->vertex_data.insert(std::end(iter->second->vertex_data),
+						std::begin(vertex_data), std::end(vertex_data));
+
+					position.X(position.X() + text_block.Size->X());
+				}
+				else
+				{
+					//For each character
+					for (auto c : text_block.Content)
+					{
+						if (auto glyph_index = fonts::utilities::detail::get_glyph_index(c, *metrics);
+							glyph_index < std::size(*metrics))
 						{
-							auto key = text_glyph_primitive_key{font};
-								//Group on font
+							auto vertex_data =
+								get_glyph_vertex_data(glyph_index, (*metrics)[glyph_index],
+									position, rotation, scaling, foreground_color, origin,
+									sub_pixel_correction);
+							auto iter = std::end(glyph_primitives);
 
-							//New primitive
-							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
-								iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[0]))).first;
+							if (handle->Type == textures::texture::TextureType::ArrayTexture2D)
+							{
+								auto key = text_glyph_primitive_key{font};
+									//Group on font
+
+								//New primitive
+								if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
+									iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[0]))).first;
+							}
+							else
+							{
+								auto key = text_glyph_primitive_key{font, glyph_index};
+									//Group on font and glyph index
+
+								//New primitive
+								if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
+									iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[glyph_index]))).first;
+							}
+
+							iter->second->vertex_data.insert(std::end(iter->second->vertex_data),
+								std::begin(vertex_data), std::end(vertex_data));
+
+							position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
+							++glyph_count;
 						}
-						else
-						{
-							auto key = text_glyph_primitive_key{font, glyph_index};
-								//Group on font and glyph index
-
-							//New primitive
-							if (iter = glyph_primitives.find(key); iter == std::end(glyph_primitives))
-								iter = glyph_primitives.emplace(std::make_pair(key, make_owning<text_glyph_primitive>((*handle)[glyph_index]))).first;
-						}
-
-						iter->second->vertex_data.insert(std::end(iter->second->vertex_data),
-							std::begin(vertex_data), std::end(vertex_data));
-
-						position.X(position.X() + (*metrics)[glyph_index].Advance * scaling);
-						++glyph_count;
 					}
 				}
 
@@ -568,7 +665,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
 	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-	bool sub_pixel_correction)
+	text_image_primitives &image_primitives, bool sub_pixel_correction)
 {
 	auto line_height = text.LineHeight();
 
@@ -626,7 +723,8 @@ void get_text_primitives(const fonts::Text &text, Vector3 position, real rotatio
 			for (auto &block : iter->Blocks)
 				get_block_primitives(block, text,
 					font_size, glyph_count, glyph_position, rotation, origin,
-					glyph_primitives, decoration_primitives, sub_pixel_correction);
+					glyph_primitives, decoration_primitives, image_primitives,
+					sub_pixel_correction);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -643,8 +741,13 @@ void DrawableText::ReloadPrimitives()
 	render_primitives_.clear();
 
 	if (text_)
+	{
+		text_->Owner(*initial_text_->Owner());
 		detail::get_text_primitives(*text_, position_, rotation_,
-			glyph_primitives_, decoration_primitives_, sub_pixel_correction_);
+			glyph_primitives_, decoration_primitives_, image_primitives_,
+			sub_pixel_correction_);
+		text_->Owner(nullptr);
+	}
 
 	//Glyphs
 	glyph_primitives_.erase_if(
@@ -653,7 +756,7 @@ void DrawableText::ReloadPrimitives()
 			if (!std::empty(primitive.second->vertex_data))
 			{
 				primitive.second->owner = this;
-				primitive.second->VertexData(std::move(primitive.second->vertex_data));	
+				primitive.second->VertexData(std::move(primitive.second->vertex_data));
 				AddPrimitive(*primitive.second);
 				return false; //Keep
 			}
@@ -667,7 +770,7 @@ void DrawableText::ReloadPrimitives()
 		if (!std::empty(decoration_primitives_.first->vertex_data))
 		{
 			decoration_primitives_.first->owner = this;
-			decoration_primitives_.first->VertexData(std::move(decoration_primitives_.first->vertex_data));	
+			decoration_primitives_.first->VertexData(std::move(decoration_primitives_.first->vertex_data));
 			AddPrimitive(*decoration_primitives_.first);
 		}
 		else
@@ -686,6 +789,21 @@ void DrawableText::ReloadPrimitives()
 		else
 			decoration_primitives_.second.reset();
 	}
+
+	//Images
+	image_primitives_.erase_if(
+		[&](auto &primitive) noexcept
+		{
+			if (!std::empty(primitive.second->vertex_data))
+			{
+				primitive.second->owner = this;
+				primitive.second->VertexData(std::move(primitive.second->vertex_data));
+				AddPrimitive(*primitive.second);
+				return false; //Keep
+			}
+			else
+				return true;
+		});
 }
 
 
@@ -759,6 +877,10 @@ void DrawableText::Prepare()
 	
 	if (decoration_primitives_.second) //Back
 		decoration_primitives_.second->Prepare();
+
+	//Prepare image primitives
+	for (auto &primitive : image_primitives_)
+		primitive.second->Prepare();
 
 	if (update_bounding_volumes_)
 	{

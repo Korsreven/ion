@@ -21,19 +21,37 @@ File:	IonTextManager.h
 
 #include "IonText.h"
 #include "managed/IonObjectManager.h"
+#include "managed/IonObjectRegister.h"
 #include "memory/IonNonOwningPtr.h"
+
+//Forward declarations
+namespace ion::graphics::materials
+{
+	class Material;
+	class MaterialManager;
+}
 
 namespace ion::graphics::fonts
 {
-	namespace text_manager::detail
+	namespace text_manager
 	{
-	} //text_manager::detail
+		using MaterialManagerRegister = managed::ObjectRegister<graphics::materials::MaterialManager>;
+
+		namespace detail
+		{
+			NonOwningPtr<materials::Material> get_material(std::string_view name, const MaterialManagerRegister &material_managers) noexcept;
+		} //detail
+	} //text_manager
 
 
 	///@brief A class that manages and stores texts
 	class TextManager final :
 		public managed::ObjectManager<Text, TextManager>
 	{
+		private:
+
+			text_manager::MaterialManagerRegister material_manager_register_;
+
 		public:
 		
 			///@brief Default constructor
@@ -79,6 +97,19 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto Texts() const noexcept
 			{
 				return Objects();
+			}
+
+			///@}
+
+			/**
+				@name Managers
+				@{
+			*/
+
+			///@brief Returns a reference to the static manager register for all script interfaces
+			[[nodiscard]] inline auto& MaterialManagers() noexcept
+			{
+				return material_manager_register_;
 			}
 
 			///@}

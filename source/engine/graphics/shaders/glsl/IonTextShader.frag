@@ -32,6 +32,14 @@ struct Primitive
 {
 	sampler2DArray texture;
 	bool has_texture;
+	bool has_material;
+};
+
+struct Material
+{
+	vec4 diffuse;
+	sampler2D diffuse_map;
+	bool has_diffuse_map;
 };
 
 struct Fog
@@ -80,6 +88,7 @@ out vec4 frag_color;
 uniform Scene scene;
 uniform Camera camera;
 uniform Primitive primitive;
+uniform Material material;
 uniform Fog fog;
 
 
@@ -282,6 +291,20 @@ void main()
 		ambient_color *= texture_color;
 		diffuse_color *= texture_color;
 		specular_color = texture_color;
+	}
+	else if (primitive.has_material)
+	{
+		ambient_color *= material.diffuse;
+		diffuse_color *= material.diffuse;
+		specular_color = material.diffuse;
+		
+		if (material.has_diffuse_map)
+		{
+			vec4 texture_color = texture(material.diffuse_map, vert_tex_coord);
+			ambient_color *= texture_color;
+			diffuse_color *= texture_color;
+			specular_color = texture_color;
+		}
 	}
 
 

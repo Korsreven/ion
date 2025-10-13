@@ -12,6 +12,8 @@ File:	IonTextManager.cpp
 
 #include "IonTextManager.h"
 
+#include "graphics/materials/IonMaterialManager.h"
+
 namespace ion::graphics::fonts
 {
 
@@ -19,6 +21,21 @@ using namespace text_manager;
 
 namespace text_manager::detail
 {
+
+NonOwningPtr<materials::Material> get_material(std::string_view name, const MaterialManagerRegister &material_managers) noexcept
+{
+	for (auto &material_manager : material_managers.ObjectsOf<materials::MaterialManager>())
+	{
+		if (material_manager)
+		{
+			if (auto material = material_manager->GetMaterial(name); material)
+				return material;
+		}
+	}
+
+	return nullptr;
+}
+
 } //text_manager::detail
 
 

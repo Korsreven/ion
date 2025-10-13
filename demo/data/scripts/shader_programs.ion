@@ -211,6 +211,16 @@ shader-program
 
         uniform: sampler2DArray "texture";
         uniform: bool "has_texture";
+        uniform: bool "has_material";
+    }
+
+    struct
+    {
+        name: "material";
+
+        uniform: vec4 "diffuse";
+        uniform: sampler2D "diffuse_map";
+        uniform: bool "has_diffuse_map";
     }
 
     struct
@@ -346,5 +356,15 @@ shader-program
 
         uniform: sampler2DArray "texture";
         uniform: bool "has_texture";
+        uniform: bool "has_material";
+    }
+
+    struct
+    {
+        name: "material";
+
+        uniform: vec4 "diffuse";
+        uniform: sampler2D "diffuse_map";
+        uniform: bool "has_diffuse_map";
     }
 }

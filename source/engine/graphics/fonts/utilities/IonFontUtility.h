@@ -43,6 +43,8 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto subscript_translate_factor = 1.0_r / 3.0_r; //33.33%
 		constexpr auto superscript_translate_factor = 0.5_r; //50%
 
+		constexpr auto default_image_placeholder_character = '.'; //Do not use space or hyphen (word wrap)
+
 
 		/**
 			@name Glyph rope
@@ -54,6 +56,7 @@ namespace ion::graphics::fonts::utilities
 			std::string &value;
 			const font::GlyphMetrices &metrics;
 			real scale_factor = 1.0_r;
+			bool no_split = false;
 		};
 
 		using glyph_strings = std::vector<glyph_string>;
@@ -77,6 +80,7 @@ namespace ion::graphics::fonts::utilities
 				char& operator[](size_t off) noexcept;
 				const char& operator[](size_t off) const noexcept;
 				const glyph_string& glyph_str(size_t off) const noexcept;
+				std::pair<size_t, size_t> glyph_str_range(size_t off) const noexcept;
 
 				std::string& insert(size_t off, size_t count, char ch);
 
@@ -135,6 +139,7 @@ namespace ion::graphics::fonts::utilities
 			return str == "br" ||
 				   str == "span" ||
 				   str == "font" ||
+				   str == "img" ||
 
 				   //Bold
 				   str == "b" ||
@@ -173,6 +178,12 @@ namespace ion::graphics::fonts::utilities
 			return str == "br";
 		}
 
+		constexpr auto is_void_element(std::string_view str) noexcept
+		{
+			return str == "br" ||
+				   str == "img";
+		}
+
 		constexpr auto is_br_tag(std::string_view str) noexcept
 		{
 			return str == "br";
@@ -183,12 +194,20 @@ namespace ion::graphics::fonts::utilities
 			return str == "font";
 		}
 
+		constexpr auto is_img_tag(std::string_view str) noexcept
+		{
+			return str == "img";
+		}
+
 
 		constexpr auto is_html_attribute(std::string_view str) noexcept
 		{
 			return str == "color" ||
-				   str == "style";
-		}	
+				   str == "style" ||
+				   str == "src" ||
+				   str == "width" ||
+				   str == "height";
+		}
 
 		constexpr auto is_color_attribute(std::string_view str) noexcept
 		{
@@ -198,6 +217,21 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto is_style_attribute(std::string_view str) noexcept
 		{
 			return str == "style";
+		}
+
+		constexpr auto is_src_attribute(std::string_view str) noexcept
+		{
+			return str == "src";
+		}
+
+		constexpr auto is_width_attribute(std::string_view str) noexcept
+		{
+			return str == "width";
+		}
+
+		constexpr auto is_height_attribute(std::string_view str) noexcept
+		{
+			return str == "height";
 		}
 
 
@@ -217,7 +251,7 @@ namespace ion::graphics::fonts::utilities
 		text::TextBlockStyle html_element_to_text_block_style(const html_element &element,
 			text::TextBlockStyle *parent_text_block) noexcept;
 
-		text::TextBlocks html_to_text_blocks(std::string_view str);
+		text::TextBlocks html_to_text_blocks(std::string_view str, Font *font = nullptr);
 		text::TextLines text_blocks_to_text_lines(text::TextBlocks text_blocks);
 		std::string text_blocks_to_string(const text::TextBlocks &text_blocks);
 
@@ -264,7 +298,7 @@ namespace ion::graphics::fonts::utilities
 
 		inline auto get_text_block_scale_factor(const text::TextBlock &text_block)
 		{
-			if (text_block.FontSize)
+			if (text_block.FontSize && !text_block.Image)
 			{
 				switch (*text_block.FontSize)
 				{
@@ -419,6 +453,9 @@ namespace ion::graphics::fonts::utilities
 
 	///@brief Returns text blocks, by parsing all HTML elements found in the given string
 	[[nodiscard]] text::TextBlocks HTMLToTextBlocks(std::string_view str);
+
+	///@brief Returns text blocks, by parsing all HTML elements found in the given string
+	[[nodiscard]] text::TextBlocks HTMLToTextBlocks(std::string_view str, Font &font);
 
 	///@brief Returns a plain string, by parsing and removing all HTML tags found in the given string
 	[[nodiscard]] std::string HTMLToString(std::string_view str);

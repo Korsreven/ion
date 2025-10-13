@@ -41,6 +41,11 @@ namespace ion::graphics
 	{
 		class Font;
 	}
+
+	namespace materials
+	{
+		class Material;
+	}
 }
 
 namespace ion::graphics::scene
@@ -88,6 +93,7 @@ namespace ion::graphics::scene
 
 				text_primitive();
 				text_primitive(textures::texture::TextureHandle texture_handle);
+				text_primitive(NonOwningPtr<materials::Material> material);
 		};
 
 		struct text_glyph_primitive final : text_primitive
@@ -100,6 +106,11 @@ namespace ion::graphics::scene
 			text_decoration_primitive();
 		};
 
+		struct text_image_primitive final : text_primitive
+		{
+			text_image_primitive(NonOwningPtr<materials::Material> material);
+		};
+
 
 		struct text_glyph_primitive_key final
 		{
@@ -109,8 +120,16 @@ namespace ion::graphics::scene
 			bool operator<(const text_glyph_primitive_key &key) const noexcept;
 		};
 
+		struct text_image_primitive_key final
+		{
+			const materials::Material *material = nullptr;
+
+			bool operator<(const text_image_primitive_key &key) const noexcept;
+		};
+
 		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, OwningPtr<text_glyph_primitive>>;
 		using text_decoration_primitives = std::pair<OwningPtr<text_decoration_primitive>, OwningPtr<text_decoration_primitive>>;
+		using text_image_primitives = adaptors::FlatMap<text_image_primitive_key, OwningPtr<text_image_primitive>>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -163,14 +182,17 @@ namespace ion::graphics::scene
 		render::render_primitive::VertexContainer get_decoration_vertex_data(
 			const Vector3 &position, real rotation, const Vector2 &size, const Color &color, const Vector3 &origin,
 			real delta_z, bool sub_pixel_correction);
+		render::render_primitive::VertexContainer get_image_vertex_data(
+			const Vector3 &position, real rotation, const Vector2 &size, const Color &color, const Vector3 &origin,
+			bool sub_pixel_correction);
 
 		void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 			int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-			bool sub_pixel_correction);
+			text_image_primitives &image_primitives, bool sub_pixel_correction);
 		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-			bool sub_pixel_correction);
+			text_image_primitives &image_primitives, bool sub_pixel_correction);
 
 		///@}
 	} //drawable_text::detail
@@ -190,6 +212,7 @@ namespace ion::graphics::scene
 
 			drawable_text::detail::text_glyph_primitives glyph_primitives_;
 			drawable_text::detail::text_decoration_primitives decoration_primitives_;
+			drawable_text::detail::text_image_primitives image_primitives_;
 
 			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;

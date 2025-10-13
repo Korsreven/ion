@@ -96,6 +96,22 @@ namespace ion::graphics::fonts
 			Superscript
 		};
 
+		struct TextBlockImage
+		{
+			std::string Source;
+			std::optional<real> Width;
+			std::optional<real> Height;
+
+
+			///@brief Checks if two text block images are equal (all members are equal)
+			[[nodiscard]] inline auto operator==(const TextBlockImage &rhs) const noexcept
+			{
+				return Source == rhs.Source &&
+					   Width == rhs.Width &&
+					   Height == rhs.Height;
+			}
+		};
+
 
 		struct TextBlockStyle
 		{
@@ -106,9 +122,10 @@ namespace ion::graphics::fonts
 			std::optional<Color> DecorationColor;
 			std::optional<TextBlockFontSize> FontSize;
 			std::optional<TextBlockVerticalAlign> VerticalAlign;
+			std::optional<TextBlockImage> Image;
 
 
-			///@brief Returns true if all styles is equal to the given text block style
+			///@brief Checks if two text block styles are equal (all members are equal)
 			[[nodiscard]] inline auto operator==(const TextBlockStyle &rhs) const noexcept
 			{
 				return ForegroundColor == rhs.ForegroundColor &&
@@ -117,7 +134,8 @@ namespace ion::graphics::fonts
 					   Decoration == rhs.Decoration &&
 					   DecorationColor == rhs.DecorationColor &&
 					   FontSize == rhs.FontSize &&
-					   VerticalAlign == rhs.VerticalAlign;
+					   VerticalAlign == rhs.VerticalAlign &&
+					   Image == rhs.Image;
 			}
 
 			///@brief Returns true if this text block style has no styles
@@ -129,7 +147,8 @@ namespace ion::graphics::fonts
 					   !Decoration &&
 					   !DecorationColor &&
 					   !FontSize &&
-					   !VerticalAlign;
+					   !VerticalAlign &&
+					   !Image;
 			}
 		};
 
@@ -140,7 +159,14 @@ namespace ion::graphics::fonts
 		{
 			std::string Content;
 			bool HardBreak = false;
-			std::optional<Vector2> Size;	
+			std::optional<Vector2> Size;
+
+
+			///@brief Returns true if this text block can not be split
+			[[nodiscard]] inline auto IsNoSplit() const noexcept
+			{
+				return !!Image;
+			}
 		};
 
 		using TextBlocks = std::vector<TextBlock>;
@@ -174,7 +200,7 @@ namespace ion::graphics::fonts
 			}
 
 
-			TextBlocks html_to_formatted_blocks(std::string_view content);
+			TextBlocks html_to_formatted_blocks(std::string_view content, TypeFace &type_face);
 			TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks, TextOverflow overflow,
 				const std::optional<Vector2> &area_size, const Vector2 &padding, TypeFace &type_face);
 
@@ -219,7 +245,8 @@ namespace ion::graphics::fonts
 			text::TextLines formatted_lines_;
 
 
-			text::TextBlocks MakeFormattedBlocks(std::string_view content) const;
+			text::TextBlocks MakeFormattedBlocks(std::string_view content,
+				NonOwningPtr<TypeFace> type_face) const;
 			text::TextLines MakeFormattedLines(text::TextBlocks text_blocks,
 				const std::optional<Vector2> &area_size, const Vector2 &padding,
 				NonOwningPtr<TypeFace> type_face) const;

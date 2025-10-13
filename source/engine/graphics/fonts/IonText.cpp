@@ -24,9 +24,12 @@ using namespace types::type_literals;
 namespace text::detail
 {
 
-TextBlocks html_to_formatted_blocks(std::string_view content)
+TextBlocks html_to_formatted_blocks(std::string_view content, TypeFace &type_face)
 {
-	return utilities::HTMLToTextBlocks(content);
+	if (type_face.HasRegularFont())
+		return utilities::HTMLToTextBlocks(content, *type_face.RegularFont());
+	else
+		return {};
 }
 
 TextLines formatted_blocks_to_formatted_lines(TextBlocks text_blocks, TextOverflow overflow,
@@ -188,10 +191,11 @@ int get_line_offset(size_t content_off, std::string_view content, TextFormatting
 
 //Private
 
-text::TextBlocks Text::MakeFormattedBlocks(std::string_view content) const
+text::TextBlocks Text::MakeFormattedBlocks(std::string_view content,
+	NonOwningPtr<TypeFace> type_face) const
 {
-	if (formatting_ == TextFormatting::HTML)
-		return detail::html_to_formatted_blocks(content);
+	if (formatting_ == TextFormatting::HTML && type_face)
+		return detail::html_to_formatted_blocks(content, *type_face);
 	else
 		return {{{}, std::string{content}}};
 }
@@ -248,7 +252,7 @@ Text::Text(std::string name, std::string content, text::TextAlignment alignment,
 	alignment_{alignment},
 	type_face_{type_face},
 
-	formatted_blocks_{MakeFormattedBlocks(content_)},
+	formatted_blocks_{MakeFormattedBlocks(content_, type_face_)},
 	formatted_lines_{MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_)}
 {
 	//Empty
@@ -277,7 +281,7 @@ Text::Text(std::string name, std::string content, text::TextFormatting formattin
 	line_height_factor_{line_height_factor.value_or(detail::default_line_height_factor)},
 	type_face_{type_face},
 
-	formatted_blocks_{MakeFormattedBlocks(content_)},
+	formatted_blocks_{MakeFormattedBlocks(content_, type_face_)},
 	formatted_lines_{MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_)}
 {
 	//Empty
@@ -316,7 +320,7 @@ void Text::Content(std::string content)
 	if (content_ != content)
 	{
 		content_ = std::move(content);
-		formatted_blocks_ = MakeFormattedBlocks(content_);
+		formatted_blocks_ = MakeFormattedBlocks(content_, type_face_);
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
@@ -326,7 +330,7 @@ void Text::Formatting(text::TextFormatting formatting)
 	if (formatting_ != formatting)
 	{
 		formatting_ = formatting;
-		formatted_blocks_ = MakeFormattedBlocks(content_);
+		formatted_blocks_ = MakeFormattedBlocks(content_, type_face_);
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
 	}
 }
@@ -372,9 +376,20 @@ void Text::LineHeight(real height) noexcept
 void Text::Lettering(NonOwningPtr<TypeFace> type_face) noexcept
 {
 	if (type_face)
+	{
+		if (formatting_ == TextFormatting::HTML)
+			formatted_blocks_ = MakeFormattedBlocks(content_, type_face_);
+
 		formatted_lines_ = MakeFormattedLines(formatted_blocks_, area_size_, padding_, type_face_);
+	}
 	else
 	{
+		if (formatting_ == TextFormatting::HTML)
+		{
+			formatted_blocks_.clear();
+			formatted_blocks_.shrink_to_fit();
+		}
+
 		formatted_lines_.clear();
 		formatted_lines_.shrink_to_fit();
 	}
@@ -486,7 +501,7 @@ void Text::AppendContent(std::string_view content)
 	}
 
 	content_ += content;
-	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_blocks = MakeFormattedBlocks(content, type_face_);
 	auto iter = std::begin(formatted_blocks);
 
 	//Merge first block with the last one already in text
@@ -518,7 +533,7 @@ void Text::PrependContent(std::string_view content)
 	}
 
 	content_.insert(0, content);
-	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_blocks = MakeFormattedBlocks(content, type_face_);
 	auto iter = std::end(formatted_blocks);
 
 	//Merge last block with the first one already in text
@@ -542,7 +557,7 @@ void Text::AppendLine(std::string_view content)
 	}
 
 	content_ += "\n" + std::string{content};
-	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_blocks = MakeFormattedBlocks(content, type_face_);
 	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
 	formatted_blocks.insert(std::begin(formatted_blocks), {{}, "\n", true});
 
@@ -561,7 +576,7 @@ void Text::PrependLine(std::string_view content)
 	}
 
 	content_.insert(0, std::string{content} + "\n");
-	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_blocks = MakeFormattedBlocks(content, type_face_);
 	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
 	formatted_blocks.push_back({{}, "\n", true});
 
@@ -592,7 +607,7 @@ void Text::InsertLine(int line_off, std::string_view content)
 		return;
 	}
 
-	auto formatted_blocks = MakeFormattedBlocks(content);
+	auto formatted_blocks = MakeFormattedBlocks(content, type_face_);
 	auto formatted_lines = MakeFormattedLines(formatted_blocks, area_size_, padding_, type_face_);
 	formatted_blocks.push_back({{}, "\n", true});
 

@@ -655,6 +655,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 	auto type_faces = ion::make_owning<ion::graphics::fonts::TypeFaceManager>();
 	auto texts = ion::make_owning<ion::graphics::fonts::TextManager>();
+	texts->MaterialManagers().Register(materials);
+
 	auto particle_systems = ion::make_owning<ion::graphics::particles::ParticleSystemManager>();
 
 
@@ -1435,6 +1437,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto scene_struct = text_prog->CreateStruct("scene");
 			auto camera_struct = text_prog->CreateStruct("camera");
 			auto primitive_struct = text_prog->CreateStruct("primitive");
+			auto material_struct = text_prog->CreateStruct("material");
 			auto fog_struct = text_prog->CreateStruct("fog");
 
 
@@ -1463,6 +1466,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Primitive
 			primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 			primitive_struct->CreateUniform<bool>("has_texture");
+			primitive_struct->CreateUniform<bool>("has_material");
+
+			//Material
+			material_struct->CreateUniform<glsl::vec4>("diffuse");
+			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
+			material_struct->CreateUniform<bool>("has_diffuse_map");
 
 			//Fog
 			fog_struct->CreateUniform<int>("mode");
@@ -1551,6 +1560,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			auto matrix_struct = simple_text_prog->CreateStruct("matrix");
 			auto scene_struct = simple_text_prog->CreateStruct("scene");
 			auto primitive_struct = simple_text_prog->CreateStruct("primitive");
+			auto material_struct = simple_text_prog->CreateStruct("material");
 
 
 			//Shader variables
@@ -1568,6 +1578,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			//Primitive
 			primitive_struct->CreateUniform<glsl::sampler2DArray>("texture");
 			primitive_struct->CreateUniform<bool>("has_texture");
+			primitive_struct->CreateUniform<bool>("has_material");
+
+			//Material
+			material_struct->CreateUniform<glsl::vec4>("diffuse");
+			material_struct->CreateUniform<glsl::sampler2D>("diffuse_map");
+			material_struct->CreateUniform<bool>("has_diffuse_map");
 
 			shader_programs->LoadShaderVariableLocations(*simple_text_prog);
 		}

@@ -20,6 +20,7 @@ File:	IonFontUtility.cpp
 #include "graphics/utilities/IonColor.h"
 #include "script/IonScriptCompiler.h"
 #include "script/utilities/IonParseUtility.h"
+#include "utilities/IonConvert.h"
 #include "utilities/IonStringUtility.h"
 
 namespace ion::graphics::fonts::utilities
@@ -33,6 +34,8 @@ namespace detail
 /*
 	Glyph rope
 */
+
+//Private
 
 std::pair<size_t, size_t> glyph_rope::get_offsets(size_t off) const noexcept
 {
@@ -71,6 +74,9 @@ std::pair<size_t, size_t> glyph_rope::get_offsets(size_t off) const noexcept
 	return {str_off, off - total_size};
 }
 
+
+//Public
+
 glyph_rope::glyph_rope(glyph_string str)  :
 	strings_{std::move(str)}
 {
@@ -102,6 +108,12 @@ const glyph_string& glyph_rope::glyph_str(size_t off) const noexcept
 {
 	auto [str_off, ch_off] = get_offsets(off);
 	return strings_[str_off];
+}
+
+std::pair<size_t, size_t> glyph_rope::glyph_str_range(size_t off) const noexcept
+{
+	auto [str_off, ch_off] = get_offsets(off);
+	return {off - ch_off, std::size(strings_[str_off].value)};
 }
 
 std::string& glyph_rope::insert(size_t off, size_t count, char ch)
@@ -141,7 +153,7 @@ glyph_rope make_glyph_rope(text::TextBlocks &text_blocks,
 	for (auto &text_block : text_blocks)
 	{
 		auto &metrics = get_text_block_metrics(text_block, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-		strings.push_back({text_block.Content, metrics, get_text_block_scale_factor(text_block)});
+		strings.push_back({text_block.Content, metrics, get_text_block_scale_factor(text_block), text_block.Image.has_value()});
 	}
 
 	return strings;
@@ -266,6 +278,9 @@ std::optional<html_element> parse_html_opening_tag(std::string_view str) noexcep
 			//Is attribute supported
 			if (is_color_attribute(attribute.name))
 				valid &= is_font_tag(element->tag);
+			else if (is_src_attribute(attribute.name) ||
+					 is_width_attribute(attribute.name) || is_height_attribute(attribute.name))
+				valid &= is_img_tag(element->tag);
 		}
 
 		if (valid)
@@ -294,7 +309,7 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 		text::TextBlockStyle{}; //Plain
 
 	//Bold
-	 if (tag == "b" || tag == "strong")
+	if (tag == "b" || tag == "strong")
 		text_block.FontStyle =
 			[&font_style = text_block.FontStyle]() noexcept
 			{
@@ -368,6 +383,10 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 		text_block.BackgroundColor = color::Yellow;
 	}
 
+	//Img
+	else if (tag == "img")
+		text_block.Image.emplace();
+
 	return text_block;
 }
 
@@ -390,6 +409,21 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 			{
 				if (auto color = script::utilities::parse::AsColor(*value); color)
 					text_block.ForegroundColor = *color;
+			}
+			//Src
+			else if (is_src_attribute(attribute.name))
+				text_block.Image->Source = *value;
+			//Width
+			else if (is_width_attribute(attribute.name))
+			{
+				if (auto width = ion::utilities::convert::To<real>(*value); width)
+					text_block.Image->Width = *width;
+			}
+			//Height
+			else if (is_height_attribute(attribute.name))
+			{
+				if (auto height = ion::utilities::convert::To<real>(*value); height)
+					text_block.Image->Height = *height;
 			}
 
 			//Style
@@ -588,11 +622,12 @@ text::TextBlockStyle html_element_to_text_block_style(const html_element &elemen
 }
 
 
-text::TextBlocks html_to_text_blocks(std::string_view str)
+text::TextBlocks html_to_text_blocks(std::string_view str, Font *font)
 {
 	html_elements elements;
 	text::TextBlockStyles text_block_styles;
 	text::TextBlocks text_blocks;
+	std::optional<int> img_placeholder_count;
 
 	std::string content;
 
@@ -635,10 +670,38 @@ text::TextBlocks html_to_text_blocks(std::string_view str)
 				{
 					iter += std::size(*tag) + 1;
 
-					if (is_empty_tag(element->tag))
+					if (is_void_element(element->tag))
 					{
 						if (is_br_tag(element->tag))
 							c = '\n';
+						else if (is_img_tag(element->tag))
+						{
+							if (!std::empty(content))
+								append_text_block(std::move(content), text_blocks, text_block_styles);
+
+							if (font)
+							{
+								//Measure placeholder spacing needed for image
+								if (!img_placeholder_count)
+								{
+									auto placeholder_size =
+										MeasureCharacter(default_image_placeholder_character, *font).value_or(vector2::Zero);
+									img_placeholder_count = static_cast<int>(std::ceil(font->Size() / placeholder_size.X()));
+								}
+
+								text_blocks.push_back({
+									html_element_to_text_block_style(
+										*element,
+										!std::empty(text_block_styles) ?
+										&text_block_styles.back() : nullptr
+									),
+									//Add placeholder spacing to text block content
+									std::string(*img_placeholder_count, default_image_placeholder_character)
+								});
+							}
+
+							continue;
+						}
 					}
 					else
 					{
@@ -877,8 +940,13 @@ text::TextBlocks truncate_text_blocks(text::TextBlocks text_blocks, int max_widt
 			//Remove content from last block
 			if (width + block_width > max_width)
 			{
-				auto &metrics = get_text_block_metrics(*iter, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
-				iter->Content = truncate_string(std::move(iter->Content), max_width - width, suffix, metrics);
+				if (iter->IsNoSplit())
+					iter->Content.clear();
+				else
+				{
+					auto &metrics = get_text_block_metrics(*iter, regular_metrics, bold_metrics, italic_metrics, bold_italic_metrics);
+					iter->Content = truncate_string(std::move(iter->Content), max_width - width, suffix, metrics);
+				}
 			}
 			
 			//Search for hard break
@@ -950,8 +1018,23 @@ void wrap(glyph_rope str, int max_width)
 						break;
 
 						default:
-						str.insert(i, 1, '\n'); //Insert new line
-						break;
+						{
+							if (str.glyph_str(i).no_split)
+							{
+								if (auto [off, _] = str.glyph_str_range(i);
+									off > 0 && str[off - 1] != '\n')
+									str.glyph_str((i = off) - 1).value.push_back('\n'); //Before no split
+								else //Overflow
+								{
+									width += c_width;
+									continue;
+								}
+							}
+							else
+								str.insert(i, 1, '\n'); //Insert new line
+
+							break;
+						}
 					}
 				}
 				else
@@ -1092,7 +1175,21 @@ void word_wrap(glyph_rope str, int max_width)
 
 					//No space found, cut word
 					else
-						str.insert(i, 1, '\n');
+					{
+						if (str.glyph_str(i).no_split)
+						{
+							if (auto [off, _] = str.glyph_str_range(i);
+								off > 0 && str[off - 1] != '\n')
+								str.glyph_str((i = off) - 1).value.push_back('\n'); //Before no split
+							else //Overflow
+							{
+								width += c_width;
+								continue;
+							}
+						}
+						else //Inside
+							str.insert(i, 1, '\n');
+					}
 				}
 				else
 				{
@@ -1123,6 +1220,11 @@ void word_wrap(glyph_rope str, int max_width)
 text::TextBlocks HTMLToTextBlocks(std::string_view str)
 {
 	return detail::html_to_text_blocks(str);
+}
+
+text::TextBlocks HTMLToTextBlocks(std::string_view str, Font &font)
+{
+	return detail::html_to_text_blocks(str, &font);
 }
 
 std::string HTMLToString(std::string_view str)
