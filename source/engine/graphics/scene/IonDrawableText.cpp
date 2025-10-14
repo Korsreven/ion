@@ -484,14 +484,13 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 				auto scaling = fonts::utilities::detail::get_text_block_scale_factor(text_block);
 				auto foreground_color = get_foreground_color(text_block, text);
 
-				auto line_thickness = std::max(1.0_r, std::floor(font_size / 8.0_r));
-				auto line_margin = std::ceil(font_size / 16.0_r);
-
 				//Background (back decoration)
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
-					auto decoration_position = Vector3{position.X(), base_y - (line_margin * 2.0_r + line_thickness * 2.0_r), position.Z()};
-					auto decoration_size = Vector2{text_block.Size->X(), font_size + (line_margin * 4.0_r + line_thickness * 4.0_r)};
+					auto background_padding = fonts::utilities::detail::get_text_decoration_background_padding(font_size);
+
+					auto decoration_position = Vector3{position.X(), base_y - background_padding * 0.5_r, position.Z()};
+					auto decoration_size = Vector2{text_block.Size->X(), font_size + background_padding};
 
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size, *background_color, origin,
@@ -509,6 +508,9 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 				//Text decoration
 				if (auto decoration = get_text_decoration(text_block, text); decoration)
 				{
+					auto line_thickness = fonts::utilities::detail::get_text_decoration_line_thickness(font_size);
+					auto line_margin = fonts::utilities::detail::get_text_decoration_line_margin(font_size);
+
 					auto decoration_position =
 						[&]() noexcept -> Vector3
 						{
@@ -566,36 +568,32 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 				{
 					auto material = fonts::text_manager::detail::get_material(text_block.Image->Source, text.Owner()->MaterialManagers());
 					auto texture_size = material ? shapes::sprite::detail::get_texture_size(*material) : std::nullopt;
-					auto image_size = texture_size.value_or(static_cast<real>(font_size));
 
-					//Width manually set
-					if (auto width = text_block.Image->Width; width)
+					//Calculate image size
+					auto image_square_size = fonts::utilities::detail::get_text_image_max_size(font_size);
+
+					if (text_block.Image->Width || text_block.Image->Height)
 					{
-						image_size.X(*width);
-
-						//Keep aspect ratio
-						if (!text_block.Image->Height)
-							image_size.Y(image_size.Y() * (*width / image_size.X()));
+						image_square_size = std::min(
+							std::max(text_block.Image->Width.value_or(0.0_r), text_block.Image->Height.value_or(0.0_r)),
+							image_square_size
+						);
+						
+						//Use custom aspect ratio
+						if (text_block.Image->Width && text_block.Image->Height)
+							texture_size = {*text_block.Image->Width, *text_block.Image->Height};
 					}
 
-					//Height manually set
-					if (auto height = text_block.Image->Height; height)
-					{
-						image_size.Y(*height);
+					auto image_size = texture_size.value_or(image_square_size);
 
-						//Keep aspect ratio
-						if (!text_block.Image->Width)
-							image_size.X(image_size.X() * (*height / image_size.Y()));
-					}
-
-					//Scale down to fit
-					if (image_size.Max() > font_size)
-						image_size *= font_size / image_size.Max();
+					//Scale to fit (keep aspect ratio)
+					if (image_size.Max() != image_square_size)
+						image_size *= image_square_size / image_size.Max();
 
 					auto image_x = position.X() +
 						text_block.Size->X() * 0.5_r -
 						image_size.X() * 0.5_r;
-					auto image_position = Vector3{image_x, base_y, position.Z()};
+					auto image_position = Vector3{image_x, base_y - (image_size.Y() - font_size) * 0.5_r, position.Z()};
 
 					auto vertex_data =
 						get_image_vertex_data(

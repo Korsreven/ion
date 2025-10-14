@@ -13,7 +13,6 @@ File:	IonFontUtility.cpp
 #include "IonFontUtility.h"
 
 #include <algorithm>
-#include <cmath>
 #include <functional>
 
 #include "graphics/fonts/IonFontManager.h"
@@ -627,7 +626,6 @@ text::TextBlocks html_to_text_blocks(std::string_view str, Font *font)
 	html_elements elements;
 	text::TextBlockStyles text_block_styles;
 	text::TextBlocks text_blocks;
-	std::optional<int> img_placeholder_count;
 
 	std::string content;
 
@@ -681,22 +679,31 @@ text::TextBlocks html_to_text_blocks(std::string_view str, Font *font)
 
 							if (font)
 							{
-								//Measure placeholder spacing needed for image
-								if (!img_placeholder_count)
-								{
-									auto placeholder_size =
-										MeasureCharacter(default_image_placeholder_character, *font).value_or(vector2::Zero);
-									img_placeholder_count = static_cast<int>(std::ceil(font->Size() / placeholder_size.X()));
-								}
-
-								text_blocks.push_back({
+								auto text_block_style =
 									html_element_to_text_block_style(
 										*element,
 										!std::empty(text_block_styles) ?
 										&text_block_styles.back() : nullptr
-									),
+									);
+
+								//Calculate image (square) size
+								auto image_size = get_text_image_max_size(font->Size());
+
+								if (text_block_style.Image->Width || text_block_style.Image->Height)
+									image_size = std::min(
+										std::max(text_block_style.Image->Width.value_or(0.0_r), text_block_style.Image->Height.value_or(0.0_r)),
+										image_size
+									);
+
+								//Measure placeholder spacing needed for image
+								auto placeholder_character_size =
+									MeasureCharacter(text_image_placeholder_character, *font).value_or(vector2::Zero);
+								int image_placeholder_count = static_cast<int>(std::ceil(image_size / placeholder_character_size.X()));
+
+								text_blocks.push_back({
+									std::move(text_block_style),
 									//Add placeholder spacing to text block content
-									std::string(*img_placeholder_count, default_image_placeholder_character)
+									std::string(image_placeholder_count, text_image_placeholder_character)
 								});
 							}
 

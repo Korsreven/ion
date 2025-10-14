@@ -13,6 +13,7 @@ File:	IonFontUtility.h
 #ifndef ION_FONT_UTILITY_H
 #define ION_FONT_UTILITY_H
 
+#include <cmath>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -43,7 +44,7 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto subscript_translate_factor = 1.0_r / 3.0_r; //33.33%
 		constexpr auto superscript_translate_factor = 0.5_r; //50%
 
-		constexpr auto default_image_placeholder_character = '.'; //Do not use space or hyphen (word wrap)
+		constexpr auto text_image_placeholder_character = '.'; //Do not use space or hyphen (word wrap)
 
 
 		/**
@@ -294,6 +295,26 @@ namespace ion::graphics::fonts::utilities
 				}();
 
 			return metrics ? *metrics : regular_metrics;
+		}
+
+		inline auto get_text_decoration_line_margin(int font_size) noexcept
+		{
+			return std::max(1.0_r, std::floor(font_size / 8.0_r));
+		}
+
+		inline auto get_text_decoration_line_thickness(int font_size) noexcept
+		{
+			return std::ceil(font_size / 16.0_r);
+		}
+
+		inline auto get_text_decoration_background_padding(int font_size) noexcept
+		{
+			return get_text_decoration_line_margin(font_size) * 4.0_r + get_text_decoration_line_thickness(font_size) * 4.0_r;
+		}
+
+		inline auto get_text_image_max_size(int font_size) noexcept
+		{
+			return font_size + get_text_decoration_background_padding(font_size);
 		}
 
 		inline auto get_text_block_scale_factor(const text::TextBlock &text_block)
