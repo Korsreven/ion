@@ -487,10 +487,10 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 				//Background (back decoration)
 				if (auto background_color = get_background_color(text_block, text); background_color)
 				{
-					auto background_padding = fonts::utilities::detail::get_text_decoration_background_padding(font_size);
+					auto background_size = fonts::utilities::detail::get_text_decoration_background_size(font_size);
 
-					auto decoration_position = Vector3{position.X(), base_y - background_padding * 0.5_r, position.Z()};
-					auto decoration_size = Vector2{text_block.Size->X(), font_size + background_padding};
+					auto decoration_position = Vector3{position.X(), base_y - (background_size - font_size) * 0.5_r, position.Z()};
+					auto decoration_size = Vector2{text_block.Size->X(), background_size};
 
 					auto vertex_data = get_decoration_vertex_data(
 						decoration_position, rotation, decoration_size, *background_color, origin,
