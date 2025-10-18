@@ -665,7 +665,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 					auto ppu = Engine::PixelsPerUnit();
 					auto min = Vector2{base_x, base_y - (element_size - font_size) * 0.5_r} / ppu;
-					auto max = (min + Vector2{text_block.Size->X(), element_size}) / ppu;
+					auto max = min + Vector2{text_block.Size->X(), element_size} / ppu;
 
 					auto tl = Vector2{min.X(), max.Y()}.RotateCopy(rotation, origin);
 					auto tr = max.RotateCopy(rotation, origin);
