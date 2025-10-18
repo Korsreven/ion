@@ -1338,6 +1338,33 @@ std::optional<Vector2> GuiControl::MinimumSize() const noexcept
 }
 
 
+std::optional<std::string> GuiControl::Tooltip(const Vector2 &point) const noexcept
+{
+	if (caption_ && skin_)
+	{
+		if (auto &part = skin_->Caption; part)
+		{
+			//Check for intersection
+			if (part->WorldAxisAlignedBoundingBox().Intersects(point))
+			{
+				auto node = part->ParentNode();
+
+				//Intersects with caption text
+				if (!node || node->AxisAligned() ||
+					part->WorldOrientedBoundingBox().Intersects(point))
+				{
+					//Intersects with a tooltip element inside caption text
+					if (auto tooltip = part->IntersectsTooltipElement(point); tooltip)
+						return *tooltip;
+				}
+			}
+		}
+	}
+
+	return Tooltip();
+}
+
+
 std::optional<Aabb> GuiControl::Area() const noexcept
 {
 	return skin_ ?

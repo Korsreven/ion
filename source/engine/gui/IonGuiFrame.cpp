@@ -788,6 +788,20 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 			return true; //Consumed
 		}
 
+		else if (hovered_control_)
+		{
+			//Show tooltip (if changed)
+			if (auto owner = Owner(); owner && owner->ActiveTooltip())
+			{
+				if (auto tooltip = hovered_control_->Tooltip(position); tooltip &&
+					owner->ActiveTooltip()->Caption() != tooltip)
+				{
+					owner->ActiveTooltip()->Show(*tooltip);
+					return true; //Consumed
+				}
+			}
+		}
+
 		return false;
 	}
 }

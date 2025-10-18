@@ -1022,6 +1022,10 @@ namespace ion::gui::controls
 				return tooltip_;
 			}
 
+			///@brief Returns the tooltip text (hint) for this control at the given point
+			///@details Returns nullopt if this control has no tooltip
+			[[nodiscard]] std::optional<std::string> Tooltip(const Vector2 &point) const noexcept;
+
 
 			///@brief Returns the caption size for this control
 			///@details Returns nullopt if no custom caption size has been set
