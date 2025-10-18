@@ -23,6 +23,7 @@ File:	IonDrawableText.cpp
 #include "graphics/fonts/utilities/IonFontUtility.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/scene/shapes/IonSprite.h"
+#include "graphics/utilities/IonObb.h"
 #include "query/IonSceneQuery.h"
 
 #undef min
@@ -471,7 +472,8 @@ render::render_primitive::VertexContainer get_image_vertex_data(
 void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 	int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
 	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-	text_image_primitives &image_primitives, bool sub_pixel_correction)
+	text_image_primitives &image_primitives, text_tooltip_elements &tooltip_elements,
+	bool sub_pixel_correction)
 {
 	if (auto font = get_default_font(text_block, text); font)
 	{
@@ -479,6 +481,7 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 		{
 			if (auto &metrics = font->GlyphMetrics(); metrics)
 			{
+				auto base_x = position.X();
 				auto base_y = position.Y();
 				position.Y(position.Y() + font_size * fonts::utilities::detail::get_text_block_translate_factor(text_block));
 				auto scaling = fonts::utilities::detail::get_text_block_scale_factor(text_block);
@@ -655,6 +658,26 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					}
 				}
 
+				//Text tooltip
+				if (text_block.Title)
+				{
+					auto element_size = fonts::utilities::detail::get_text_decoration_background_size(font_size);
+
+					auto ppu = Engine::PixelsPerUnit();
+					auto min = Vector2{base_x, base_y - (element_size - font_size) * 0.5_r} / ppu;
+					auto max = (min + Vector2{text_block.Size->X(), element_size}) / ppu;
+
+					auto tl = Vector2{min.X(), max.Y()}.RotateCopy(rotation, origin);
+					auto tr = max.RotateCopy(rotation, origin);
+					auto bl = min.RotateCopy(rotation, origin);
+					auto br = Vector2{max.X(), min.Y()}.RotateCopy(rotation, origin);
+
+					min = tl.FloorCopy(tr).FloorCopy(bl).FloorCopy(br);
+					max = tl.CeilCopy(tr).CeilCopy(bl).CeilCopy(br);
+					
+					tooltip_elements.push_back({Aabb{min, max}, *text_block.Title});
+				}
+
 				position.Y(base_y);
 			}
 		}
@@ -663,7 +686,8 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 
 void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
 	text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-	text_image_primitives &image_primitives, bool sub_pixel_correction)
+	text_image_primitives &image_primitives, text_tooltip_elements &tooltip_elements,
+	bool sub_pixel_correction)
 {
 	auto line_height = text.LineHeight();
 
@@ -722,7 +746,7 @@ void get_text_primitives(const fonts::Text &text, Vector3 position, real rotatio
 				get_block_primitives(block, text,
 					font_size, glyph_count, glyph_position, rotation, origin,
 					glyph_primitives, decoration_primitives, image_primitives,
-					sub_pixel_correction);
+					tooltip_elements, sub_pixel_correction);
 
 			glyph_position.Y(glyph_position.Y() - *line_height); //Next glyph y position
 		}
@@ -737,13 +761,14 @@ void get_text_primitives(const fonts::Text &text, Vector3 position, real rotatio
 void DrawableText::ReloadPrimitives()
 {
 	render_primitives_.clear();
+	tooltip_elements_.clear();
 
 	if (text_)
 	{
 		text_->Owner(*initial_text_->Owner());
 		detail::get_text_primitives(*text_, position_, rotation_,
 			glyph_primitives_, decoration_primitives_, image_primitives_,
-			sub_pixel_correction_);
+			tooltip_elements_, sub_pixel_correction_);
 		text_->Owner(nullptr);
 	}
 
@@ -849,6 +874,30 @@ void DrawableText::Revert()
 		text_ = *initial_text_;
 		reload_primitives_ = true;
 	}
+}
+
+
+/*
+	Observers
+*/
+
+std::optional<std::string> DrawableText::IntersectsTooltipElement(const Vector2 &point) const noexcept
+{
+	if (auto node = ParentNode(); node)
+	{
+		for (auto &tooltip_element : tooltip_elements_)
+		{
+			//Check for intersection
+			if (Aabb{tooltip_element.aabb}.Transform(Matrix3::Transformation(node->FullTransformation())).Intersects(point))
+			{
+				if (node->AxisAligned() ||
+					Obb{tooltip_element.aabb}.Transform(Matrix3::Transformation(node->FullTransformation())).Intersects(point))
+					return tooltip_element.title;
+			}
+		}
+	}
+
+	return {};
 }
 
 

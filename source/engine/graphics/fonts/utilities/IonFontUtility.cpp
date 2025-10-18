@@ -412,6 +412,9 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 			//Src
 			else if (is_src_attribute(attribute.name))
 				text_block.Image->Source = *value;
+			//Title
+			else if (is_title_attribute(attribute.name))
+				text_block.Title = *value;
 			//Width
 			else if (is_width_attribute(attribute.name))
 			{

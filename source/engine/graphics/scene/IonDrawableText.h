@@ -27,6 +27,7 @@ File:	IonDrawableText.h
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
 #include "graphics/textures/IonTexture.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -53,6 +54,7 @@ namespace ion::graphics::scene
 	class DrawableText; //Forward declaration
 
 	using namespace types::type_literals;
+	using utilities::Aabb;
 	using utilities::Color;
 	using utilities::Vector2;
 	using utilities::Vector3;
@@ -112,6 +114,17 @@ namespace ion::graphics::scene
 		};
 
 
+		struct text_element
+		{
+			Aabb aabb;
+		};
+
+		struct text_tooltip_element final : text_element
+		{
+			std::string title;
+		};
+
+
 		struct text_glyph_primitive_key final
 		{
 			const fonts::Font *font = nullptr;
@@ -130,6 +143,7 @@ namespace ion::graphics::scene
 		using text_glyph_primitives = adaptors::FlatMap<text_glyph_primitive_key, OwningPtr<text_glyph_primitive>>;
 		using text_decoration_primitives = std::pair<OwningPtr<text_decoration_primitive>, OwningPtr<text_decoration_primitive>>;
 		using text_image_primitives = adaptors::FlatMap<text_image_primitive_key, OwningPtr<text_image_primitive>>;
+		using text_tooltip_elements = std::vector<text_tooltip_element>;
 
 
 		inline auto get_vertex_declaration() noexcept
@@ -189,10 +203,12 @@ namespace ion::graphics::scene
 		void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts::Text &text,
 			int font_size, int &glyph_count, Vector3 &position, real rotation, const Vector3 &origin,
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-			text_image_primitives &image_primitives, bool sub_pixel_correction);
+			text_image_primitives &image_primitives, text_tooltip_elements &tooltip_elements,
+			bool sub_pixel_correction);
 		void get_text_primitives(const fonts::Text &text, Vector3 position, real rotation,
 			text_glyph_primitives &glyph_primitives, text_decoration_primitives &decoration_primitives,
-			text_image_primitives &image_primitives, bool sub_pixel_correction);
+			text_image_primitives &image_primitives, text_tooltip_elements &tooltip_elements,
+			bool sub_pixel_correction);
 
 		///@}
 	} //drawable_text::detail
@@ -213,6 +229,7 @@ namespace ion::graphics::scene
 			drawable_text::detail::text_glyph_primitives glyph_primitives_;
 			drawable_text::detail::text_decoration_primitives decoration_primitives_;
 			drawable_text::detail::text_image_primitives image_primitives_;
+			drawable_text::detail::text_tooltip_elements tooltip_elements_;
 
 			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;
@@ -324,6 +341,11 @@ namespace ion::graphics::scene
 			{
 				return text_;
 			}
+
+
+			///@brief Returns the tooltip associated with the text element intersecting the given point
+			///@details Returns nullopt if the given point does not intersect any tooltip element
+			[[nodiscard]] std::optional<std::string> IntersectsTooltipElement(const Vector2 &point) const noexcept;
 
 			///@}
 

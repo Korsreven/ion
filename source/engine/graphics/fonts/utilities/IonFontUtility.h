@@ -171,7 +171,7 @@ namespace ion::graphics::fonts::utilities
 				   str == "big" ||
 
 				   //Other
-				   str == "mark";			   
+				   str == "mark";
 		}
 
 		constexpr auto is_empty_tag(std::string_view str) noexcept
@@ -206,6 +206,7 @@ namespace ion::graphics::fonts::utilities
 			return str == "color" ||
 				   str == "style" ||
 				   str == "src" ||
+				   str == "title" ||
 				   str == "width" ||
 				   str == "height";
 		}
@@ -223,6 +224,11 @@ namespace ion::graphics::fonts::utilities
 		constexpr auto is_src_attribute(std::string_view str) noexcept
 		{
 			return str == "src";
+		}
+
+		constexpr auto is_title_attribute(std::string_view str) noexcept
+		{
+			return str == "title";
 		}
 
 		constexpr auto is_width_attribute(std::string_view str) noexcept

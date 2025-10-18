@@ -123,6 +123,7 @@ namespace ion::graphics::fonts
 			std::optional<TextBlockFontSize> FontSize;
 			std::optional<TextBlockVerticalAlign> VerticalAlign;
 			std::optional<TextBlockImage> Image;
+			std::optional<std::string> Title;
 
 
 			///@brief Checks if two text block styles are equal (all members are equal)
@@ -135,7 +136,8 @@ namespace ion::graphics::fonts
 					   DecorationColor == rhs.DecorationColor &&
 					   FontSize == rhs.FontSize &&
 					   VerticalAlign == rhs.VerticalAlign &&
-					   Image == rhs.Image;
+					   Image == rhs.Image &&
+					   Title == rhs.Title;
 			}
 
 			///@brief Returns true if this text block style has no styles
@@ -148,7 +150,8 @@ namespace ion::graphics::fonts
 					   !DecorationColor &&
 					   !FontSize &&
 					   !VerticalAlign &&
-					   !Image;
+					   !Image &&
+					   !Title;
 			}
 		};
 
