@@ -210,6 +210,11 @@ std::optional<fonts::text::TextDecoration> get_text_decoration(const fonts::text
 	return text_block.Decoration ? text_block.Decoration : text.DefaultDecoration();
 }
 
+std::optional<fonts::text::TextDecorationStyle> get_text_decoration_style(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
+{
+	return text_block.DecorationStyle ? text_block.DecorationStyle : text.DefaultDecorationStyle();
+}
+
 std::optional<Color> get_text_decoration_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept
 {
 	return text_block.DecorationColor ? text_block.DecorationColor : text.DefaultDecorationColor();
@@ -508,11 +513,12 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 						std::begin(vertex_data), std::end(vertex_data));
 				}
 				
-				//Text decoration
+				//Text decoration (front/back decoration)
 				if (auto decoration = get_text_decoration(text_block, text); decoration)
 				{
 					auto line_thickness = fonts::utilities::detail::get_text_decoration_line_thickness(font_size);
 					auto line_margin = fonts::utilities::detail::get_text_decoration_line_margin(font_size);
+					auto line_style = get_text_decoration_style(text_block, text);
 
 					auto decoration_position =
 						[&]() noexcept -> Vector3
@@ -534,35 +540,82 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					
 					auto decoration_size = Vector2{text_block.Size->X(), line_thickness};
 					auto decoration_color = get_text_decoration_color(text_block, text).value_or(foreground_color);
+					auto front_decoration = *decoration == fonts::text::TextDecoration::LineThrough;
 
-					//Front decoration
-					if (*decoration == fonts::text::TextDecoration::LineThrough)
+					auto decoration_delta_z = front_decoration ?
+						Engine::ZEpsilon() :
+						-Engine::ZEpsilon();
+					auto &decoration_primitive = front_decoration ?
+						decoration_primitives.first :
+						decoration_primitives.second;
+
+					if (line_style == fonts::text::TextDecorationStyle::Dotted ||
+						line_style == fonts::text::TextDecorationStyle::Dashed)
 					{
+						auto line_size = line_style == fonts::text::TextDecorationStyle::Dotted ?
+							fonts::utilities::detail::get_text_decoration_dotted_line_size(font_size) :
+							fonts::utilities::detail::get_text_decoration_dashed_line_size(font_size);
+						auto line_spacing = line_style == fonts::text::TextDecorationStyle::Dotted ?
+							fonts::utilities::detail::get_text_decoration_dotted_line_spacing(font_size) :
+							fonts::utilities::detail::get_text_decoration_dashed_line_spacing(font_size);
+						auto count = static_cast<int>(std::max(1.0_r, decoration_size.X() / (line_size + line_spacing)));
+
 						auto vertex_data = get_decoration_vertex_data(
-							decoration_position, rotation, decoration_size, decoration_color, origin,
-							Engine::ZEpsilon(), sub_pixel_correction);
+							decoration_position, rotation, {line_size, decoration_size.Y()}, decoration_color, origin,
+							decoration_delta_z, sub_pixel_correction);
 
 						//New primitive
-						if (!decoration_primitives.first)
-							decoration_primitives.first = make_owning<text_decoration_primitive>();
+						if (!decoration_primitive)
+							decoration_primitive = make_owning<text_decoration_primitive>();
 
-						decoration_primitives.first->vertex_data.insert(
-							std::end(decoration_primitives.first->vertex_data),
+						decoration_primitive->vertex_data.insert(
+							std::end(decoration_primitive->vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
+
+						for (auto i = 1; i < count; ++i)
+						{
+							decoration_position.X(decoration_position.X() + line_size + line_spacing);
+
+							vertex_data = get_decoration_vertex_data(
+								decoration_position, rotation, {line_size, decoration_size.Y()}, decoration_color, origin,
+								decoration_delta_z, sub_pixel_correction);
+
+							decoration_primitive->vertex_data.insert(
+								std::end(decoration_primitive->vertex_data),
+								std::begin(vertex_data), std::end(vertex_data));
+						}
 					}
-					else //Back decoration
+					else //Solid or double
 					{
 						auto vertex_data = get_decoration_vertex_data(
 							decoration_position, rotation, decoration_size, decoration_color, origin,
-							-Engine::ZEpsilon(), sub_pixel_correction);
+							decoration_delta_z, sub_pixel_correction);
 
 						//New primitive
-						if (!decoration_primitives.second)
-							decoration_primitives.second = make_owning<text_decoration_primitive>();
+						if (!decoration_primitive)
+							decoration_primitive = make_owning<text_decoration_primitive>();
 
-						decoration_primitives.second->vertex_data.insert(
-							std::end(decoration_primitives.second->vertex_data),
+						decoration_primitive->vertex_data.insert(
+							std::end(decoration_primitive->vertex_data),
 							std::begin(vertex_data), std::end(vertex_data));
+
+						//One more solid line
+						if (line_style == fonts::text::TextDecorationStyle::Double)
+						{
+							auto line_spacing = fonts::utilities::detail::get_text_decoration_double_line_spacing(font_size);
+							auto line_offset = *decoration == fonts::text::TextDecoration::Overline ?
+								decoration_size.Y() + line_spacing :
+								-decoration_size.Y() - line_spacing;
+
+							vertex_data = get_decoration_vertex_data(
+								{decoration_position.X(), decoration_position.Y() + line_offset, decoration_position.Z()},
+								rotation, decoration_size, decoration_color, origin,
+								decoration_delta_z, sub_pixel_correction);
+
+							decoration_primitive->vertex_data.insert(
+								std::end(decoration_primitive->vertex_data),
+								std::begin(vertex_data), std::end(vertex_data));
+						}
 					}
 				}
 

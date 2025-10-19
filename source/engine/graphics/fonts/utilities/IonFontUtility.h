@@ -156,6 +156,7 @@ namespace ion::graphics::fonts::utilities
 				   //Underline
 				   str == "u" ||
 				   str == "ins" ||
+				   str == "abbr" ||
 
 				   //Line-through
 				   str == "s" ||
@@ -303,14 +304,39 @@ namespace ion::graphics::fonts::utilities
 			return metrics ? *metrics : regular_metrics;
 		}
 
+		inline auto get_text_decoration_line_thickness(int font_size) noexcept
+		{
+			return std::ceil(font_size / 16.0_r);
+		}
+
 		inline auto get_text_decoration_line_margin(int font_size) noexcept
 		{
 			return std::max(1.0_r, std::floor(font_size / 8.0_r));
 		}
 
-		inline auto get_text_decoration_line_thickness(int font_size) noexcept
+		inline auto get_text_decoration_dotted_line_size(int font_size) noexcept
 		{
-			return std::ceil(font_size / 16.0_r);
+			return std::max(2.0_r, std::ceil(font_size / 8.0_r));
+		}
+
+		inline auto get_text_decoration_dashed_line_size(int font_size) noexcept
+		{
+			return std::max(6.0_r, std::ceil(font_size / 4.0_r));
+		}
+
+		inline auto get_text_decoration_double_line_spacing(int font_size) noexcept
+		{
+			return std::ceil(font_size / 8.0_r);
+		}
+
+		inline auto get_text_decoration_dotted_line_spacing(int font_size) noexcept
+		{
+			return std::max(2.0_r, std::ceil(font_size / 8.0_r));
+		}
+
+		inline auto get_text_decoration_dashed_line_spacing(int font_size) noexcept
+		{
+			return std::max(4.0_r, std::ceil(font_size / 8.0_r));
 		}
 
 		inline auto get_text_decoration_background_size(int font_size) noexcept

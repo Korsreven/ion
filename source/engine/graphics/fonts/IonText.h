@@ -83,6 +83,13 @@ namespace ion::graphics::fonts
 			Overline
 		};
 
+		enum class TextDecorationStyle
+		{
+			Double,
+			Dotted,
+			Dashed
+		};
+
 
 		enum class TextBlockFontSize : bool
 		{
@@ -119,6 +126,7 @@ namespace ion::graphics::fonts
 			std::optional<Color> BackgroundColor;
 			std::optional<TextFontStyle> FontStyle;
 			std::optional<TextDecoration> Decoration;
+			std::optional<TextDecorationStyle> DecorationStyle;
 			std::optional<Color> DecorationColor;
 			std::optional<TextBlockFontSize> FontSize;
 			std::optional<TextBlockVerticalAlign> VerticalAlign;
@@ -133,6 +141,7 @@ namespace ion::graphics::fonts
 					   BackgroundColor == rhs.BackgroundColor &&
 					   FontStyle == rhs.FontStyle &&
 					   Decoration == rhs.Decoration &&
+					   DecorationStyle == rhs.DecorationStyle &&
 					   DecorationColor == rhs.DecorationColor &&
 					   FontSize == rhs.FontSize &&
 					   VerticalAlign == rhs.VerticalAlign &&
@@ -147,6 +156,7 @@ namespace ion::graphics::fonts
 					   !BackgroundColor &&
 					   !FontStyle &&
 					   !Decoration &&
+					   !DecorationStyle &&
 					   !DecorationColor &&
 					   !FontSize &&
 					   !VerticalAlign &&
@@ -241,6 +251,7 @@ namespace ion::graphics::fonts
 			std::optional<Color> default_background_color_;	
 			std::optional<text::TextFontStyle> default_font_style_;
 			std::optional<text::TextDecoration> default_decoration_;
+			std::optional<text::TextDecorationStyle> default_decoration_style_;
 			std::optional<Color> default_decoration_color_;
 
 			NonOwningPtr<TypeFace> type_face_;
@@ -377,6 +388,13 @@ namespace ion::graphics::fonts
 			inline void DefaultDecoration(std::optional<text::TextDecoration> decoration) noexcept
 			{
 				default_decoration_ = decoration;
+			}
+
+			///@brief Sets the default decoration style for the displayed text to the given style
+			///@details If nullopt is passed, no default decoration style will be used
+			inline void DefaultDecorationStyle(std::optional<text::TextDecorationStyle> decoration_style) noexcept
+			{
+				default_decoration_style_ = decoration_style;
 			}
 
 			///@brief Sets the default decoration color for the displayed text decoration to the given color
@@ -516,6 +534,13 @@ namespace ion::graphics::fonts
 			[[nodiscard]] inline auto DefaultDecoration() const noexcept
 			{
 				return default_decoration_;
+			}
+
+			///@brief Returns the default decoration style for the displayed text
+			///@details Returns nullopt if no default decoration style has been specified
+			[[nodiscard]] inline auto DefaultDecorationStyle() const noexcept
+			{
+				return default_decoration_style_;
 			}
 
 			///@brief Returns the default decoration color for the displayed text decoration

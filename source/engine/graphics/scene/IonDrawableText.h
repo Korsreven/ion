@@ -180,6 +180,7 @@ namespace ion::graphics::scene
 		std::optional<Color> get_background_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<fonts::text::TextFontStyle> get_font_style(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<fonts::text::TextDecoration> get_text_decoration(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
+		std::optional<fonts::text::TextDecorationStyle> get_text_decoration_style(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 		std::optional<Color> get_text_decoration_color(const fonts::text::TextBlock &text_block, const fonts::Text &text) noexcept;
 
 		fonts::Font* get_default_font(const fonts::Text &text) noexcept;

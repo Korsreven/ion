@@ -98,6 +98,7 @@ ClassDefinition get_text_style_class()
 		.AddProperty("background-color", ParameterType::Color)
 		.AddProperty("decoration", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("decoration-color", ParameterType::Color)
+		.AddProperty("decoration-style", {"double"s, "dotted"s, "dashed"s})
 		.AddProperty("foreground-color", ParameterType::Color)
 		.AddProperty("font-size", {"smaller"s, "larger"s})
 		.AddProperty("font-style", {"bold"s, "italic"s, "bold-italic"s})
@@ -202,6 +203,15 @@ graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::Objec
 		}
 		else if (property.Name() == "decoration-color")
 			style.DecorationColor = property[0].Get<ScriptType::Color>()->Get();
+		else if (property.Name() == "decoration-style")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "double")
+				style.DecorationStyle = graphics::fonts::text::TextDecorationStyle::Double;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "dotted")
+				style.DecorationStyle = graphics::fonts::text::TextDecorationStyle::Dotted;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "dashed")
+				style.DecorationStyle = graphics::fonts::text::TextDecorationStyle::Dashed;
+		}
 		else if (property.Name() == "foreground-color")
 			style.ForegroundColor = property[0].Get<ScriptType::Color>()->Get();
 		else if (property.Name() == "font-size")

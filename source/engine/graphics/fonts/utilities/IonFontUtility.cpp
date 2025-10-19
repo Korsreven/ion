@@ -334,8 +334,13 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 			}();
 
 	//Underline
-	else if (tag == "u" || tag == "ins")
+	else if (tag == "u" || tag == "ins" || tag == "abbr")
+	{
 		text_block.Decoration = text::TextDecoration::Underline;
+
+		if (tag == "abbr")
+			text_block.DecorationStyle = text::TextDecorationStyle::Dotted;
+	}
 
 	//Line-through
 	else if (tag == "s" || tag == "del" || tag == "strike")
@@ -545,6 +550,22 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 									text_block.Decoration = text::TextDecoration::LineThrough;
 								else if (decoration->Get() == "underline")
 									text_block.Decoration = text::TextDecoration::Underline;
+							}
+						}
+
+						//Text decoration style
+						else if (property.Name() == "text-decoration-style")
+						{
+							if (auto decoration_style = property[0].Get<script::ScriptType::Enumerable>(); decoration_style)
+							{
+								if (decoration_style->Get() == "solid")
+									text_block.DecorationStyle = {};
+								else if (decoration_style->Get() == "double")
+									text_block.DecorationStyle = text::TextDecorationStyle::Double;
+								else if (decoration_style->Get() == "dotted")
+									text_block.DecorationStyle = text::TextDecorationStyle::Dotted;
+								else if (decoration_style->Get() == "dashed")
+									text_block.DecorationStyle = text::TextDecorationStyle::Dashed;
 							}
 						}
 

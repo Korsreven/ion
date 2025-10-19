@@ -57,6 +57,7 @@ ClassDefinition get_text_class()
 		.AddProperty("default-base-opacity", ParameterType::FloatingPoint)
 		.AddProperty("default-decoration", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("default-decoration-color", ParameterType::Color)
+		.AddProperty("default-decoration-style", {"double"s, "dotted"s, "dashed"s})
 		.AddProperty("default-font-style", {"bold"s, "italic"s, "bold-italic"s})
 		.AddProperty("default-foreground-color", ParameterType::Color)
 		.AddProperty("from-line", ParameterType::Integer)
@@ -110,6 +111,15 @@ void set_text_properties(const script_tree::ObjectNode &object, Text &text)
 		}
 		else if (property.Name() == "default-decoration-color")
 			text.DefaultDecorationColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "default-decoration-style")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "double")
+				text.DefaultDecorationStyle(text::TextDecorationStyle::Double);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "dotted")
+				text.DefaultDecorationStyle(text::TextDecorationStyle::Dotted);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "dashed")
+				text.DefaultDecorationStyle(text::TextDecorationStyle::Dashed);
+		}
 		else if (property.Name() == "default-font-style")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "bold")
