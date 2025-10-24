@@ -626,13 +626,13 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					auto texture_size = material ? shapes::sprite::detail::get_texture_size(*material) : std::nullopt;
 
 					//Calculate image size
-					auto image_square_size = fonts::utilities::detail::get_text_image_max_size(font_size);
+					auto image_square_size = fonts::utilities::detail::get_text_image_default_size(font_size);
 
 					if (text_block.Image->Width || text_block.Image->Height)
 					{
 						image_square_size = std::min(
 							std::max(text_block.Image->Width.value_or(0.0_r), text_block.Image->Height.value_or(0.0_r)),
-							image_square_size
+							fonts::utilities::detail::get_text_image_max_size(font_size)
 						);
 						
 						//Use custom aspect ratio

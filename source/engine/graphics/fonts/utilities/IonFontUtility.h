@@ -344,9 +344,14 @@ namespace ion::graphics::fonts::utilities
 			return font_size + get_text_decoration_line_margin(font_size) * 4.0_r + get_text_decoration_line_thickness(font_size) * 4.0_r;
 		}
 
-		inline auto get_text_image_max_size(int font_size) noexcept
+		inline auto get_text_image_default_size(int font_size) noexcept
 		{
 			return get_text_decoration_background_size(font_size);
+		}
+
+		inline auto get_text_image_max_size(int font_size) noexcept
+		{
+			return font_size + get_text_decoration_background_size(font_size);
 		}
 
 		inline auto get_text_block_scale_factor(const text::TextBlock &text_block)

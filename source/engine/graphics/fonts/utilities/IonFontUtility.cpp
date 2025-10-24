@@ -713,12 +713,12 @@ text::TextBlocks html_to_text_blocks(std::string_view str, Font *font)
 									);
 
 								//Calculate image (square) size
-								auto image_size = get_text_image_max_size(font->Size());
+								auto image_size = get_text_image_default_size(font->Size());
 
 								if (text_block_style.Image->Width || text_block_style.Image->Height)
 									image_size = std::min(
 										std::max(text_block_style.Image->Width.value_or(0.0_r), text_block_style.Image->Height.value_or(0.0_r)),
-										image_size
+										get_text_image_max_size(font->Size())
 									);
 
 								//Measure placeholder spacing needed for image
