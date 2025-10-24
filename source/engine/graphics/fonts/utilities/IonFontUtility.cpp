@@ -243,6 +243,8 @@ html_attributes parse_html_attributes(std::string_view str) noexcept
 				}
 			}
 		}
+		else
+			++off;
 	}
 	
 	return attributes;
