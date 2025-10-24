@@ -60,6 +60,11 @@ void GuiLabel::UpdateCaption() noexcept
 
 		if (auto size = MinimumSize(); size)
 		{
+			if (min_size_)
+				size->Ceil(*min_size_);
+			if (max_size_)
+				size->Floor(*max_size_);
+
 			need_update = false;
 			Size(*size);
 			need_update = true;

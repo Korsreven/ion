@@ -15,12 +15,16 @@ File:	IonGuiLabel.h
 
 #include <optional>
 #include <string>
+#include <utility>
 
 #include "IonGuiControl.h"
+#include "graphics/utilities/IonVector2.h"
 #include "memory/IonOwningPtr.h"
 
 namespace ion::gui::controls
 {
+	using namespace graphics::utilities;
+
 	namespace gui_label
 	{
 		struct LabelSkin : gui_control::ControlSkin
@@ -45,6 +49,8 @@ namespace ion::gui::controls
 		protected:
 
 			bool auto_size_ = false;
+			std::optional<Vector2> min_size_;
+			std::optional<Vector2> max_size_;
 
 
 			/**
@@ -77,7 +83,33 @@ namespace ion::gui::controls
 			///@brief Sets whether or not this label should automatically adjust its size
 			inline void AutoSize(bool auto_size) noexcept
 			{
-				auto_size_ = auto_size;
+				if (auto_size_ != auto_size)
+				{
+					auto_size_ = auto_size;
+
+					if (Caption())
+						UpdateCaption();
+				}
+			}
+
+			///@brief Sets the auto size constraints for this label to the given min and max size
+			inline void AutoSizeConstraints(std::optional<Vector2> min_size, std::optional<Vector2> max_size) noexcept
+			{
+				if (min_size && max_size)
+				{
+					auto [min, max] = std::minmax(*min_size, *max_size);
+					min_size = min;
+					max_size = max;
+				}
+
+				if (min_size_ != min_size || max_size_ != max_size)
+				{
+					min_size_ = min_size;
+					max_size_ = max_size;
+
+					if (Caption())
+						UpdateCaption();
+				}
 			}
 
 			///@}
@@ -91,6 +123,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto AutoSize() const noexcept
 			{
 				return auto_size_;
+			}
+
+			///@brief Returns the auto size constraints for this label
+			[[nodiscard]] inline auto AutoSizeConstraints() const noexcept
+			{
+				return std::pair{min_size_, max_size_};
 			}
 
 			///@}
