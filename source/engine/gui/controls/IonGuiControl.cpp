@@ -831,13 +831,13 @@ void GuiControl::SetCaptionState(ControlState state, ControlSkinTextPart &part) 
 				else if (text->DefaultFontStyle())
 					part->Get()->DefaultFontStyle({});
 
-				if (style->Decoration)
+				if (style->DecorationLine)
 				{
-					if (text->DefaultDecoration() != *style->Decoration)
-						part->Get()->DefaultDecoration(*style->Decoration);
+					if (text->DefaultDecorationLine() != *style->DecorationLine)
+						part->Get()->DefaultDecorationLine(*style->DecorationLine);
 				}
-				else if (text->DefaultDecoration())
-					part->Get()->DefaultDecoration({});
+				else if (text->DefaultDecorationLine())
+					part->Get()->DefaultDecorationLine({});
 
 				if (style->DecorationColor)
 				{

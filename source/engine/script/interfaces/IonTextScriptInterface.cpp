@@ -55,8 +55,8 @@ ClassDefinition get_text_class()
 		.AddProperty("content", ParameterType::String)
 		.AddProperty("default-background-color", ParameterType::Color)
 		.AddProperty("default-base-opacity", ParameterType::FloatingPoint)
-		.AddProperty("default-decoration", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("default-decoration-color", ParameterType::Color)
+		.AddProperty("default-decoration-line", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("default-decoration-style", {"double"s, "dotted"s, "dashed"s})
 		.AddProperty("default-font-style", {"bold"s, "italic"s, "bold-italic"s})
 		.AddProperty("default-foreground-color", ParameterType::Color)
@@ -100,17 +100,17 @@ void set_text_properties(const script_tree::ObjectNode &object, Text &text)
 			text.DefaultBackgroundColor(property[0].Get<ScriptType::Color>()->Get());
 		else if (property.Name() == "default-base-opacity")
 			text.DefaultBaseOpacity(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
-		else if (property.Name() == "default-decoration")
-		{
-			if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
-				text.DefaultDecoration(text::TextDecoration::Overline);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
-				text.DefaultDecoration(text::TextDecoration::LineThrough);
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
-				text.DefaultDecoration(text::TextDecoration::Underline);
-		}
 		else if (property.Name() == "default-decoration-color")
 			text.DefaultDecorationColor(property[0].Get<ScriptType::Color>()->Get());
+		else if (property.Name() == "default-decoration-line")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
+				text.DefaultDecorationLine(text::TextDecorationLine::Overline);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
+				text.DefaultDecorationLine(text::TextDecorationLine::LineThrough);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
+				text.DefaultDecorationLine(text::TextDecorationLine::Underline);
+		}
 		else if (property.Name() == "default-decoration-style")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "double")

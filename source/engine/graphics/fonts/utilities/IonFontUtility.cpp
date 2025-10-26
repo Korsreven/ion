@@ -338,7 +338,7 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 	//Underline
 	else if (tag == "u" || tag == "ins" || tag == "abbr")
 	{
-		text_block.Decoration = text::TextDecoration::Underline;
+		text_block.DecorationLine = text::TextDecorationLine::Underline;
 
 		if (tag == "abbr")
 			text_block.DecorationStyle = text::TextDecorationStyle::Dotted;
@@ -346,7 +346,7 @@ text::TextBlockStyle html_tag_to_text_block_style(std::string_view tag,
 
 	//Line-through
 	else if (tag == "s" || tag == "del" || tag == "strike")
-		text_block.Decoration = text::TextDecoration::LineThrough;
+		text_block.DecorationLine = text::TextDecorationLine::LineThrough;
 
 	//Subscript
 	else if (tag == "sub")
@@ -539,19 +539,55 @@ text::TextBlockStyle html_attributes_to_text_block_style(const html_attributes &
 							}
 						}
 
-						//Text decoration
-						else if (property.Name() == "text-decoration" || property.Name() == "text-decoration-line")
+						//Text decoration (shorthand)
+						else if (property.Name() == "text-decoration")
 						{
-							if (auto decoration = property[0].Get<script::ScriptType::Enumerable>(); decoration)
+							for (auto i = 0; i < property.NumberOfArguments(); ++i)
 							{
-								if (decoration->Get() == "none")
-									text_block.Decoration = {};
-								else if (decoration->Get() == "overline")
-									text_block.Decoration = text::TextDecoration::Overline;
-								else if (decoration->Get() == "line-through")
-									text_block.Decoration = text::TextDecoration::LineThrough;
-								else if (decoration->Get() == "underline")
-									text_block.Decoration = text::TextDecoration::Underline;
+								if (auto decoration = property[i].Get<script::ScriptType::Enumerable>(); decoration)
+								{
+									//Line
+									if (decoration->Get() == "none")
+										text_block.DecorationLine = {};
+									else if (decoration->Get() == "overline")
+										text_block.DecorationLine = text::TextDecorationLine::Overline;
+									else if (decoration->Get() == "line-through")
+										text_block.DecorationLine = text::TextDecorationLine::LineThrough;
+									else if (decoration->Get() == "underline")
+										text_block.DecorationLine = text::TextDecorationLine::Underline;
+
+									//Style
+									else if (decoration->Get() == "solid")
+										text_block.DecorationStyle = {};
+									else if (decoration->Get() == "double")
+										text_block.DecorationStyle = text::TextDecorationStyle::Double;
+									else if (decoration->Get() == "dotted")
+										text_block.DecorationStyle = text::TextDecorationStyle::Dotted;
+									else if (decoration->Get() == "dashed")
+										text_block.DecorationStyle = text::TextDecorationStyle::Dashed;
+								}
+								//Color
+								else if (auto color = property[i].Get<script::ScriptType::Color>(); color)
+									text_block.DecorationColor = color->Get();
+							}
+						}
+
+						//Text decoration line
+						else if (property.Name() == "text-decoration-line")
+						{
+							for (auto i = 0; i < property.NumberOfArguments(); ++i)
+							{
+								if (auto decoration_line = property[i].Get<script::ScriptType::Enumerable>(); decoration_line)
+								{
+									if (decoration_line->Get() == "none")
+										text_block.DecorationLine = {};
+									else if (decoration_line->Get() == "overline")
+										text_block.DecorationLine = text::TextDecorationLine::Overline;
+									else if (decoration_line->Get() == "line-through")
+										text_block.DecorationLine = text::TextDecorationLine::LineThrough;
+									else if (decoration_line->Get() == "underline")
+										text_block.DecorationLine = text::TextDecorationLine::Underline;
+								}
 							}
 						}
 

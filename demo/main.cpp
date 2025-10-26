@@ -1899,7 +1899,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 
 		ion::graphics::fonts::text::TextBlockStyle caption_style_hovered;
 		caption_style_hovered.ForegroundColor = caption_text->DefaultForegroundColor();
-		caption_style_hovered.Decoration = ion::graphics::fonts::text::TextDecoration::Underline;
+		caption_style_hovered.DecorationLine = ion::graphics::fonts::text::TextDecorationLine::Underline;
 
 		//Placeholder text styles
 		ion::graphics::fonts::text::TextBlockStyle placeholder_text_style_enabled;

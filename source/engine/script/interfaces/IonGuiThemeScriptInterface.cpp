@@ -95,9 +95,9 @@ NonOwningPtr<graphics::fonts::Text> get_text(std::string_view name, const Manage
 ClassDefinition get_text_style_class()
 {
 	return ClassDefinition::Create("text-style")
-		.AddProperty("background-color", ParameterType::Color)
-		.AddProperty("decoration", {"underline"s, "line-through"s, "overline"s})
+		.AddProperty("background-color", ParameterType::Color)		
 		.AddProperty("decoration-color", ParameterType::Color)
+		.AddProperty("decoration-line", {"underline"s, "line-through"s, "overline"s})
 		.AddProperty("decoration-style", {"double"s, "dotted"s, "dashed"s})
 		.AddProperty("foreground-color", ParameterType::Color)
 		.AddProperty("font-size", {"smaller"s, "larger"s})
@@ -191,18 +191,18 @@ graphics::fonts::text::TextBlockStyle create_text_style(const script_tree::Objec
 	for (auto &property : object.Properties())
 	{
 		if (property.Name() == "background-color")
-			style.BackgroundColor = property[0].Get<ScriptType::Color>()->Get();
-		else if (property.Name() == "decoration")
-		{
-			if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
-				style.Decoration = graphics::fonts::text::TextDecoration::Underline;
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
-				style.Decoration = graphics::fonts::text::TextDecoration::LineThrough;
-			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
-				style.Decoration = graphics::fonts::text::TextDecoration::Overline;
-		}
+			style.BackgroundColor = property[0].Get<ScriptType::Color>()->Get();		
 		else if (property.Name() == "decoration-color")
 			style.DecorationColor = property[0].Get<ScriptType::Color>()->Get();
+		else if (property.Name() == "decoration-line")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "underline")
+				style.DecorationLine = graphics::fonts::text::TextDecorationLine::Underline;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "line-through")
+				style.DecorationLine = graphics::fonts::text::TextDecorationLine::LineThrough;
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "overline")
+				style.DecorationLine = graphics::fonts::text::TextDecorationLine::Overline;
+		}
 		else if (property.Name() == "decoration-style")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "double")

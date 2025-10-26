@@ -16,6 +16,7 @@ File:	IonText.h
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -76,11 +77,52 @@ namespace ion::graphics::fonts
 			BoldItalic
 		};
 
-		enum class TextDecoration
+		struct TextDecorationLine
 		{
-			Underline,
-			LineThrough,
-			Overline
+			enum Flags : uint32
+			{
+				Underline = 0b1,
+				LineThrough = 0b10,
+				Overline = 0b100
+			};
+
+			uint32 Value = 0b0;
+
+
+			///@brief Deleted default constructor
+			constexpr TextDecorationLine() = delete;
+
+			///@brief Constructs a new text decoration line with the given lines
+			template <typename... Lines>
+			constexpr TextDecorationLine(Lines... lines) : Value{(... | lines)}
+			{
+				static_assert((std::is_same_v<Lines, Flags> && ...));
+			}
+
+			///@brief Adds the given line to the text decoration line
+			constexpr auto& operator=(TextDecorationLine::Flags line) noexcept
+			{
+				Value |= line;
+				return *this;
+			}
+
+			///@brief Checks if two text decoration lines are equal
+			[[nodiscard]] constexpr auto operator==(const TextDecorationLine &rhs) const noexcept
+			{
+				return Value == rhs.Value;
+			}
+
+			///@brief Checks if a text decoration line has the given line
+			[[nodiscard]] constexpr auto operator==(TextDecorationLine::Flags line) const noexcept
+			{
+				return (Value & line) != 0;
+			}
+
+			///@brief Checks if a text decoration line is missing the given line
+			[[nodiscard]] constexpr auto operator!=(TextDecorationLine::Flags line) const noexcept
+			{
+				return !(*this == line);
+			}
 		};
 
 		enum class TextDecorationStyle
@@ -125,7 +167,7 @@ namespace ion::graphics::fonts
 			std::optional<Color> ForegroundColor;
 			std::optional<Color> BackgroundColor;
 			std::optional<TextFontStyle> FontStyle;
-			std::optional<TextDecoration> Decoration;
+			std::optional<TextDecorationLine> DecorationLine;
 			std::optional<TextDecorationStyle> DecorationStyle;
 			std::optional<Color> DecorationColor;
 			std::optional<TextBlockFontSize> FontSize;
@@ -140,7 +182,7 @@ namespace ion::graphics::fonts
 				return ForegroundColor == rhs.ForegroundColor &&
 					   BackgroundColor == rhs.BackgroundColor &&
 					   FontStyle == rhs.FontStyle &&
-					   Decoration == rhs.Decoration &&
+					   DecorationLine == rhs.DecorationLine &&
 					   DecorationStyle == rhs.DecorationStyle &&
 					   DecorationColor == rhs.DecorationColor &&
 					   FontSize == rhs.FontSize &&
@@ -155,7 +197,7 @@ namespace ion::graphics::fonts
 				return !ForegroundColor &&
 					   !BackgroundColor &&
 					   !FontStyle &&
-					   !Decoration &&
+					   !DecorationLine &&
 					   !DecorationStyle &&
 					   !DecorationColor &&
 					   !FontSize &&
@@ -250,7 +292,7 @@ namespace ion::graphics::fonts
 			Color default_foreground_color_ = text::detail::jet_black;	
 			std::optional<Color> default_background_color_;	
 			std::optional<text::TextFontStyle> default_font_style_;
-			std::optional<text::TextDecoration> default_decoration_;
+			std::optional<text::TextDecorationLine> default_decoration_line_;
 			std::optional<text::TextDecorationStyle> default_decoration_style_;
 			std::optional<Color> default_decoration_color_;
 
@@ -383,11 +425,11 @@ namespace ion::graphics::fonts
 				default_font_style_ = font_style;
 			}
 
-			///@brief Sets the default decoration for the displayed text to the given decoration
-			///@details If nullopt is passed, no default decoration will be used
-			inline void DefaultDecoration(std::optional<text::TextDecoration> decoration) noexcept
+			///@brief Sets the default decoration line for the displayed text to the given line
+			///@details If nullopt is passed, no default decoration line will be used
+			inline void DefaultDecorationLine(std::optional<text::TextDecorationLine> decoration_line) noexcept
 			{
-				default_decoration_ = decoration;
+				default_decoration_line_ = decoration_line;
 			}
 
 			///@brief Sets the default decoration style for the displayed text to the given style
@@ -529,11 +571,11 @@ namespace ion::graphics::fonts
 				return default_font_style_;
 			}
 
-			///@brief Returns the default decoration for the displayed text
-			///@details Returns nullopt if no default decoration has been specified
-			[[nodiscard]] inline auto DefaultDecoration() const noexcept
+			///@brief Returns the default decoration line for the displayed text
+			///@details Returns nullopt if no default decoration line has been specified
+			[[nodiscard]] inline auto DefaultDecorationLine() const noexcept
 			{
-				return default_decoration_;
+				return default_decoration_line_;
 			}
 
 			///@brief Returns the default decoration style for the displayed text

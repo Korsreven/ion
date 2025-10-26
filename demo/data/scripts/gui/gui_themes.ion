@@ -462,7 +462,7 @@ theme
             hovered
             {
                 foreground-color: white;
-                decoration: underline;
+                decoration-line: underline;
             }
         }
     }
