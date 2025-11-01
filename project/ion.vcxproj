@@ -320,6 +320,7 @@
     <ClCompile Include="..\source\engine\utilities\IonCrypto.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonFileUtility.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonMath.cpp" />
+    <ClCompile Include="..\source\engine\utilities\IonNoise.cpp" />
     <ClCompile Include="..\source\engine\utilities\IonStringUtility.cpp" />
     <ClCompile Include="..\source\main.cpp" />
   </ItemGroup>
@@ -555,6 +556,7 @@
     <ClInclude Include="..\source\engine\utilities\IonCrypto.h" />
     <ClInclude Include="..\source\engine\utilities\IonFileUtility.h" />
     <ClInclude Include="..\source\engine\utilities\IonMath.h" />
+    <ClInclude Include="..\source\engine\utilities\IonNoise.h" />
     <ClInclude Include="..\source\engine\utilities\IonRandom.h" />
     <ClInclude Include="..\source\engine\utilities\IonStringUtility.h" />
   </ItemGroup>
