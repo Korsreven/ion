@@ -246,6 +246,7 @@ File:	Ion.h
 #include "utilities/IonCrypto.h"
 #include "utilities/IonFileUtility.h"
 #include "utilities/IonMath.h"
+#include "utilities/IonNoise.h"
 #include "utilities/IonRandom.h"
 #include "utilities/IonStringUtility.h"
 
