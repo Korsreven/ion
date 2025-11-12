@@ -23,46 +23,30 @@ namespace detail
 
 real fade(real t) noexcept
 {
-	return t * t * t * (t * (t * 6.0_r - 15.0_r) + 10.0_r);
+	//6t^5 - 15t^4 + 10t^3
+	return t * t * t * (t * (t * 6 - 15) + 10);
 }
 
 
 real grad(int hash, real x) noexcept
 {
-	return (hash & 1) ? x : -x;
+	return (hash & 1) == 0 ? x : -x;
 }
 
-std::pair<real, real> grad2(int hash, real x) noexcept
+real grad(int hash, real x, real y) noexcept
 {
-    switch (hash & 7)
-    {
-        case 0: return {x, x};
-        case 1: return {-x, x};
-        case 2: return {x, -x};
-        case 3: return {-x, -x};
-        case 4: return {x, 0.0_r};
-        case 5: return {-x, 0.0_r};
-        case 6: return {0.0_r, x};
-        default: return {0.0_r, -x};
-    }
+	auto h = hash & 7;
+	auto u = h < 4 ? x : y;
+	auto v = h < 4 ? y : x;
+	return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-real value(int hash, real x) noexcept
+real grad(int hash, real x, real y, real z) noexcept
 {
-	//Map 32 bits of hash into a deterministic floating point
-    return ((hash & 0x7fffffff) / 2147483647.0_r * 2.0_r - 1.0_r) * x;
-}
-
-
-int hash(int x) noexcept
-{
-	x = (x << 13) ^ x;
-	return (x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff;
-}
-
-int hash(int x, int y) noexcept
-{
-    return hash(x + hash(y));
+	auto h = hash & 15;
+    auto u = h < 8 ? x : y;
+    auto v = h < 4 ? y : (h == 12 || h == 14 ? x : z);
+    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
 } //detail
@@ -72,63 +56,58 @@ int hash(int x, int y) noexcept
 	Perlin functions
 */
 
-real Perlin1D(real x) noexcept
+real Perlin(real x) noexcept
 {
-	auto x0 = static_cast<int>(std::floor(x)); //Left coordinate
-	auto x1 = x0 + 1; //Right coordinate
+	//Determine the unit segment containing the coordinate
+	auto i = static_cast<int>(std::floor(x));
 
-	auto sx = x - x0; //Distance from x0
-	auto u = detail::fade(sx); //Smooth interpolation weight
+	//Relative coordinate within segment
+	auto x0 = x - i;
 
-	//Get gradient directions based on hashed coordinates
-	auto g0 = detail::grad(detail::hash(x0));
-	auto g1 = detail::grad(detail::hash(x1));
+	//Wrap coordinate for permutation table
+	auto ii = i & 255;
 
-	//Distance vectors (from lattice point to input coordinate)
-	auto d0 = sx;
-	auto d1 = sx - 1.0_r;
+	//Compute fade curves for coordinate
+	auto u = detail::fade(x0);
 
-	//Dot product between gradient and distance
-	auto v0 = g0 * d0;
-	auto v1 = g1 * d1;
+	//Permute coordinate for gradient lookup
+	auto a = detail::perm[ii];
 
-	//Interpolate between the two values
+	//Gradient contributions from segment endpoints
+	auto v0 = detail::grad(detail::perm[a], x0);
+	auto v1 = detail::grad(detail::perm[a + 1], x0 - 1.0_r);
+
+	//Interpolate along x
 	return math::Lerp(v0, v1, u);
 }
 
-real Perlin2D(real x, real y) noexcept
+real Perlin(real x, real y) noexcept
 {
-	//Determine grid cell coordinates
-	auto x0 = static_cast<int>(std::floor(x));
-	auto y0 = static_cast<int>(std::floor(y));
-	auto x1 = x0 + 1;
-	auto y1 = y0 + 1;
+	//Determine the unit square containing the coordinate
+	auto i = static_cast<int>(std::floor(x));
+	auto j = static_cast<int>(std::floor(y));
 
-	//Relative coordinates within cell
-	auto sx = x - x0;
-	auto sy = y - y0;
+	//Relative coordinates within square
+	auto x0 = x - i;
+	auto y0 = y - j;
 
-	//Smooth interpolation weights
-	auto u = detail::fade(sx);
-	auto v = detail::fade(sy);
+	//Wrap coordinates for permutation table
+	auto ii = i & 255;
+	auto jj = j & 255;
 
-	//Hash each corner to get gradient directions
-	auto [gx00, gy00] = detail::grad2(detail::hash(x0, y0));
-	auto [gx10, gy10] = detail::grad2(detail::hash(x1, y0));
-	auto [gx01, gy01] = detail::grad2(detail::hash(x0, y1));
-	auto [gx11, gy11] = detail::grad2(detail::hash(x1, y1));
+	//Compute fade curves for each coordinate
+	auto u = detail::fade(x0);
+	auto v = detail::fade(y0);
 
-	//Distance vectors from each corner to point
-	auto dx0 = sx;
-	auto dy0 = sy;
-    auto dx1 = sx - 1.0_r;
-	auto dy1 = sy;
-    
-	//Dot products between gradients and distance vectors
-	auto v00 = gx00 * dx0 + gy00 * dy0;
-	auto v10 = gx10 * dx1 + gy10 * dy0;
-	auto v01 = gx01 * dx0 + gy01 * dy1;
-	auto v11 = gx11 * dx1 + gy11 * dy1;
+	//Permute coordinates for gradient lookup
+	auto a = detail::perm[ii] + jj;
+	auto b = detail::perm[ii + 1] + jj;
+
+	//Gradient contributions from each corners
+	auto v00 = detail::grad(detail::perm[a], x0, y0); //Bottom-left
+	auto v10 = detail::grad(detail::perm[b], x0 - 1.0_r, y0); //Bottom-right
+	auto v01 = detail::grad(detail::perm[a + 1], x0, y0 - 1.0_r); //Top-left
+	auto v11 = detail::grad(detail::perm[b + 1], x0 - 1.0_r, y0 - 1.0_r); //Top-right
 
 	//Interpolate along x
 	auto ix0 = math::Lerp(v00, v10, u);
@@ -136,6 +115,64 @@ real Perlin2D(real x, real y) noexcept
 
 	//Interpolate along y
 	return math::Lerp(ix0, ix1, v);
+}
+
+real Perlin(real x, real y, real z) noexcept
+{
+	//Determine the unit cube containing the coordinate
+	auto i = static_cast<int>(std::floor(x));
+	auto j = static_cast<int>(std::floor(y));
+	auto k = static_cast<int>(std::floor(z));
+
+	//Relative coordinates within cube
+	auto x0 = x - i;
+	auto y0 = y - j;
+	auto z0 = z - k;
+
+	//Wrap coordinates for permutation table
+	auto ii = i & 255;
+	auto jj = j & 255;
+	auto kk = k & 255;
+
+	//Compute fade curves for each coordinate
+	auto u = detail::fade(x0);
+	auto v = detail::fade(y0);
+	auto w = detail::fade(z0);
+
+	//Permute coordinates for gradient lookup
+	auto a = detail::perm[ii] + jj;
+	auto aa = detail::perm[a] + kk;
+	auto ab = detail::perm[a + 1] + kk;
+	auto b = detail::perm[ii + 1] + jj;
+	auto ba = detail::perm[b] + kk;
+	auto bb = detail::perm[b + 1] + kk;
+
+	//Gradient contributions from each corners
+	//Front face
+	auto v000 = detail::grad(detail::perm[aa], x0, y0, z0); //Bottom-left
+	auto v100 = detail::grad(detail::perm[ba], x0 - 1.0_r, y0, z0); //Bottom-right
+	auto v010 = detail::grad(detail::perm[ab], x0, y0 - 1.0_r, z0); //Top-left
+	auto v110 = detail::grad(detail::perm[bb], x0 - 1.0_r, y0 - 1.0_r, z0); //Top-right
+	//Back face
+	auto v001 = detail::grad(detail::perm[aa + 1], x0, y0, z0 - 1.0_r); //Bottom-left
+	auto v101 = detail::grad(detail::perm[ba + 1], x0 - 1.0_r, y0, z0 - 1.0_r); //Bottom-right
+	auto v011 = detail::grad(detail::perm[ab + 1], x0, y0 - 1.0_r, z0 - 1.0_r); //Top-left
+	auto v111 = detail::grad(detail::perm[bb + 1], x0 - 1.0_r, y0 - 1.0_r, z0 - 1.0_r); //Top-right
+
+	//Interpolate along x
+	//Front face
+	auto ix0 = math::Lerp(v000, v100, u);
+	auto ix1 = math::Lerp(v010, v110, u);
+	//Back face
+	auto ix2 = math::Lerp(v001, v101, u);
+	auto ix3 = math::Lerp(v011, v111, u);
+
+	//Interpolate along y
+	auto iy0 = math::Lerp(ix0, ix1, v);
+	auto iy1 = math::Lerp(ix2, ix3, v);
+
+	//Interpolate along z
+	return math::Lerp(iy0, iy1, w);
 }
 
 
@@ -143,115 +180,173 @@ real Perlin2D(real x, real y) noexcept
 	Simplex functions
 */
 
-real Simplex2D(real x, real y) noexcept
+real Simplex(real x) noexcept
 {
-	//Skew the input space to determine which simplex cell we are in
-	auto s = (x + y) * detail::simplex_f2;
+	//Determine simplex cell
+	auto i = static_cast<int>(std::floor(x));
+
+	//Distance from cell origin
+	auto x0 = x - i;
+
+	//Endpoint offset
+	auto x1 = x0 - 1.0_r;
+
+	//Wrap coordinate for permutation table
+	auto ii = i & 255;
+
+	//Compute contribution from each endpoint
+	auto contrib =
+		[](real t, real x, int hash)
+		{
+			if (t < 0.0_r)
+				return 0.0_r;
+
+			t *= t;
+			return t * t * detail::grad(hash, x);
+		};
+
+	auto n0 = contrib(1.0_r - x0 * x0, x0, detail::perm[ii]);
+	auto n1 = contrib(1.0_r - x1 * x1, x1, detail::perm[ii + 1]);
+
+	//Scale to roughly [-1.0, 1.0]
+	return 0.395_r * (n0 + n1);
+}
+
+real Simplex(real x, real y) noexcept
+{
+	//Skew the input space to determine simplex cell
+	auto s = (x + y) * detail::f2;
 	auto i = static_cast<int>(std::floor(x + s));
 	auto j = static_cast<int>(std::floor(y + s));
 
 	//Unskew the cell origin back to (x, y) space
-	auto t = (i + j) * detail::simplex_g2;
-	auto X0 = i - t;
-	auto Y0 = j - t;
+	auto t = (i + j) * detail::g2;
 
 	//Distance from cell origin
-	auto x0 = x - X0;
-	auto y0 = y - Y0;
+	auto x0 = x - (i - t);
+	auto y0 = y - (j - t);
 
 	//Determine which simplex triangle we are in
 	auto i1 = x0 > y0 ? 1 : 0; //Lower triangle
 	auto j1 = x0 > y0 ? 0 : 1; //Upper triangle
 
-	//Offsets for the other corners
-	auto x1 = x0 - i1 + detail::simplex_g2;
-	auto y1 = y0 - j1 + detail::simplex_g2;
-	auto x2 = x0 - 1.0_r + 2.0_r * detail::simplex_g2;
-	auto y2 = y0 - 1.0_r + 2.0_r * detail::simplex_g2;
+	//Corner offsets
+	auto x1 = x0 - i1 + detail::g2;
+	auto y1 = y0 - j1 + detail::g2;
+	auto x2 = x0 - 1.0_r + 2.0_r * detail::g2;
+	auto y2 = y0 - 1.0_r + 2.0_r * detail::g2;
 
-	//Hash lattice corners
-	auto h0 = detail::hash(i, j);
-	auto h1 = detail::hash(i + i1, j + j1);
-	auto h2 = detail::hash(i + 1, j + 1);
-
-	//Gradients from your existing grad2()
-	auto [gx0, gy0] = detail::grad2(h0);
-	auto [gx1, gy1] = detail::grad2(h1);
-	auto [gx2, gy2] = detail::grad2(h2);
+	//Wrap coordinates for permutation table
+	auto ii = i & 255;
+	auto jj = j & 255;
 
 	//Compute contribution from each corner
 	auto contrib =
-		[](real t, real gx, real gy, real x, real y) noexcept
+		[](real t, real x, real y, int hash)
 		{
 			if (t < 0.0_r)
 				return 0.0_r;
 			
 			t *= t;
-			return t * t * (gx * x + gy * y);
+			return t * t * detail::grad(hash, x, y);
 		};
 
-	auto t0 = 0.5_r - x0 * x0 - y0 * y0;
-	auto n0 = contrib(t0, gx0, gy0, x0, y0);
-
-	auto t1 = 0.5_r - x1 * x1 - y1 * y1;
-	auto n1 = contrib(t1, gx1, gy1, x1, y1);
-
-	auto t2 = 0.5_r - x2 * x2 - y2 * y2;
-	auto n2 = contrib(t2, gx2, gy2, x2, y2);
+	auto n0 = contrib(0.5_r - x0 * x0 - y0 * y0, x0, y0,
+		detail::perm[ii + detail::perm[jj]]);
+	auto n1 = contrib(0.5_r - x1 * x1 - y1 * y1, x1, y1,
+		detail::perm[ii + i1 + detail::perm[jj + j1]]);
+	auto n2 = contrib(0.5_r - x2 * x2 - y2 * y2, x2, y2,
+		detail::perm[ii + 1 + detail::perm[jj + 1]]);
 
 	//Scale to roughly [-1.0, 1.0]
 	return 70.0_r * (n0 + n1 + n2);
 }
 
-
-/*
-	Value functions
-*/
-
-real Value1D(real x) noexcept
+real Simplex(real x, real y, real z) noexcept
 {
-	auto x0 = static_cast<int>(std::floor(x)); //Left coordinate
-	auto x1 = x0 + 1; //Right coordinate
+	//Skew the input space to determine simplex cell
+	auto s = (x + y + z) * detail::f3;
+	auto i = static_cast<int>(std::floor(x + s));
+	auto j = static_cast<int>(std::floor(y + s));
+	auto k = static_cast<int>(std::floor(z + s));
 
-	auto sx = x - x0; //Distance from x0
-	auto u = detail::fade(sx); //Smooth interpolation weight
+	//Unskew the cell origin back to (x, y, z) space
+	auto t = (i + j + k) * detail::g3;
 
-	//Get random scalar values at lattice points
-	auto v0 = detail::value(detail::hash(x0));
-	auto v1 = detail::value(detail::hash(x1));
+	//Distance from cell origin
+	auto x0 = x - (i - t);
+	auto y0 = y - (j - t);
+	auto z0 = z - (k - t);
 
-	//Interpolate between the two values
-	return math::Lerp(v0, v1, u);
-}
+	//Determine simplex corner order
+	auto i1 = 0;
+	auto j1 = 0;
+	auto k1 = 0;
+	auto i2 = 0;
+	auto j2 = 0;
+	auto k2 = 0;
 
-real Value2D(real x, real y) noexcept
-{
-	//Determine grid cell coordinates
-	auto x0 = static_cast<int>(std::floor(x));
-	auto y0 = static_cast<int>(std::floor(y));
-	auto x1 = x0 + 1;
-	auto y1 = y0 + 1;
+	if (x0 >= y0)
+	{
+		i2 = 1;
 
-	//Relative coordinates within cell
-	auto sx = x - x0;
-	auto sy = y - y0;
+		if (y0 >= z0)
+			i1 = j2 = 1;
+		else if (x0 >= z0)
+			i1 = k2 = 1;
+		else
+			k1 = k2 = 1;
+	}
+	else
+	{
+		j2 = 1;
 
-	//Smooth interpolation weights
-	auto u = detail::fade(sx);
-	auto v = detail::fade(sy);
+		if (y0 < z0)
+			k1 = k2 = 1;
+		else if (x0 < z0)
+			j1 = k2 = 1;
+		else
+			j1 = i2 = 1;
+	}
 
-	//Get random scalar values at the four lattice corners
-	auto v00 = detail::value(detail::hash(x0, y0));
-	auto v10 = detail::value(detail::hash(x1, y0));
-	auto v01 = detail::value(detail::hash(x0, y1));
-	auto v11 = detail::value(detail::hash(x1, y1));
+	//Corner offsets
+	auto x1 = x0 - i1 + detail::g3;
+	auto y1 = y0 - j1 + detail::g3;
+	auto z1 = z0 - k1 + detail::g3;
+	auto x2 = x0 - i2 + 2.0_r * detail::g3;
+	auto y2 = y0 - j2 + 2.0_r * detail::g3;
+	auto z2 = z0 - k2 + 2.0_r * detail::g3;
+	auto x3 = x0 - 1.0_r + 3.0_r * detail::g3;
+	auto y3 = y0 - 1.0_r + 3.0_r * detail::g3;
+	auto z3 = z0 - 1.0_r + 3.0_r * detail::g3;
 
-	//Interpolate along x
-	auto ix0 = math::Lerp(v00, v10, u);
-	auto ix1 = math::Lerp(v01, v11, u);
+	//Wrap coordinates for permutation table
+	auto ii = i & 255;
+	auto jj = j & 255;
+	auto kk = k & 255;
 
-	//Interpolate along y
-	return math::Lerp(ix0, ix1, v);
+	//Compute contribution from each corner
+	auto contrib =
+		[](real t, real x, real y, real z, int hash)
+		{
+			if (t < 0.0_r)
+				return 0.0_r;
+
+			t *= t;
+			return t * t * detail::grad(hash, x, y, z);
+		};
+
+	auto n0 = contrib(0.6_r - x0 * x0 - y0 * y0 - z0 * z0, x0, y0, z0,
+		detail::perm[ii + detail::perm[jj + detail::perm[kk]]]);
+	auto n1 = contrib(0.6_r - x1 * x1 - y1 * y1 - z1 * z1, x1, y1, z1,
+		detail::perm[ii + i1 + detail::perm[jj + j1 + detail::perm[kk + k1]]]);
+	auto n2 = contrib(0.6_r - x2 * x2 - y2 * y2 - z2 * z2, x2, y2, z2,
+		detail::perm[ii + i2 + detail::perm[jj + j2 + detail::perm[kk + k2]]]);
+	auto n3 = contrib(0.6_r - x3 * x3 - y3 * y3 - z3 * z3, x3, y3, z3,
+		detail::perm[ii + 1 + detail::perm[jj + 1 + detail::perm[kk + 1]]]);
+
+	//Scale to roughly [-1.0, 1.0]
+	return 32.0_r * (n0 + n1 + n2 + n3);
 }
 
 } //ion::utilities::noise
