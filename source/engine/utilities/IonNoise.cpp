@@ -61,13 +61,13 @@ real Perlin(real x) noexcept
 	//Determine the unit segment containing the coordinate
 	auto i = static_cast<int>(std::floor(x));
 
-	//Relative coordinate within segment
+	//Relative coordinate within the segment
 	auto x0 = x - i;
 
 	//Wrap coordinate for permutation table
 	auto ii = i & 255;
 
-	//Compute fade curves for coordinate
+	//Compute fade curve for the coordinate
 	auto u = detail::fade(x0);
 
 	//Permute coordinate for gradient lookup
@@ -87,7 +87,7 @@ real Perlin(real x, real y) noexcept
 	auto i = static_cast<int>(std::floor(x));
 	auto j = static_cast<int>(std::floor(y));
 
-	//Relative coordinates within square
+	//Relative coordinates within the square
 	auto x0 = x - i;
 	auto y0 = y - j;
 
@@ -103,7 +103,7 @@ real Perlin(real x, real y) noexcept
 	auto a = detail::perm[ii] + jj;
 	auto b = detail::perm[ii + 1] + jj;
 
-	//Gradient contributions from each corners
+	//Gradient contributions from each corner
 	auto v00 = detail::grad(detail::perm[a], x0, y0); //Bottom-left
 	auto v10 = detail::grad(detail::perm[b], x0 - 1.0_r, y0); //Bottom-right
 	auto v01 = detail::grad(detail::perm[a + 1], x0, y0 - 1.0_r); //Top-left
@@ -147,7 +147,7 @@ real Perlin(real x, real y, real z) noexcept
 	auto ba = detail::perm[b] + kk;
 	auto bb = detail::perm[b + 1] + kk;
 
-	//Gradient contributions from each corners
+	//Gradient contributions from each corner
 	//Front face
 	auto v000 = detail::grad(detail::perm[aa], x0, y0, z0); //Bottom-left
 	auto v100 = detail::grad(detail::perm[ba], x0 - 1.0_r, y0, z0); //Bottom-right
@@ -182,7 +182,7 @@ real Perlin(real x, real y, real z) noexcept
 
 real Simplex(real x) noexcept
 {
-	//Determine simplex cell
+	//Determine the simplex cell
 	auto i = static_cast<int>(std::floor(x));
 
 	//Distance from cell origin
