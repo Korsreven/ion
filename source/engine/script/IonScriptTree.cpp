@@ -467,20 +467,52 @@ lineage_search_result lineage_depth_first_search(ObjectNodes &objects)
 } //detail
 
 
-//TreeNode
+//ArgumentNode
 
-TreeNode::TreeNode(const ObjectNode &object) noexcept :
-	Object{object}
+ArgumentNode::ArgumentNode(ArgumentType argument) noexcept :
+	argument_{std::move(argument)}
 {
 	//Empty
 }
 
-TreeNode::TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept :
-	Object{object},
-	Parent{&parent},
-	Depth{depth}
+ArgumentNode::ArgumentNode(ArgumentType argument, std::string unit) noexcept :
+	argument_{std::move(argument)}, unit_{std::move(unit)}
 {
 	//Empty
+}
+
+ArgumentNode::ArgumentNode(std::nullopt_t) noexcept
+{
+	//Empty
+}
+
+
+//PropertyNode
+
+PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
+	name_{std::move(name)},
+	arguments_{std::move(arguments)}
+{
+	//Empty
+}
+
+
+/*
+	Arguments
+*/
+
+ArgumentNode& PropertyNode::Argument(int number) noexcept
+{
+	return number < NumberOfArguments() ?
+		arguments_[number] :
+		const_cast<ArgumentNode&>(InvalidArgumentNode);
+}
+
+const ArgumentNode& PropertyNode::Argument(int number) const noexcept
+{
+	return number < NumberOfArguments() ?
+		arguments_[number] :
+		InvalidArgumentNode;
 }
 
 
@@ -673,50 +705,18 @@ const PropertyNode& ObjectNode::Property(std::string_view name) const noexcept
 }
 
 
-//PropertyNode
+//TreeNode
 
-PropertyNode::PropertyNode(std::string name, ArgumentNodes arguments) noexcept :
-	name_{std::move(name)},
-	arguments_{std::move(arguments)}
+TreeNode::TreeNode(const ObjectNode &object) noexcept :
+	Object{object}
 {
 	//Empty
 }
 
-
-/*
-	Arguments
-*/
-
-ArgumentNode& PropertyNode::Argument(int number) noexcept
-{
-	return number < NumberOfArguments() ?
-		arguments_[number] :
-		const_cast<ArgumentNode&>(InvalidArgumentNode);
-}
-
-const ArgumentNode& PropertyNode::Argument(int number) const noexcept
-{
-	return number < NumberOfArguments() ?
-		arguments_[number] :
-		InvalidArgumentNode;
-}
-
-
-//ArgumentNode
-
-ArgumentNode::ArgumentNode(ArgumentType argument) noexcept :
-	argument_{std::move(argument)}
-{
-	//Empty
-}
-
-ArgumentNode::ArgumentNode(ArgumentType argument, std::string unit) noexcept :
-	argument_{std::move(argument)}, unit_{std::move(unit)}
-{
-	//Empty
-}
-
-ArgumentNode::ArgumentNode(std::nullopt_t) noexcept
+TreeNode::TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept :
+	Object{object},
+	Parent{&parent},
+	Depth{depth}
 {
 	//Empty
 }

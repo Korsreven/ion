@@ -35,15 +35,15 @@ namespace ion::script
 			Forward declaration
 			Node types
 		*/
-
-		struct TreeNode;
-		class ObjectNode;
-		class PropertyNode;
+		
 		class ArgumentNode;
+		class PropertyNode;
+		class ObjectNode;
+		struct TreeNode;
 
-		using ObjectNodes = std::vector<ObjectNode>;
-		using PropertyNodes = std::vector<PropertyNode>;
 		using ArgumentNodes = std::vector<ArgumentNode>;
+		using PropertyNodes = std::vector<PropertyNode>;
+		using ObjectNodes = std::vector<ObjectNode>;
 
 		using ArgumentType =
 			std::variant<
@@ -188,8 +188,8 @@ namespace ion::script
 				return 0;
 			}
 
-			template <typename T>
-			inline auto deserialize_argument(std::string_view bytes, ArgumentNodes &arguments)
+			template <typename T, typename Arguments>
+			inline auto deserialize_argument(std::string_view bytes, Arguments &arguments)
 			{
 				typename T::value_type value;
 				auto bytes_deserialized = deserialize_value(bytes, value);
@@ -300,18 +300,176 @@ namespace ion::script
 			Node types
 		*/
 
-		///@brief A base class representing a tree node
-		struct TreeNode final
+		///@brief A class representing an argument node in the tree
+		///@details An argument node is child of a property node and contains a value with an associated unit
+		class ArgumentNode final
 		{
-			const ObjectNode &Object;
-			const ObjectNode *const Parent = nullptr;
-			const int Depth = 0;
+			private:
 
-			///@brief Constructs a new tree node containing the given root object
-			TreeNode(const ObjectNode &object) noexcept;
+				std::optional<ArgumentType> argument_;
+				std::string unit_;
+			
+			public:
 
-			///@brief Constructs a new tree node containing the given child object, parent object and depth
-			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
+				///@brief Constructs a new argument node with the given argument
+				ArgumentNode(ArgumentType argument) noexcept;
+
+				///@brief Constructs a new argument node with the given argument and unit
+				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
+
+				///@brief Constructs an invalid argument node
+				explicit ArgumentNode(std::nullopt_t) noexcept;
+
+
+				/**
+					@name Operators
+					@{
+				*/
+
+				///@brief Returns true if this argument is valid
+				[[nodiscard]] inline operator bool() const noexcept
+				{
+					return argument_.has_value();
+				}
+
+				///@}
+
+				/**
+					@name Observers
+					@{
+				*/
+
+				///@brief Returns the value of the argument with the given argument type
+				template <typename T>
+				[[nodiscard]] inline auto Get() const noexcept
+				{
+					auto value = *this ? std::get_if<T>(&*argument_) : nullptr;
+
+					if constexpr (std::is_same_v<T, ScriptType::FloatingPoint>)
+					{		
+						if (!value)
+						{
+							//Try to get as integer
+							if (auto val = *this ? std::get_if<ScriptType::Integer>(&*argument_) : nullptr; val)
+								//Okay, non-narrowing
+								return std::make_optional(ScriptType::FloatingPoint{val->As<ScriptType::FloatingPoint::value_type>()});
+						}
+					}
+
+					return value ? std::make_optional(*value) : std::nullopt;
+				}
+
+				///@brief Calls the correct overload for the given overload set, based on the value of the argument
+				template <typename T, typename ...Ts>
+				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
+				{
+					assert(*this);
+					return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
+				}
+
+				///@brief Returns the unit of this argument
+				[[nodiscard]] inline auto& Unit() const noexcept
+				{
+					return unit_;
+				}
+
+				///@}
+		};
+
+		///@brief A class representing a property node in the tree
+		///@details A property node is child of an object node and the parent of argument nodes
+		class PropertyNode final
+		{
+			private:
+
+				std::string name_;
+				ArgumentNodes arguments_;
+
+			public:
+
+				///@brief Constructs a new property node with the given name and arguments
+				PropertyNode(std::string name, ArgumentNodes arguments) noexcept;
+
+
+				/**
+					@name Operators
+					@{
+				*/
+
+				///@brief Returns true if this property is valid
+				[[nodiscard]] inline operator bool() const noexcept
+				{
+					return !std::empty(name_);
+				}
+
+				///@}
+
+				/**
+					@name Observers
+					@{
+				*/
+
+				///@brief Returns the name of the property
+				[[nodiscard]] inline auto& Name() const noexcept
+				{
+					return name_;
+				}
+
+				///@}
+
+				/**
+					@name Arguments
+					@{
+				*/
+
+				///@brief Returns a mutable argument at the given argument number
+				[[nodiscard]] ArgumentNode& Argument(int number) noexcept;
+
+				///@brief Returns an immutable argument at the given argument number
+				[[nodiscard]] const ArgumentNode& Argument(int number) const noexcept;
+
+
+				///@brief Returns a mutable argument at the given argument number
+				[[nodiscard]] inline auto& operator[](int number) noexcept
+				{
+					return Argument(number);
+				}
+
+				///@brief Returns an immutable argument at the given argument number
+				[[nodiscard]] inline auto& operator[](int number) const noexcept
+				{
+					return Argument(number);
+				}
+
+
+				///@brief Returns the number of arguments in this property
+				[[nodiscard]] inline auto NumberOfArguments() const noexcept
+				{
+					return std::ssize(arguments_);
+				}
+
+				///@}
+
+				/**
+					@name Ranges
+					@{
+				*/
+
+				///@brief Returns a mutable range of all arguments in this property
+				///@details This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto Arguments() noexcept
+				{
+					return adaptors::ranges::Iterable<ArgumentNodes&>{arguments_};
+				}
+
+				///@brief Returns an immutable range of all arguments in this property
+				///@details This can be used directly with a range-based for loop
+				[[nodiscard]] inline auto Arguments() const noexcept
+				{
+					return adaptors::ranges::Iterable<const ArgumentNodes&>{arguments_};
+				}
+
+				///@}
 		};
 
 		///@brief A class representing an object node in the tree
@@ -500,176 +658,18 @@ namespace ion::script
 				///@}
 		};
 
-		///@brief A class representing a property node in the tree
-		///@details A property node is child of an object node and the parent of argument nodes
-		class PropertyNode final
+		///@brief A base class representing a tree node
+		struct TreeNode final
 		{
-			private:
+			const ObjectNode &Object;
+			const ObjectNode *const Parent = nullptr;
+			const int Depth = 0;
 
-				std::string name_;
-				ArgumentNodes arguments_;
+			///@brief Constructs a new tree node containing the given root object
+			TreeNode(const ObjectNode &object) noexcept;
 
-			public:
-
-				///@brief Constructs a new property node with the given name and arguments
-				PropertyNode(std::string name, ArgumentNodes arguments) noexcept;
-
-
-				/**
-					@name Operators
-					@{
-				*/
-
-				///@brief Returns true if this property is valid
-				[[nodiscard]] inline operator bool() const noexcept
-				{
-					return !std::empty(name_);
-				}
-
-				///@}
-
-				/**
-					@name Observers
-					@{
-				*/
-
-				///@brief Returns the name of the property
-				[[nodiscard]] inline auto& Name() const noexcept
-				{
-					return name_;
-				}
-
-				///@}
-
-				/**
-					@name Arguments
-					@{
-				*/
-
-				///@brief Returns a mutable argument at the given argument number
-				[[nodiscard]] ArgumentNode& Argument(int number) noexcept;
-
-				///@brief Returns an immutable argument at the given argument number
-				[[nodiscard]] const ArgumentNode& Argument(int number) const noexcept;
-
-
-				///@brief Returns a mutable argument at the given argument number
-				[[nodiscard]] inline auto& operator[](int number) noexcept
-				{
-					return Argument(number);
-				}
-
-				///@brief Returns an immutable argument at the given argument number
-				[[nodiscard]] inline auto& operator[](int number) const noexcept
-				{
-					return Argument(number);
-				}
-
-
-				///@brief Returns the number of arguments in this property
-				[[nodiscard]] inline auto NumberOfArguments() const noexcept
-				{
-					return std::ssize(arguments_);
-				}
-
-				///@}
-
-				/**
-					@name Ranges
-					@{
-				*/
-
-				///@brief Returns a mutable range of all arguments in this property
-				///@details This can be used directly with a range-based for loop
-				[[nodiscard]] inline auto Arguments() noexcept
-				{
-					return adaptors::ranges::Iterable<ArgumentNodes&>{arguments_};
-				}
-
-				///@brief Returns an immutable range of all arguments in this property
-				///@details This can be used directly with a range-based for loop
-				[[nodiscard]] inline auto Arguments() const noexcept
-				{
-					return adaptors::ranges::Iterable<const ArgumentNodes&>{arguments_};
-				}
-
-				///@}
-		};
-
-		///@brief A class representing an argument node in the tree
-		///@details An argument node is child of a property node and contains a value with an associated unit
-		class ArgumentNode final
-		{
-			private:
-
-				std::optional<ArgumentType> argument_;
-				std::string unit_;
-			
-			public:
-
-				///@brief Constructs a new argument node with the given argument
-				ArgumentNode(ArgumentType argument) noexcept;
-
-				///@brief Constructs a new argument node with the given argument and unit
-				ArgumentNode(ArgumentType argument, std::string unit) noexcept;
-
-				///@brief Constructs an invalid argument node
-				explicit ArgumentNode(std::nullopt_t) noexcept;
-
-
-				/**
-					@name Operators
-					@{
-				*/
-
-				///@brief Returns true if this argument is valid
-				[[nodiscard]] inline operator bool() const noexcept
-				{
-					return argument_.has_value();
-				}
-
-				///@}
-
-				/**
-					@name Observers
-					@{
-				*/
-
-				///@brief Returns the value of the argument with the given argument type
-				template <typename T>
-				[[nodiscard]] inline auto Get() const noexcept
-				{
-					auto value = *this ? std::get_if<T>(&*argument_) : nullptr;
-
-					if constexpr (std::is_same_v<T, ScriptType::FloatingPoint>)
-					{		
-						if (!value)
-						{
-							//Try to get as integer
-							if (auto val = *this ? std::get_if<ScriptType::Integer>(&*argument_) : nullptr; val)
-								//Okay, non-narrowing
-								return std::make_optional(ScriptType::FloatingPoint{val->As<ScriptType::FloatingPoint::value_type>()});
-						}
-					}
-
-					return value ? std::make_optional(*value) : std::nullopt;
-				}
-
-				///@brief Calls the correct overload for the given overload set, based on the value of the argument
-				template <typename T, typename ...Ts>
-				inline auto Visit(T &&callable, Ts &&...callables) const noexcept
-				{
-					assert(*this);
-					return std::visit(types::overloaded{std::forward<T>(callable), std::forward<Ts>(callables)...}, *argument_);
-				}
-
-				///@brief Returns the unit of this argument
-				[[nodiscard]] inline auto& Unit() const noexcept
-				{
-					return unit_;
-				}
-
-				///@}
+			///@brief Constructs a new tree node containing the given child object, parent object and depth
+			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
 		};
 	} //script_tree
 
@@ -837,10 +837,10 @@ namespace ion::script
 			For fluent interface design
 			@{
 		*/
-
-		inline const auto InvalidObjectNode = ObjectNode{"", "", {}};
-		inline const auto InvalidPropertyNode = PropertyNode{"", {}};
+		
 		inline const auto InvalidArgumentNode = ArgumentNode{std::nullopt};
+		inline const auto InvalidPropertyNode = PropertyNode{"", {}};
+		inline const auto InvalidObjectNode = ObjectNode{"", "", {}};
 
 		///@}
 	} //script_tree
