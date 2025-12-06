@@ -114,6 +114,8 @@ namespace ion::utilities::noise
 	///@brief Returns the simplex noise for the given x, y and z coordinates
 	///@details The result is in range [-1.0, 1.0]
 	[[nodiscard]] real Simplex(real x, real y, real z) noexcept;
+
+	///@}
 } //ion::utilities::noise
 
 #endif
