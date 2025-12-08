@@ -275,7 +275,6 @@ std::optional<std::string> string_literal_as_string(std::string_view str)
 						result += '\\';
 						break;
 
-						case 'a': //CSS
 						case 'n': //Line feed
 						result += '\n';
 						break;

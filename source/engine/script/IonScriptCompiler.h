@@ -217,9 +217,11 @@ namespace ion::script
 				{
 					case ' ':
 					case '\n': //Line feed
+					case '\f': //Form feed
 					case '\r': //Carriage return
 					case '\t': //Horizontal tab
 					case '\v': //Vertical tab
+					case '\0': //Null character
 					return true;
 
 					default:
