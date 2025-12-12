@@ -61,7 +61,8 @@ namespace ion::gui::controls
 			std::pair<real, real> handle_size_ =
 				{gui_scroll_bar::detail::default_handle_size_min_percent,
 				 gui_scroll_bar::detail::default_handle_size_max_percent};
-			NonOwningPtr<GuiScrollable> scrollable_;
+			bool auto_hide_ = false;
+			NonOwningPtr<GuiScrollable> scrollable_;			
 
 
 			/**
@@ -133,6 +134,17 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@brief Sets whether or not this scroll bar auto hides
+			///@details Hides if the scrollable can show its entire content
+			inline void AutoHide(bool auto_hide) noexcept
+			{
+				if (auto_hide_ != auto_hide)
+				{
+					auto_hide_ = auto_hide;
+					UpdateHandle();
+				}
+			}
+
 			///@}
 
 			/**
@@ -144,6 +156,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto& HandleSize() const noexcept
 			{
 				return handle_size_;
+			}
+
+			///@brief Returns true if this scroll bar auto hides
+			///@details Hides if the scrollable can show its entire content
+			[[nodiscard]] inline auto AutoHide() const noexcept
+			{
+				return auto_hide_;
 			}
 
 			///@}

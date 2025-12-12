@@ -291,6 +291,7 @@ ClassDefinition get_gui_scroll_bar_class()
 {
 	return ClassDefinition::Create("scroll-bar", "slider")
 		.AddProperty("attach", ParameterType::String)
+		.AddProperty("auto-hide", ParameterType::Boolean)
 		.AddProperty("handle-size", {ParameterType::FloatingPoint, ParameterType::FloatingPoint});
 }
 
@@ -1004,6 +1005,8 @@ void set_scroll_bar_properties(const script_tree::ObjectNode &object, controls::
 			if (auto owner = scroll_bar.Owner(); owner)
 				scroll_bar.AttachedScrollable(owner->GetControlAs<controls::GuiScrollable>(property[0].Get<ScriptType::String>()->Get()));
 		}
+		else if (property.Name() == "auto-hide")
+			scroll_bar.AutoHide(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "handle-size")
 			scroll_bar.HandleSize(property[0].Get<ScriptType::FloatingPoint>()->As<real>(),
 								  property[1].Get<ScriptType::FloatingPoint>()->As<real>());

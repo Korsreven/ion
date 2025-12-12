@@ -100,6 +100,9 @@ void GuiScrollBar::UpdateHandle() noexcept
 				if (auto handle_size = Vector2{handle_width, handle_height};
 					handle_size != skin.Handle->Size())
 					gui_slider::detail::resize_handle(skin, skin.Handle->Size(), handle_size);
+
+				if (auto_hide_)
+					skin.Handle->Visible(count <= view_count);
 			}
 		}
 	}
