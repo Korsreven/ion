@@ -75,16 +75,16 @@ void GuiScrollBar::UpdateHandle() noexcept
 {
 	if (auto [min, max] = Range(); min != max && skin_)
 	{
+		auto count = scrollable_ ? scrollable_->TotalElements() : max - min;
+		auto view_count = scrollable_ ? scrollable_->ElementsInView() : 1;
+
 		if (auto &skin = static_cast<ScrollBarSkin&>(*skin_); skin.Handle)
 		{
 			//Set handle size
 			if (auto size = ContentSize(); size)
 			{
 				auto [width, height] = size->XY();
-				auto [handle_width, handle_height] = skin.Handle->Size().XY();
-
-				auto count = scrollable_ ? scrollable_->TotalElements() : max - min;
-				auto view_count = scrollable_ ? scrollable_->ElementsInView() : 1;
+				auto [handle_width, handle_height] = skin.Handle->Size().XY();		
 
 				if (type_ == gui_slider::SliderType::Vertical)
 				{
@@ -100,11 +100,11 @@ void GuiScrollBar::UpdateHandle() noexcept
 				if (auto handle_size = Vector2{handle_width, handle_height};
 					handle_size != skin.Handle->Size())
 					gui_slider::detail::resize_handle(skin, skin.Handle->Size(), handle_size);
-
-				if (auto_hide_)
-					skin.Handle->Visible(count <= view_count);
 			}
 		}
+
+		if (auto_hide_)
+			Visible(count <= view_count);
 	}
 
 	GuiSlider::UpdateHandle(); //Use base functionality
