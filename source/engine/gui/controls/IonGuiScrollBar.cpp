@@ -104,7 +104,7 @@ void GuiScrollBar::UpdateHandle() noexcept
 		}
 
 		if (auto_hide_)
-			Visible(count <= view_count);
+			Visible(view_count < count);
 	}
 
 	GuiSlider::UpdateHandle(); //Use base functionality
