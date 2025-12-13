@@ -200,6 +200,7 @@ ClassDefinition get_gui_control_class()
 	return ClassDefinition::Create("control", "component")
 		.AddProperty("caption", ParameterType::String)
 		.AddProperty("caption-layout", control_caption_layouts)
+		.AddProperty("caption-line-clamp", ParameterType::Integer)
 		.AddProperty("caption-line-spacing", ParameterType::FloatingPoint)
 		.AddProperty("caption-margin", ParameterType::Vector2)
 		.AddProperty("caption-overflow", {"no-wrap"s, "no-wrap-ellipsis"s, "wrap"s})
@@ -696,6 +697,8 @@ void set_control_properties(const script_tree::ObjectNode &object, controls::Gui
 			else if (layout == "outside-bottom-right")
 				control.CaptionLayout(controls::gui_control::ControlCaptionLayout::OutsideBottomRight);
 		}
+		else if (property.Name() == "caption-line-clamp")
+			control.CaptionLineClamp(property[0].Get<ScriptType::Integer>()->As<int>());
 		else if (property.Name() == "caption-line-spacing")
 			control.CaptionLineSpacing(property[0].Get<ScriptType::FloatingPoint>()->As<real>());
 		else if (property.Name() == "caption-margin")

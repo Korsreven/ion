@@ -994,6 +994,7 @@ void GuiControl::UpdateCaption() noexcept
 
 			text->Padding(caption_padding_.value_or(detail::default_caption_padding_size));
 			text->LineHeightFactor(caption_line_spacing_.value_or(detail::default_caption_line_spacing));
+			text->MaxLines(caption_line_clamp_);
 			text->Alignment(detail::caption_layout_to_text_alignment(caption_layout_));
 			text->VerticalAlignment(detail::caption_layout_to_text_vertical_alignment(caption_layout_));
 

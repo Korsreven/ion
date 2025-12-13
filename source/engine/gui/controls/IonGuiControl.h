@@ -446,6 +446,7 @@ namespace ion::gui::controls
 			std::optional<Vector2> caption_size_;
 			std::optional<Vector2> caption_margin_;
 			std::optional<Vector2> caption_padding_;
+			std::optional<int> caption_line_clamp_;
 			std::optional<real> caption_line_spacing_;
 			gui_control::ControlCaptionLayout caption_layout_ = gui_control::ControlCaptionLayout::Center;
 			gui_control::ControlCaptionOverflow caption_overflow_ = gui_control::ControlCaptionOverflow::Wrap;
@@ -760,6 +761,16 @@ namespace ion::gui::controls
 				}
 			}
 
+			///@brief Sets the caption line clamp for this control to the given max lines
+			inline void CaptionLineClamp(const std::optional<int> &max_lines) noexcept
+			{
+				if (caption_line_clamp_ != max_lines)
+				{
+					caption_line_clamp_ = max_lines;
+					UpdateCaption();
+				}
+			}
+
 			///@brief Sets the caption line spacing for this control to the given line spacing
 			inline void CaptionLineSpacing(const std::optional<real> &line_spacing) noexcept
 			{
@@ -1046,6 +1057,13 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto& CaptionPadding() const noexcept
 			{
 				return caption_padding_;
+			}
+
+			///@brief Returns the caption line clamp for this control
+			///@details Returns nullopt if no custom caption line clamp has been set
+			[[nodiscard]] inline auto& CaptionLineClamp() const noexcept
+			{
+				return caption_line_clamp_;
 			}
 
 			///@brief Returns the caption line spacing for this control
