@@ -44,6 +44,9 @@ void GuiScrollable::UpdateScrollBar() noexcept
 		scroll_bar_->Range(0, max);
 		scroll_bar_->Value(ScrollValue());
 		scroll_bar_->LargeStep(scroll_rate_);
+
+		if (scroll_bar_->AutoHide())
+			scroll_bar_->Visible(elements_in_view < element_count);
 	}
 }
 
