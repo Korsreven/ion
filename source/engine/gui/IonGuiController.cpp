@@ -631,18 +631,22 @@ bool GuiController::MousePressed(MouseButton button, Vector2 position) noexcept
 	if (!enabled_)
 		return false;
 
-	//Check focused frame first
-	if (focused_frame_ &&
-		focused_frame_->MousePressed(button, position))
-		return true; //Consumed
-
-	else if (!std::empty(active_frames_))
+	if (!std::empty(active_frames_))
 	{
-		//Check all other top frames
-		for (auto &top_frame : active_frames_.back().frames)
+		auto top_frames = active_frames_.back().frames; //Copy
+		std::stable_sort(std::begin(top_frames), std::end(top_frames),
+			[](auto &top_frame1, auto &top_frame2)
+			{
+				if (top_frame1->HoveredControl() && top_frame2->HoveredControl())
+					return top_frame1->HoveredControl()->GlobalZOrder() > top_frame2->HoveredControl()->GlobalZOrder();
+				else
+					return !!top_frame1->HoveredControl();
+			});
+
+		//Check all top frames (in order)
+		for (auto &top_frame : top_frames)
 		{
-			if (top_frame != focused_frame_ &&
-				top_frame->MousePressed(button, position))
+			if (top_frame->MousePressed(button, position))
 				return true; //Consumed
 		}
 	}
@@ -655,18 +659,22 @@ bool GuiController::MouseReleased(MouseButton button, Vector2 position) noexcept
 	if (!enabled_)
 		return false;
 
-	//Check focused frame first
-	if (focused_frame_ &&
-		focused_frame_->MouseReleased(button, position))
-		return true; //Consumed
-
-	else if (!std::empty(active_frames_))
+	if (!std::empty(active_frames_))
 	{
-		//Check all other top frames
-		for (auto &top_frame : active_frames_.back().frames)
+		auto top_frames = active_frames_.back().frames; //Copy
+		std::stable_sort(std::begin(top_frames), std::end(top_frames),
+			[](auto &top_frame1, auto &top_frame2)
+			{
+				if (top_frame1->HoveredControl() && top_frame2->HoveredControl())
+					return top_frame1->HoveredControl()->GlobalZOrder() > top_frame2->HoveredControl()->GlobalZOrder();
+				else
+					return !!top_frame1->HoveredControl();
+			});
+
+		//Check all top frames (in order)
+		for (auto &top_frame : top_frames)
 		{
-			if (top_frame != focused_frame_ &&
-				top_frame->MouseReleased(button, position))
+			if (top_frame->MouseReleased(button, position))
 				return true; //Consumed
 		}
 	}
@@ -685,18 +693,22 @@ bool GuiController::MouseMoved(Vector2 position) noexcept
 	if (active_tooltip_)
 		active_tooltip_->MouseMoved(position);
 
-	//Check focused frame first
-	if (focused_frame_ &&
-		focused_frame_->MouseMoved(position))
-		return true; //Consumed
-
-	else if (!std::empty(active_frames_))
+	if (!std::empty(active_frames_))
 	{
-		//Check all other top frames
-		for (auto &top_frame : active_frames_.back().frames)
+		auto top_frames = active_frames_.back().frames; //Copy
+		std::stable_sort(std::begin(top_frames), std::end(top_frames),
+			[](auto &top_frame1, auto &top_frame2)
+			{
+				if (top_frame1->HoveredControl() && top_frame2->HoveredControl())
+					return top_frame1->HoveredControl()->GlobalZOrder() > top_frame2->HoveredControl()->GlobalZOrder();
+				else
+					return !!top_frame1->HoveredControl();
+			});
+
+		//Check all top frames (in order)
+		for (auto &top_frame : top_frames)
 		{
-			if (top_frame != focused_frame_ &&
-				top_frame->MouseMoved(position))
+			if (top_frame->MouseMoved(position))
 				return true; //Consumed
 		}
 	}
@@ -709,18 +721,22 @@ bool GuiController::MouseWheelRolled(int delta, Vector2 position) noexcept
 	if (!enabled_)
 		return false;
 
-	//Check focused frame first
-	if (focused_frame_ &&
-		focused_frame_->MouseWheelRolled(delta, position))
-		return true; //Consumed
-
-	else if (!std::empty(active_frames_))
+	if (!std::empty(active_frames_))
 	{
-		//Check all other top frames
-		for (auto &top_frame : active_frames_.back().frames)
+		auto top_frames = active_frames_.back().frames; //Copy
+		std::stable_sort(std::begin(top_frames), std::end(top_frames),
+			[](auto &top_frame1, auto &top_frame2)
+			{
+				if (top_frame1->HoveredControl() && top_frame2->HoveredControl())
+					return top_frame1->HoveredControl()->GlobalZOrder() > top_frame2->HoveredControl()->GlobalZOrder();
+				else
+					return !!top_frame1->HoveredControl();
+			});
+
+		//Check all top frames (in order)
+		for (auto &top_frame : top_frames)
 		{
-			if (top_frame != focused_frame_ &&
-				top_frame->MouseWheelRolled(delta, position))
+			if (top_frame->MouseWheelRolled(delta, position))
 				return true; //Consumed
 		}
 	}
