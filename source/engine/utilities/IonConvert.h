@@ -16,7 +16,7 @@ File:	IonConvert.h
 #include <array>
 #include <cassert>
 #include <charconv>
-#include <climits>
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
