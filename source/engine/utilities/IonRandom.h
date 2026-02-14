@@ -15,6 +15,7 @@ File:	IonRandom.h
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <random>
 #include <type_traits>
 
@@ -111,14 +112,14 @@ namespace ion::utilities::random
 					//Empty
 				}
 
-				random_number_generator(std::random_device::result_type seed) :
+				random_number_generator(std::random_device::result_type seed) noexcept :
 					engine32_{seed},
 					engine64_{static_cast<uint64>(seed)}
 				{
 					//Empty
 				}
 
-				random_number_generator(Engine32_t::result_type seed32, Engine64_t::result_type seed64) :
+				random_number_generator(Engine32_t::result_type seed32, Engine64_t::result_type seed64) noexcept :
 					engine32_{seed32},
 					engine64_{seed64}
 				{
@@ -150,6 +151,30 @@ namespace ion::utilities::random
 		};
 
 		inline random_number_generator<> default_rng;
+		inline std::reference_wrapper<random_number_generator<>> current_rng = default_rng;
+
+		class scoped_rng_override final
+		{
+			private:
+
+				decltype(current_rng) previous_rng_;
+
+			public:
+
+				explicit scoped_rng_override(random_number_generator<> &rng) noexcept :
+					previous_rng_{current_rng}
+				{
+					current_rng = rng;
+				}
+
+				~scoped_rng_override() noexcept
+				{
+					current_rng = previous_rng_;
+				}
+
+				scoped_rng_override(const scoped_rng_override&) = delete;
+				scoped_rng_override& operator=(const scoped_rng_override&) = delete;
+		};
 
 
 		///@brief Returns a random number in range [min, max]
@@ -177,7 +202,7 @@ namespace ion::utilities::random
 	template <typename T>
 	[[nodiscard]] inline auto Number(T min, T max) noexcept
 	{
-		return detail::get_number(min, max, detail::default_rng);
+		return detail::get_number(min, max, detail::current_rng);
 	}
 
 	///@brief Returns a random number in range [min, max]
