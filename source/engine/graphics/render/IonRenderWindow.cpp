@@ -130,6 +130,17 @@ void RenderWindow::DisplayModeChanged() noexcept
 }
 
 
+void RenderWindow::Paused() noexcept
+{
+	NotifyWindowActionReceived(events::listeners::WindowAction::Pause);
+}
+
+void RenderWindow::Resumed() noexcept
+{
+	NotifyWindowActionReceived(events::listeners::WindowAction::Resume);
+}
+
+
 std::optional<Vector2> RenderWindow::GetFullScreenSize() const noexcept
 {
 	return full_screen_size_;

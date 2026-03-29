@@ -125,7 +125,33 @@ void wait_for(duration seconds) noexcept
 } //engine::detail
 
 
-//Protected
+//Private
+
+bool Engine::Unsubscribable(Listenable<WindowListener>&) noexcept
+{
+	//Cancel all unsubscribe attempts
+	return false;
+}
+
+
+/*
+	Window listener events
+*/
+
+void Engine::WindowActionReceived(events::listeners::WindowAction action) noexcept
+{
+	switch (action)
+	{
+		case events::listeners::WindowAction::Pause:
+		frame_stopwatch_.Stop();
+		break;
+
+		case events::listeners::WindowAction::Resume:
+		frame_stopwatch_.Start();
+		break;
+	}
+}
+
 
 /*
 	Notifying
@@ -288,7 +314,10 @@ int Engine::Start() noexcept
 
 	//Show window
 	if (render_window_)
+	{
 		render_window_->Show();
+		render_window_->Events().Subscribe(*this);
+	}
 
 	total_stopwatch_.Restart();
 
@@ -316,7 +345,13 @@ int Engine::Start() noexcept
 
 	//Hide window
 	if (render_window_)
+	{
+		WindowListener::Listening(false);
+		render_window_->Events().Unsubscribe(*this);
+		WindowListener::Listening(true);
+
 		render_window_->Hide();
+	}
 
 	if (active_instance_ == this)
 		active_instance_ = nullptr;

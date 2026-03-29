@@ -333,6 +333,13 @@ namespace ion::system
 			virtual void DisplayModeChanged() noexcept;
 
 
+			///@brief Called right after a window has been paused (entered modal loop)
+			virtual void Paused() noexcept;
+
+			///@brief Called right after a window has been resumed (exited modal loop)
+			virtual void Resumed() noexcept;
+
+
 			///@brief Called to retrieve the full screen size, if any
 			virtual std::optional<Vector2> GetFullScreenSize() const noexcept;
 

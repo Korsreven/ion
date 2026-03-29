@@ -822,6 +822,14 @@ bool Window::ProcessMessage(HWND handle, UINT message, WPARAM w_param, LPARAM l_
 
 			return true;
 		}
+
+		case WM_ENTERSIZEMOVE:
+		Paused();
+		return false; //Do not return true from this
+
+		case WM_EXITSIZEMOVE:
+		Resumed();
+		return false; //Do not return true from this
 	}
 
 	return false;
@@ -931,6 +939,17 @@ void Window::Resized([[maybe_unused]] const Vector2 &size) noexcept
 }
 
 void Window::DisplayModeChanged() noexcept
+{
+	//Optional to override
+}
+
+
+void Window::Paused() noexcept
+{
+	//Optional to override
+}
+
+void Window::Resumed() noexcept
 {
 	//Optional to override
 }

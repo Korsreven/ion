@@ -20,6 +20,7 @@ File:	IonEngine.h
 #include "events/IonInputController.h"
 #include "events/IonListenable.h"
 #include "events/listeners/IonFrameListener.h"
+#include "events/listeners/IonWindowListener.h"
 #include "graphics/render/IonRenderWindow.h"
 #include "graphics/scene/graph/IonSceneGraph.h"
 #include "managed/IonObjectManager.h"
@@ -63,6 +64,7 @@ namespace ion
 
 	///@brief The class that creates the render window with a default viewport and starts the rendering loop
 	class Engine final :
+		private events::listeners::WindowListener,
 		protected events::Listenable<events::listeners::FrameListener>,	
 		public managed::ObjectManager<graphics::scene::graph::SceneGraph, Engine>,
 		public types::Trace<Engine>
@@ -88,6 +90,22 @@ namespace ion
 
 			static inline Engine *active_instance_ = nullptr;
 			static inline graphics::scene::graph::SceneGraph *active_scene_graph_ = nullptr;
+
+
+			///@brief See Listener<T>::Unsubscribable for more details
+			///@details Make sure that if this engine is about to unsubscribe from the system window, cancel it
+			bool Unsubscribable(events::Listenable<WindowListener>&) noexcept override final;
+
+
+			/**
+				@name Window listener events
+				@{
+			*/
+
+			///@brief See WindowListener::WindowActionReceived for more details
+			void WindowActionReceived(events::listeners::WindowAction action) noexcept override final;
+
+			///@}
 
 
 			/**

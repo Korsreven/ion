@@ -139,6 +139,13 @@ namespace ion::graphics::render
 			void DisplayModeChanged() noexcept override final;
 
 
+			///@brief See Window::Paused for more details
+			void Paused() noexcept override final;
+
+			///@brief See Window::Resumed for more details
+			void Resumed() noexcept override final;
+
+
 			///@brief See Window::GetFullScreenSize for more details
 			std::optional<Vector2> GetFullScreenSize() const noexcept override final;
 

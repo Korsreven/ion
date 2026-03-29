@@ -32,7 +32,10 @@ namespace ion::events::listeners
 
 		Move,
 		Resize,
-		DisplayModeChange
+		DisplayModeChange,
+
+		Pause,
+		Resume
 	};
 
 

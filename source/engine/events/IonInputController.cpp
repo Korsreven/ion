@@ -39,7 +39,7 @@ void InputController::WindowActionReceived(WindowAction action) noexcept
 {
 	switch (action)
 	{
-		case listeners::WindowAction::Close:
+		case WindowAction::Close:
 		case WindowAction::Deactivate:
 		case WindowAction::Minimize:
 		ReleaseButtons();
