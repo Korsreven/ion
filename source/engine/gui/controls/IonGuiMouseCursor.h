@@ -55,8 +55,9 @@ namespace ion::gui::controls
 			void DefaultSetup() noexcept;
 
 		protected:
-
+			
 			gui_mouse_cursor::MouseCursorHotSpot hot_spot_ = gui_mouse_cursor::MouseCursorHotSpot::TopLeft;
+			Vector2 mouse_position_;
 
 
 			/**
@@ -104,6 +105,12 @@ namespace ion::gui::controls
 			[[nodiscard]] inline auto HotSpot() const noexcept
 			{
 				return hot_spot_;
+			}
+
+			///@brief Returns the mouse position of this mouse cursor
+			[[nodiscard]] inline auto MousePosition() const noexcept
+			{
+				return mouse_position_;
 			}
 
 			///@}

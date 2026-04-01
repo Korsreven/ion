@@ -139,6 +139,8 @@ GuiMouseCursor::GuiMouseCursor(std::string name, const skins::GuiSkin &skin, con
 
 bool GuiMouseCursor::MouseMoved(Vector2 position) noexcept
 {
+	mouse_position_ = position;
+
 	if (visible_)
 	{
 		UpdatePosition(position);
