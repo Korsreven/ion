@@ -431,10 +431,25 @@ GuiController::~GuiController()
 
 void GuiController::ActiveMouseCursor(std::string_view name) noexcept
 {
+	auto show_immediately = false;
+	Vector2 mouse_position;
+
 	if (active_mouse_cursor_)
+	{
+		show_immediately = active_mouse_cursor_->IsVisible();
+		mouse_position = active_mouse_cursor_->MousePosition();
 		active_mouse_cursor_->Hide(); //Hide immediately
+	}
 
 	active_mouse_cursor_ = GetMouseCursor(name).get();
+
+	if (active_mouse_cursor_)
+	{
+		if (show_immediately)
+			active_mouse_cursor_->Show(); //Show immediately
+
+		active_mouse_cursor_->MouseMoved(mouse_position);
+	}
 }
 
 void GuiController::ActiveTooltip(std::string_view name) noexcept
