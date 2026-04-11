@@ -38,8 +38,9 @@ namespace ion::graphics::scene::shapes
 		protected:
 
 			OwningPtr<textures::Animation> diffuse_animation_;
-			OwningPtr<textures::Animation> specular_animation_;
 			OwningPtr<textures::Animation> normal_animation_;
+			OwningPtr<textures::Animation> specular_animation_;
+			OwningPtr<textures::Animation> emissive_animation_;
 
 			OwningPtr<materials::Material> material_;
 			NonOwningPtr<materials::Material> initial_material_;
