@@ -545,6 +545,12 @@ void Animation::JumpBackward(duration time) noexcept
 		CycleTime(CycleTime() - time);
 }
 
+void Animation::JumpTo(int frame) noexcept
+{
+	if (auto frame_count = FrameCount(); frame_count > 0)
+		current_frame_ = std::clamp(frame, 0, frame_count - 1);
+}
+
 
 duration Animation::CyclePlaybackTime() const noexcept
 {

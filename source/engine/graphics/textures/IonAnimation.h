@@ -327,6 +327,9 @@ namespace ion::graphics::textures
 			///@brief Jumps backward by the given amount of time
 			void JumpBackward(duration time) noexcept;
 
+			///@brief Jumps to the given frame
+			void JumpTo(int frame) noexcept;
+
 
 			///@brief Returns the actual cycle playback time of the animation
 			[[nodiscard]] duration CyclePlaybackTime() const noexcept;

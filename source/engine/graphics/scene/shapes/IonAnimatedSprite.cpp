@@ -210,6 +210,18 @@ void AnimatedSprite::JumpBackward(duration time) noexcept
 		emissive_animation_->JumpBackward(time);
 }
 
+void AnimatedSprite::JumpTo(int frame) noexcept
+{
+	if (diffuse_animation_)
+		diffuse_animation_->JumpTo(frame);
+	if (normal_animation_)
+		normal_animation_->JumpTo(frame);
+	if (specular_animation_)
+		specular_animation_->JumpTo(frame);
+	if (emissive_animation_)
+		emissive_animation_->JumpTo(frame);
+}
+
 
 /*
 	Elapse time

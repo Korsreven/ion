@@ -115,6 +115,9 @@ namespace ion::graphics::scene::shapes
 			///@brief Jumps backward by the given amount of time
 			void JumpBackward(duration time) noexcept;
 
+			///@brief Jumps to the given frame
+			void JumpTo(int frame) noexcept;
+
 			///@}
 
 			/**
