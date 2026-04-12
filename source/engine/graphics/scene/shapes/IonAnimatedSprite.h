@@ -97,10 +97,10 @@ namespace ion::graphics::scene::shapes
 			*/
 
 			///@brief Returns the number of frames in the animated sprite
-			[[nodiscard]] inline int FrameCount() const noexcept;
+			[[nodiscard]] int FrameCount() const noexcept;
 
 			///@brief Returns true if the animated sprite has one or more frames
-			[[nodiscard]] inline int HasFrames() const noexcept;
+			[[nodiscard]] int HasFrames() const noexcept;
 
 
 			///@brief Returns the attached diffuse animation
