@@ -89,17 +89,6 @@ namespace ion::graphics::textures
 			NonOwningPtr<FrameSequence> frame_sequence_;
 
 
-			inline auto FrameCount() const noexcept
-			{
-				return frame_sequence_ ? frame_sequence_->FrameCount() : 0;
-			}
-
-			inline auto HasFrames() const noexcept
-			{
-				return frame_sequence_ && !frame_sequence_->IsEmpty();
-			}
-
-
 			void StepForward(bool rewind = false) noexcept;
 			void StepBackward(bool rewind = false) noexcept;
 
@@ -252,6 +241,19 @@ namespace ion::graphics::textures
 			[[nodiscard]] inline auto InReverse() const noexcept
 			{
 				return reverse_;
+			}
+
+
+			///@brief Returns the number of frames in the animation
+			inline auto FrameCount() const noexcept
+			{
+				return frame_sequence_ ? frame_sequence_->FrameCount() : 0;
+			}
+
+			///@brief Returns true if the animation has one or more frames
+			inline auto HasFrames() const noexcept
+			{
+				return frame_sequence_ && !frame_sequence_->IsEmpty();
 			}
 			
 			///@}

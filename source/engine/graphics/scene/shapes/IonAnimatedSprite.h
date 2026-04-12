@@ -92,6 +92,48 @@ namespace ion::graphics::scene::shapes
 			///@}
 
 			/**
+				@name Observers
+				@{
+			*/
+
+			///@brief Returns the number of frames in the animated sprite
+			[[nodiscard]] inline int FrameCount() const noexcept;
+
+			///@brief Returns true if the animated sprite has one or more frames
+			[[nodiscard]] inline int HasFrames() const noexcept;
+
+
+			///@brief Returns the attached diffuse animation
+			///@details Returns nullptr if no diffuse animation exists
+			[[nodiscard]] inline NonOwningPtr<textures::Animation> DiffuseAnimation() const noexcept
+			{
+				return diffuse_animation_;
+			}
+
+			///@brief Returns the attached normal animation
+			///@details Returns nullptr if no normal animation exists
+			[[nodiscard]] inline NonOwningPtr<textures::Animation> NormalAnimation() const noexcept
+			{
+				return normal_animation_;
+			}
+
+			///@brief Returns the attached specular animation
+			///@details Returns nullptr if no specular animation exists
+			[[nodiscard]] inline NonOwningPtr<textures::Animation> SpecularAnimation() const noexcept
+			{
+				return specular_animation_;
+			}
+
+			///@brief Returns the attached emissive animation
+			///@details Returns nullptr if no emissive animation exists
+			[[nodiscard]] inline NonOwningPtr<textures::Animation> EmissiveAnimation() const noexcept
+			{
+				return emissive_animation_;
+			}
+
+			///@}
+
+			/**
 				@name Playback
 				@{
 			*/

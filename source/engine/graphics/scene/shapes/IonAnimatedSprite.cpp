@@ -134,6 +134,39 @@ void AnimatedSprite::Revert()
 
 
 /*
+	Observers
+*/
+
+int AnimatedSprite::FrameCount() const noexcept
+{
+	if (diffuse_animation_)
+		return diffuse_animation_->FrameCount();
+	if (normal_animation_)
+		return normal_animation_->FrameCount();
+	if (specular_animation_)
+		return specular_animation_->FrameCount();
+	if (emissive_animation_)
+		return emissive_animation_->FrameCount();
+
+	return 0;
+}
+
+int AnimatedSprite::HasFrames() const noexcept
+{
+	if (diffuse_animation_)
+		return diffuse_animation_->HasFrames();
+	if (normal_animation_)
+		return normal_animation_->HasFrames();
+	if (specular_animation_)
+		return specular_animation_->HasFrames();
+	if (emissive_animation_)
+		return emissive_animation_->HasFrames();
+
+	return 0;
+}
+
+
+/*
 	Playback
 */
 
