@@ -164,7 +164,7 @@ namespace ion::graphics::scene::shapes
 			///@brief Sets the surface material used by this sprite to the given material
 			void SurfaceMaterial(NonOwningPtr<materials::Material> material) noexcept
 			{
-				Mesh::SurfaceMaterial(material);
+				Rectangle::SurfaceMaterial(material);
 			}
 
 			///@}

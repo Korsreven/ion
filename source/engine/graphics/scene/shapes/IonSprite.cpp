@@ -133,6 +133,8 @@ void Sprite::MaterialChanged() noexcept
 		RecalculateSize();
 	if (auto_repeat_)
 		RecalculateTexCoords();
+
+	Rectangle::MaterialChanged();
 }
 
 

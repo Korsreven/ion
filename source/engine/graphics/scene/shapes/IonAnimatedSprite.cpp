@@ -22,6 +22,46 @@ namespace animated_sprite::detail
 } //animated_sprite::detail
 
 
+//Protected
+
+/*
+	Events
+*/
+
+void AnimatedSprite::MaterialChanged() noexcept
+{
+	if (auto material = SurfaceMaterial(); (material && material->Owner()) || !material)
+	{
+		diffuse_animation_ = material && material->DiffuseMap().first ?
+			make_owning<textures::Animation>(*material->DiffuseMap().first) : nullptr;
+		normal_animation_ = material && material->NormalMap().first ?
+			make_owning<textures::Animation>(*material->NormalMap().first) : nullptr;
+		specular_animation_ = material && material->SpecularMap().first ?
+			make_owning<textures::Animation>(*material->SpecularMap().first) : nullptr;
+		emissive_animation_ = material && material->EmissiveMap().first ?
+			make_owning<textures::Animation>(*material->EmissiveMap().first) : nullptr;
+
+		material_ = material && (diffuse_animation_ || normal_animation_ || specular_animation_ || emissive_animation_) ?
+			make_owning<materials::Material>(*material) : nullptr;
+		initial_material_ = material_;
+
+		if (material_)
+		{
+			material_->DiffuseMap(diffuse_animation_);
+			material_->NormalMap(normal_animation_);
+			material_->SpecularMap(specular_animation_);
+			material_->EmissiveMap(emissive_animation_);
+			SurfaceMaterial(material_);
+			return;
+		}
+	}
+	
+	Sprite::MaterialChanged();
+}
+
+
+//Public
+
 AnimatedSprite::AnimatedSprite(std::optional<std::string> name,
 	NonOwningPtr<materials::Material> material, bool visible) :
 
@@ -93,14 +133,20 @@ AnimatedSprite::AnimatedSprite(std::optional<std::string> name, const Vector3 &p
 	emissive_animation_{material && material->EmissiveMap().first ?
 		make_owning<textures::Animation>(*material->EmissiveMap().first) : nullptr},
 
-	material_{material ? make_owning<materials::Material>(*material) : nullptr},
+	material_{material && (diffuse_animation_ || normal_animation_ || specular_animation_ || emissive_animation_) ?
+		make_owning<materials::Material>(*material) : nullptr},
 	initial_material_{material}
 {
-	material_->DiffuseMap(diffuse_animation_);
-	material_->NormalMap(normal_animation_);
-	material_->SpecularMap(specular_animation_);
-	material_->EmissiveMap(emissive_animation_);
-	SurfaceMaterial(material_);
+	if (material_)
+	{
+		material_->DiffuseMap(diffuse_animation_);
+		material_->NormalMap(normal_animation_);
+		material_->SpecularMap(specular_animation_);
+		material_->EmissiveMap(emissive_animation_);
+		SurfaceMaterial(material_);
+	}
+	else if (material)
+		SurfaceMaterial(material);
 }
 
 

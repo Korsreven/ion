@@ -45,6 +45,16 @@ namespace ion::graphics::scene::shapes
 			OwningPtr<materials::Material> material_;
 			NonOwningPtr<materials::Material> initial_material_;
 
+
+			/**
+				@name Events
+				@{
+			*/
+
+			virtual void MaterialChanged() noexcept override;
+
+			///@}
+
 		public:
 
 			///@brief Constructs a new animated sprite with the given name, material and visibility
