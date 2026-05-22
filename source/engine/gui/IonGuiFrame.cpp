@@ -797,10 +797,9 @@ bool GuiFrame::MouseMoved(Vector2 position) noexcept
 				{
 					if (owner->ActiveTooltip()->Caption() != tooltip ||
 						(!owner->ActiveTooltip()->IsVisible() && hovered_control_->Tooltip() != tooltip))
-					{
 						owner->ActiveTooltip()->Show(*tooltip);
-						return true; //Consumed
-					}
+					
+					return true; //Consumed
 				}
 				else if (owner->ActiveTooltip()->IsVisible())
 				{
