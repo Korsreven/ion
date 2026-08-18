@@ -1,6 +1,6 @@
 ![logo](docs/logo.png?raw=true)
 
-# ION Engine 1.0
+# ION Engine 1.1
 
 ## Introduction
 [ION engine](https://github.com/Korsreven/ion) is a fast, lightweight and fully functional 2D game engine using OpenGL.  
@@ -8,10 +8,10 @@
 With the combination of an easy to use high-level scene graph, a blazingly fast low-level batch renderer, fully functional GUI, integrated scripting and powerful utilities, ION Engine has ***everything you need*** to create games right out of the box. To learn some more about the engine, please check out the list of [main features](FEATURES.md) and the latest online version of the [API reference](https://korsreven.github.io/). No prior knowledge of OpenGL is required to get started.
 
 ## Source Code
-ION engine is written in modern C++ (with some GLSL) and consists of around 115K lines of code. The development has been done exclusively using Visual Studio on a Microsoft Windows PC. The source code itself is platform independent and should be portable (with some coding effort).
+ION engine is written in modern C++ (with some GLSL) and consists of around 125K lines of code. The development has been done exclusively using Visual Studio on a Microsoft Windows PC. The source code itself is platform independent and should be portable (with some coding effort).
 
 ## Project Status
-ION engine has been actively under development for a period of 5 years (2017 to 2022). Now that the engine is stable and feature complete, development will begin to slow down a bit while I start working on some games. The source code will be maintained from time to time, when new bugs are found or new features are needed. Tutorials and code examples will become available at a later date.
+ION engine has been actively under development for a period of 9 years (2017 to 2026). Now that the engine is stable and feature complete, development will begin to slow down a bit while I start working on some games. The source code will be maintained from time to time, when new bugs are found or new features are needed. Tutorials and code examples will become available at a later date.
 
 ## Dependencies
 One of the things I enjoy the most when writing code, is actually writing most of the code myself. But there is no rule without exception... ION engine is using four different third party libraries.
@@ -21,7 +21,7 @@ One of the things I enjoy the most when writing code, is actually writing most o
 * GLEW v2.1.0 (http://glew.sourceforge.net/)
 
 ## How to get started
-* Download and install [Microsoft Visual Studio 2022](https://visualstudio.microsoft.com/vs/community/)
+* Download and install [Microsoft Visual Studio 2026](https://visualstudio.microsoft.com/vs/community/)
     * Remember to include ***Desktop development with C++*** before installing
 * Clone the [Korsreven/ion](https://github.com/Korsreven/ion) repository
 * Create directories `ion/binaries/Debug` and `ion/binaries/Release`
@@ -52,9 +52,9 @@ One of the things I enjoy the most when writing code, is actually writing most o
 
 ## How to setup shaders
 ION engine comes with some [default shaders](source/engine/graphics/shaders/glsl).
-* `IonModelShader` is needed for rendering models (meshes, shapes, sprites etc.) as designed
-* `IonParticleShader` is needed for rendering particle systems as designed
-* `IonTextShader` is needed for rendering text as designed
+* `IonModelShader` is needed for rendering models (meshes, shapes, sprites etc.) as intended
+* `IonParticleShader` is needed for rendering particle systems as intended
+* `IonTextShader` is needed for rendering text as intended
 * `IonSimple*` are mostly for rendering GUI/HUD objects without any lighting or fog
 
 The *fixed function pipeline* is used when rendering without shaders (***not recommended***). To render text properly without shaders, use `FontManager::FontGlyphTextureType(GlyphTextureType::Texture2D)`.
