@@ -26,20 +26,20 @@ using graphics::utilities::Vector2;
 namespace direction_randomizer::detail
 {
 
-void affect_particles(affector::detail::particle_range particles, duration time,
+void affect_particles(Particles &particles, duration time,
 					  real angle, real scope) noexcept
 {
-	for (auto &particle : particles)
+	for (auto i = 0; i < std::ssize(particles); ++i)
 	{
 		if (scope > random::Number())
 		{
-			auto velocity = particle.Velocity();
-			particle.Direction(particle.Direction() + particle.Direction().RandomDeviant(angle) * time.count());
-			auto new_velocity = particle.Velocity();
+			auto velocity = particles.Velocity(i);
+			particles.Direction(i, particles.Direction(i) + particles.Direction(i).RandomDeviant(angle) * time.count());
+			auto new_velocity = particles.Velocity(i);
 
 			//Keep velocity
 			if (new_velocity != 0.0_r)
-				particle.Direction(particle.Direction() * (velocity / new_velocity));
+				particles.Direction(i, particles.Direction(i) * (velocity / new_velocity));
 		}
 	}
 }
@@ -53,7 +53,7 @@ void affect_particles(affector::detail::particle_range particles, duration time,
 	Affect particles
 */
 
-void DirectionRandomizer::DoAffect(affector::detail::particle_range particles, duration time) noexcept
+void DirectionRandomizer::DoAffect(Particles &particles, duration time) noexcept
 {
 	detail::affect_particles(particles, time, angle_, scope_);
 }

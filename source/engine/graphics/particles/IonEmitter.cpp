@@ -20,24 +20,6 @@ using namespace ion::utilities;
 
 namespace emitter::detail
 {
-
-void evolve_particles(container_type<Particle> &particles, duration time) noexcept
-{
-	auto end = std::end(particles);
-	auto last = end;
-
-	for (auto iter = std::begin(particles); iter != last;)
-	{
-		//Particle lifetime has ended
-		if (!iter->Evolve(time))
-			*iter = std::move(*--last); //Move last active particle
-		else
-			++iter;
-	}
-
-	particles.erase(last, end);
-}
-
 } //emitter::detail
 
 
@@ -112,6 +94,7 @@ OwningPtr<Emitter> Emitter::Clone() const
 	emitter->emission_duration_ = emission_duration_;			
 
 	emitter->particle_quota_ = particle_quota_;
+	emitter->particle_quota_limit_ = particle_quota_limit_;
 	emitter->particle_velocity_ = particle_velocity_;
 	emitter->particle_size_ = particle_size_;		
 	emitter->particle_mass_ = particle_mass_;
@@ -178,11 +161,11 @@ void Emitter::Elapse(duration time) noexcept
 
 	//Evolve particles (even when not emitting)
 	if (!std::empty(particles_))
-		detail::evolve_particles(particles_, time);
+		particles_.Evolve(time);
 
 	//Affect particles (even when not emitting)
 	for (auto &affector : Affectors())
-		affector.Affect(Particles(), time);
+		affector.Affect(particles_, time);
 }
 
 
@@ -192,10 +175,10 @@ void Emitter::Elapse(duration time) noexcept
 
 void Emitter::Emit(int particle_count) noexcept
 {
-	for (particle_count = std::min(particle_count, particle_quota_ - std::ssize(particles_));
+	for (particle_count = std::min(particle_count, std::min(particle_quota_, particle_quota_limit_) - std::ssize(particles_));
 		particle_count > 0; --particle_count)
 
-		particles_.emplace_back(
+		particles_.AddParticle(
 			position_ + detail::particle_position(type_, size_ * 0.5_r, inner_size_ * 0.5_r), //Position
 			detail::particle_direction(direction_, emission_angle_, particle_velocity_.first, particle_velocity_.second), //Direction + velocity
 			detail::particle_size(particle_size_.first, particle_size_.second), //Size

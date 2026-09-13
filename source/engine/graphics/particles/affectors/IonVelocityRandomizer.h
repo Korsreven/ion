@@ -26,7 +26,7 @@ namespace ion::graphics::particles::affectors
 
 	namespace velocity_randomizer::detail
 	{
-		void affect_particles(affector::detail::particle_range particles, duration time,
+		void affect_particles(Particles &particles, duration time,
 							  const std::pair<real, real> &velocity, real scope) noexcept;
 	} //velocity_randomizer::detail
 
@@ -48,7 +48,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses velocity randomizer by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+			void DoAffect(Particles &particles, duration time) noexcept override;
 
 			///@}
 

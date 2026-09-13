@@ -459,6 +459,19 @@ void RenderPrimitive::VertexData(VertexContainer data) noexcept
 	}
 }
 
+void RenderPrimitive::CopyVertexData(const render_primitive::VertexContainer &data)
+{
+	if (!std::empty(vertex_data_) || !std::empty(data))
+	{
+		vertex_data_ = data; //Prevents unnecessary heap allocations
+		aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
+
+		data_changed_ = true;
+		world_data_changed_ = false; //Discard world changes
+		VertexDataChanged();
+	}
+}
+
 void RenderPrimitive::AppendVertexData(const render_primitive::VertexContainer &data)
 {
 	if (!std::empty(data))

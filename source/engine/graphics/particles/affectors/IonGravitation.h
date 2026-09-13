@@ -29,7 +29,7 @@ namespace ion::graphics::particles::affectors
 	{
 		constexpr auto g = 6.67430E-11_r;
 
-		void affect_particles(affector::detail::particle_range particles, duration time,
+		void affect_particles(Particles &particles, duration time,
 							  const Vector2 &position, real gravity, real mass) noexcept;
 	} //gravitation::detail
 
@@ -52,7 +52,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses gravitation by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+			void DoAffect(Particles &particles, duration time) noexcept override;
 
 			///@}
 

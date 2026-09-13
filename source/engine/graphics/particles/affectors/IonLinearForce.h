@@ -35,7 +35,7 @@ namespace ion::graphics::particles::affectors
 
 		namespace detail
 		{
-			void affect_particles(affector::detail::particle_range particles, duration time,
+			void affect_particles(Particles &particles, duration time,
 								  ForceType type, const Vector2 &force) noexcept;
 		} //detail
 	} //linear_force
@@ -58,7 +58,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses linear force by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+			void DoAffect(Particles &particles, duration time) noexcept override;
 
 			///@}
 

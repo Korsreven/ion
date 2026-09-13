@@ -26,7 +26,7 @@ Affector::Affector(std::string name) noexcept :
 	Affect particles
 */
 
-void Affector::Affect(affector::detail::particle_range particles, duration time) noexcept
+void Affector::Affect(Particles &particles, duration time) noexcept
 {
 	if (enabled_)
 		DoAffect(particles, time);

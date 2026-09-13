@@ -26,7 +26,7 @@ namespace ion::graphics::particles::affectors
 
 	namespace direction_randomizer::detail
 	{
-		void affect_particles(affector::detail::particle_range particles, duration time,
+		void affect_particles(Particles &particles, duration time,
 							  real angle, real scope) noexcept;
 	} //direction_randomizer::detail
 
@@ -48,7 +48,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses direction randomizer by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+			void DoAffect(Particles &particles, duration time) noexcept override;
 
 			///@}
 

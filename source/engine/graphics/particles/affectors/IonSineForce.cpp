@@ -23,7 +23,7 @@ using namespace ion::utilities;
 namespace sine_force::detail
 {
 
-void affect_particles(affector::detail::particle_range particles, duration time,
+void affect_particles(Particles &particles, duration time,
 					  ForceType type, const Vector2 &force, real angle) noexcept
 {
 	auto scaled_force = force * (math::Sin(angle) * time.count());
@@ -31,14 +31,14 @@ void affect_particles(affector::detail::particle_range particles, duration time,
 	//Add
 	if (type == ForceType::Add)
 	{
-		for (auto &particle : particles)
-			particle.Direction(particle.Direction() + scaled_force);
+		for (auto i = 0; i < std::ssize(particles); ++i)
+			particles.Direction(i, particles.Direction(i) + scaled_force);
 	}
 	//Average
 	else
 	{
-		for (auto &particle : particles)
-			particle.Direction((particle.Direction() + scaled_force) * 0.5_r);
+		for (auto i = 0; i < std::ssize(particles); ++i)
+			particles.Direction(i, (particles.Direction(i) + scaled_force) * 0.5_r);
 	}
 }
 
@@ -51,7 +51,7 @@ void affect_particles(affector::detail::particle_range particles, duration time,
 	Affect particles
 */
 
-void SineForce::DoAffect(affector::detail::particle_range particles, duration time) noexcept
+void SineForce::DoAffect(Particles &particles, duration time) noexcept
 {
 	if (current_angle_ += current_frequency_ * time.count())
 	{

@@ -92,14 +92,14 @@ std::vector<Step> uniformly_distribute_steps(const std::vector<Color> &colors, r
 		return {};
 }
 
-void affect_particles(affector::detail::particle_range particles, const color_steps &steps) noexcept
+void affect_particles(Particles &particles, const color_steps &steps) noexcept
 {
 	static const Step first{0.0_r, {}};
 	static const Step last{1.0_r, {}};
 
-	for (auto &particle : particles)
+	for (auto i = 0; i < std::ssize(particles); ++i)
 	{
-		auto percent = particle.LifetimePercent();
+		auto percent = particles.LifetimePercent(i);
 		auto [from, to] =
 			[&]() noexcept
 			{
@@ -116,17 +116,17 @@ void affect_particles(affector::detail::particle_range particles, const color_st
 
 			//from -> to
 			if (from->ToColor)
-				particle.FillColor(from->ToColor->MixCopy(*(to->ToColor), percent));
+				particles.FillColor(i, from->ToColor->MixCopy(*(to->ToColor), percent));
 			//current -> to
 			else
 			{
-				auto previous_percent = particle.PreviousLifetimePercent();
+				auto previous_percent = particles.PreviousLifetimePercent(i);
 				previous_percent = (previous_percent - from->Percent) / (to->Percent - from->Percent);
 
 				if (previous_percent <= 0.0_r)
-					particle.FromColor(particle.FillColor());
+					particles.FromColor(i, particles.FillColor(i));
 
-				particle.FillColor(particle.FromColor().MixCopy(*(to->ToColor), percent));
+				particles.FillColor(i, particles.FromColor(i).MixCopy(*(to->ToColor), percent));
 			}
 		}
 	}
@@ -141,7 +141,7 @@ void affect_particles(affector::detail::particle_range particles, const color_st
 	Affect particles
 */
 
-void ColorFader::DoAffect(affector::detail::particle_range particles, [[maybe_unused]] duration time) noexcept
+void ColorFader::DoAffect(Particles &particles, [[maybe_unused]] duration time) noexcept
 {
 	if (!std::empty(steps_))
 		detail::affect_particles(particles, steps_);

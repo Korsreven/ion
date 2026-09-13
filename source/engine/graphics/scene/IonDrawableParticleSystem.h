@@ -19,6 +19,7 @@ File:	IonDrawableParticleSystem.h
 #include <vector>
 
 #include "IonDrawableObject.h"
+#include "adaptors/IonFlatMap.h"
 #include "graphics/particles/IonParticleSystem.h"
 #include "graphics/render/IonRenderPrimitive.h"
 #include "graphics/render/vertex/IonVertexBatch.h"
@@ -66,42 +67,43 @@ namespace ion::graphics::scene
 			public:
 
 				DrawableParticleSystem *owner = nullptr;
-				render::render_primitive::VertexContainer vertex_data;
 
 				particle_emitter_primitive(NonOwningPtr<materials::Material> particle_material);
 		};
 
 		using particle_emitter_primitives = std::vector<OwningPtr<particle_emitter_primitive>>;
 
+		using particle_emitter_pointers = std::vector<particles::Emitter*>;
+		using particle_emitter_batches = adaptors::FlatMap<std::pair<real, materials::Material*>, particle_emitter_pointers>;
+
 
 		inline auto get_vertex_declaration() noexcept
 		{
-			static const auto particle = particles::Particle{};
 			return
 				render::vertex::VertexDeclaration
 				{
 					{
 						{shaders::shader_layout::AttributeName::Vertex_Position,
 							render::vertex::vertex_declaration::VertexElementType::Float3,
-							reinterpret_cast<const std::byte*>(particle.Position().Components()) - reinterpret_cast<const std::byte*>(&particle),
-							sizeof(particles::Particle)},
+							offsetof(particles::ParticleRenderData, Position),
+							sizeof(particles::ParticleRenderData)},
 
 						{shaders::shader_layout::AttributeName::Vertex_Rotation,
 							render::vertex::vertex_declaration::VertexElementType::Float1,
-							reinterpret_cast<const std::byte*>(&particle.Rotation()) - reinterpret_cast<const std::byte*>(&particle),
-							sizeof(particles::Particle)},
+							offsetof(particles::ParticleRenderData, Rotation),
+							sizeof(particles::ParticleRenderData)},
 
 						{shaders::shader_layout::AttributeName::Vertex_PointSize,
 							render::vertex::vertex_declaration::VertexElementType::Float1,
-							reinterpret_cast<const std::byte*>(particle.Size().Components()) - reinterpret_cast<const std::byte*>(&particle),
-							sizeof(particles::Particle)},
+							offsetof(particles::ParticleRenderData, Size),
+							sizeof(particles::ParticleRenderData)},
 
 						{shaders::shader_layout::AttributeName::Vertex_Color,
 							render::vertex::vertex_declaration::VertexElementType::Float4,
-							reinterpret_cast<const std::byte*>(particle.FillColor().Channels()) - reinterpret_cast<const std::byte*>(&particle),
-							sizeof(particles::Particle)}
+							offsetof(particles::ParticleRenderData, FillColor),
+							sizeof(particles::ParticleRenderData)}
 					},
-					sizeof(particles::Particle)
+					sizeof(particles::ParticleRenderData)
 				};
 		}
 
@@ -113,10 +115,11 @@ namespace ion::graphics::scene
 			@{
 		*/
 
-		void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, render::render_primitive::VertexContainer &data) noexcept;
-		void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, render::render_primitive::VertexContainer &data) noexcept;
+		void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, particle_emitter_primitive &primitive) noexcept;
+		void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept;
+		void apply_node_rotation_and_scaling(const vertex_metrics &metrics, real node_rotation, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept;
 
-		void get_emitter_primitives(const particles::ParticleSystem &particle_system, const vertex_metrics &metrics,
+		void get_emitter_primitives(const particle_emitter_batches &emitter_batches, const vertex_metrics &metrics,
 			real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives);
 
 		///@}
@@ -133,12 +136,14 @@ namespace ion::graphics::scene
 
 			drawable_particle_system::detail::vertex_metrics vertex_metrics_;
 			drawable_particle_system::detail::particle_emitter_primitives emitter_primitives_;
+			drawable_particle_system::detail::particle_emitter_batches emitter_batches_;
 
 			bool reload_primitives_ = false;
 			bool update_bounding_volumes_ = false;
 
 
 			void ReloadPrimitives();
+			void UpdateBatches();
 
 		public:
 

@@ -23,19 +23,19 @@ using namespace ion::utilities;
 namespace gravitation::detail
 {
 
-void affect_particles(affector::detail::particle_range particles, duration time,
+void affect_particles(Particles &particles, duration time,
 					  const Vector2 &position, real gravity, real mass) noexcept
 {
-	for (auto &particle : particles)
+	for (auto i = 0; i < std::ssize(particles); ++i)
 	{
 		//Newton's law of universal gravitation
-		auto distance = position - particle.Position();
+		auto distance = position - particles.Position(i);
 		auto length = distance.SquaredLength();
 
 		if (length > 0.0_r)
 		{
-			auto force = gravity * mass * particle.Mass() / length;
-			particle.Direction(particle.Direction() + distance * force * time.count());
+			auto force = gravity * mass * particles.Mass(i) / length;
+			particles.Direction(i, particles.Direction(i) + distance * force * time.count());
 		}
 	}
 }
@@ -49,7 +49,7 @@ void affect_particles(affector::detail::particle_range particles, duration time,
 	Affect particles
 */
 
-void Gravitation::DoAffect(affector::detail::particle_range particles, duration time) noexcept
+void Gravitation::DoAffect(Particles &particles, duration time) noexcept
 {
 	detail::affect_particles(particles, time, position_, gravity_, mass_);
 }

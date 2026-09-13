@@ -88,7 +88,7 @@ namespace ion::graphics::particles::affectors
 			std::vector<Step> normalize_steps(std::vector<Step> steps) noexcept;
 			std::vector<Step> uniformly_distribute_steps(const std::vector<Color> &colors, real from_percent, real to_percent);
 
-			void affect_particles(affector::detail::particle_range particles, const color_steps &steps) noexcept;
+			void affect_particles(Particles &particles, const color_steps &steps) noexcept;
 		} //detail
 	} //color_fader
 
@@ -109,7 +109,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses color fader by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void DoAffect(affector::detail::particle_range particles, duration time) noexcept override;
+			void DoAffect(Particles &particles, duration time) noexcept override;
 
 			///@}
 

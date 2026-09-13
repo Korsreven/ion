@@ -33,6 +33,8 @@ File:	IonEmitter.h
 #include "utilities/IonMath.h"
 #include "utilities/IonRandom.h"
 
+#undef min
+
 namespace ion::graphics::materials
 {
 	class Material; //Forward declaration
@@ -60,10 +62,6 @@ namespace ion::graphics::particles
 
 		namespace detail
 		{
-			template <typename T>
-			using container_type = std::vector<T>;
-
-
 			inline auto box_coordinate(real coord, real rand, real half_size, real half_inner_size1, real half_inner_size2) noexcept
 			{
 				return coord > -half_inner_size1 && coord < half_inner_size1 ?
@@ -152,9 +150,6 @@ namespace ion::graphics::particles
 			{
 				return duration{ion::utilities::random::Number(min_lifetime.count(), max_lifetime.count())};
 			}
-
-
-			void evolve_particles(container_type<Particle> &particles, duration time) noexcept;
 		} //detail
 	} //emitter
 
@@ -177,10 +172,11 @@ namespace ion::graphics::particles
 			std::optional<Cumulative<duration>> emission_duration_;			
 
 			int particle_quota_ = 100;
+			int particle_quota_limit_ = 0;
 			bool emitting_ = false;
 			Cumulative<real> emission_amount_{1.0_r};
 
-			emitter::detail::container_type<Particle> particles_;
+			Particles particles_;
 
 
 			//Initial spawn values for each new particle, in range [first, second]
@@ -283,6 +279,7 @@ namespace ion::graphics::particles
 			inline void EmissionRate(real rate) noexcept
 			{
 				emission_rate_ = rate;
+				particle_quota_limit_ = static_cast<int>(std::ceil(emission_rate_ * particle_lifetime_.second.count())); //Update
 			}
 
 			///@brief Sets the emission angle of the emitter to the given value in range [0.0, pi]
@@ -311,10 +308,7 @@ namespace ion::graphics::particles
 			inline void ParticleQuota(int quota)
 			{
 				particle_quota_ = quota > 0 ? quota : 0;
-
-				//Erase all particles that does not fit quota
-				if (particle_quota_ < std::ssize(particles_))
-					particles_.erase(std::begin(particles_) + particle_quota_, std::end(particles_));
+				particles_.Quota(std::min(particle_quota_, particle_quota_limit_));
 			}
 
 			///@}
@@ -392,6 +386,13 @@ namespace ion::graphics::particles
 				return particle_quota_;
 			}
 
+			///@brief Returns the particle quota upper limit of the emitter
+			///@details The max number of simultaneous particles possible
+			[[nodiscard]] inline auto ParticleQuotaLimit() const noexcept
+			{
+				return particle_quota_limit_;
+			}
+
 			///@brief Returns true if the emitter is emitting particles
 			[[nodiscard]] inline auto IsEmitting() const noexcept
 			{
@@ -464,6 +465,7 @@ namespace ion::graphics::particles
 			inline void ParticleLifetime(duration min_lifetime, duration max_lifetime) noexcept
 			{
 				particle_lifetime_ = std::minmax(min_lifetime, max_lifetime);
+				particle_quota_limit_ = static_cast<int>(std::ceil(emission_rate_ * particle_lifetime_.second.count())); //Update
 			}
 
 			///@brief Sets the material of each new particle to the given material
@@ -571,25 +573,17 @@ namespace ion::graphics::particles
 				return !std::empty(particles_);
 			}
 
-			///@}
 
-			/**
-				@name Ranges
-				@{
-			*/
-
-			///@brief Returns a mutable range of all particles in this emitter
-			///@details This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Particles() noexcept
+			///@brief Returns a mutable reference to the particles emitted by this emitter
+			[[nodiscard]] inline auto& GetParticles() noexcept
 			{
-				return adaptors::ranges::Iterable<emitter::detail::container_type<Particle>&>{particles_};
+				return particles_;
 			}
 
-			///@brief Returns an immutable range of all particles in this emitter
-			///@details This can be used directly with a range-based for loop
-			[[nodiscard]] inline auto Particles() const noexcept
+			///@brief Returns an immutable reference to the particles emitted by this emitter
+			[[nodiscard]] inline auto& GetParticles() const noexcept
 			{
-				return adaptors::ranges::Iterable<const emitter::detail::container_type<Particle>&>{particles_};
+				return particles_;
 			}
 
 			///@}

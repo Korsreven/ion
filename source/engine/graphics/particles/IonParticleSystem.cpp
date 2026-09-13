@@ -103,7 +103,7 @@ void ParticleSystem::Elapse(duration time) noexcept
 
 		//Affect particles (in emitter)
 		for (auto &affector : Affectors())
-			affector.Affect(emitter.Particles(), time);
+			affector.Affect(emitter.GetParticles(), time);
 	}
 }
 

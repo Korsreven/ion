@@ -20,7 +20,7 @@ File:	IonAffector.h
 
 namespace ion::graphics::particles
 {
-	class Particle;
+	class Particles;
 }
 
 namespace ion::graphics::particles::affectors
@@ -29,10 +29,6 @@ namespace ion::graphics::particles::affectors
 
 	namespace affector::detail
 	{
-		template <typename T>
-		using container_type = std::vector<T>;
-
-		using particle_range = adaptors::ranges::Iterable<container_type<Particle>&>;
 	} //affector::detail
 
 
@@ -58,7 +54,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Elapses affector by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			virtual void DoAffect(affector::detail::particle_range particles, duration time) noexcept = 0;
+			virtual void DoAffect(Particles &particles, duration time) noexcept = 0;
 
 			///@}
 
@@ -145,7 +141,7 @@ namespace ion::graphics::particles::affectors
 
 			///@brief Calls virtual function DoAffect if this affector is enabled
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void Affect(affector::detail::particle_range particles, duration time) noexcept;
+			void Affect(Particles &particles, duration time) noexcept;
 
 			///@}
 	};

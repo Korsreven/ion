@@ -26,13 +26,13 @@ using graphics::utilities::Vector2;
 namespace velocity_randomizer::detail
 {
 
-void affect_particles(affector::detail::particle_range particles, duration time,
+void affect_particles(Particles &particles, duration time,
 					  const std::pair<real, real> &velocity, real scope) noexcept
 {
-	for (auto &particle : particles)
+	for (auto i = 0; i < std::ssize(particles); ++i)
 	{
 		if (scope > random::Number())
-			particle.Velocity(particle.Velocity() * random::Number(velocity.first, velocity.second) * time.count());
+			particles.Velocity(i, particles.Velocity(i) * random::Number(velocity.first, velocity.second) * time.count());
 	}
 }
 
@@ -45,7 +45,7 @@ void affect_particles(affector::detail::particle_range particles, duration time,
 	Affect particles
 */
 
-void VelocityRandomizer::DoAffect(affector::detail::particle_range particles, duration time) noexcept
+void VelocityRandomizer::DoAffect(Particles &particles, duration time) noexcept
 {
 	detail::affect_particles(particles, time, velocity_, scope_);
 }

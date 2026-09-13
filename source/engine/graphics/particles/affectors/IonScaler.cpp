@@ -92,14 +92,14 @@ std::vector<Step> uniformly_distribute_steps(const std::vector<Vector2> &sizes, 
 		return {};
 }
 
-void affect_particles(affector::detail::particle_range particles, const size_steps &steps) noexcept
+void affect_particles(Particles &particles, const size_steps &steps) noexcept
 {
 	static const Step first{0.0_r, {}};
 	static const Step last{1.0_r, {}};
 
-	for (auto &particle : particles)
+	for (auto i = 0; i < std::ssize(particles); ++i)
 	{
-		auto percent = particle.LifetimePercent();
+		auto percent = particles.LifetimePercent(i);
 		auto [from, to] =
 			[&]() noexcept
 			{
@@ -116,17 +116,17 @@ void affect_particles(affector::detail::particle_range particles, const size_ste
 
 			//from -> to
 			if (from->Size)
-				particle.Size(from->Size->Lerp(*(to->Size), percent));
+				particles.Size(i, from->Size->Lerp(*(to->Size), percent));
 			//current -> to
 			else
 			{
-				auto previous_percent = particle.PreviousLifetimePercent();
+				auto previous_percent = particles.PreviousLifetimePercent(i);
 				previous_percent = (previous_percent - from->Percent) / (to->Percent - from->Percent);
 
 				if (previous_percent <= 0.0_r)
-					particle.FromSize(particle.Size());
+					particles.FromSize(i, particles.Size(i));
 
-				particle.Size(particle.FromSize().Lerp(*(to->Size), percent));
+				particles.Size(i, particles.FromSize(i).Lerp(*(to->Size), percent));
 			}
 		}
 	}
@@ -141,7 +141,7 @@ void affect_particles(affector::detail::particle_range particles, const size_ste
 	Affect particles
 */
 
-void Scaler::DoAffect(affector::detail::particle_range particles, [[maybe_unused]] duration time) noexcept
+void Scaler::DoAffect(Particles &particles, [[maybe_unused]] duration time) noexcept
 {
 	if (!std::empty(steps_))
 		detail::affect_particles(particles, steps_);

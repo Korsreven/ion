@@ -13,7 +13,10 @@ File:	IonRenderPrimitive.h
 #ifndef ION_RENDER_PRIMITIVE_H
 #define ION_RENDER_PRIMITIVE_H
 
+#include <cassert>
 #include <optional>
+#include <ranges>
+#include <tuple>
 #include <vector>
 
 #include "IonRenderPass.h"
@@ -27,6 +30,8 @@ File:	IonRenderPrimitive.h
 #include "vertex/IonVertexBatch.h"
 #include "vertex/IonVertexDataView.h"
 #include "vertex/IonVertexDeclaration.h"
+
+#undef max
 
 namespace ion::graphics::materials
 {
@@ -187,8 +192,68 @@ namespace ion::graphics::render
 			///@brief Sets the vertex data of this render primitive to the given data
 			void VertexData(render_primitive::VertexContainer data) noexcept;
 
-			///@brief Appends the given vertex data to the vertex data of this render primitive
+			///@brief Copies the given data to the vertex data of this render primitive
+			void CopyVertexData(const render_primitive::VertexContainer &data);
+
+			///@brief Appends the given data to the vertex data of this render primitive
 			void AppendVertexData(const render_primitive::VertexContainer &data);
+
+			///@brief Streams the given data to the vertex data of this render primitive
+			template <std::ranges::contiguous_range DataRange>
+			void StreamVertexData(const DataRange &data, size_t block_size = 0, size_t total_size = 0, size_t offset = 0)
+			{
+				if (!std::empty(vertex_data_) || !std::empty(data))
+				{
+					auto data_size = std::size(data);
+					block_size = std::max(data_size, block_size);
+					total_size = std::max(block_size, total_size);
+					assert(offset + block_size <= total_size);
+
+					vertex_data_.resize(total_size * sizeof(typename DataRange::value_type) /
+						sizeof(typename render_primitive::VertexContainer::value_type));
+
+					std::memcpy(reinterpret_cast<std::byte*>(std::data(vertex_data_)) + offset * sizeof(typename DataRange::value_type),
+						std::data(data), data_size * sizeof(typename DataRange::value_type)); //Copy data to block head
+					std::memset(reinterpret_cast<std::byte*>(std::data(vertex_data_)) + (offset + data_size) * sizeof(typename DataRange::value_type),
+						0, (block_size - data_size) * sizeof(typename DataRange::value_type)); //Zero out block tail
+
+					//Final block
+					if (offset + block_size == total_size)
+					{
+						aabb_ = render_primitive::detail::get_aabb(vertex_metrics_, vertex_data_);
+
+						data_changed_ = true;
+						world_data_changed_ = false; //Discard world changes
+						VertexDataChanged();
+					}
+				}
+			}
+
+			template <typename... Operations>
+				requires (sizeof...(Operations) > 0)
+			void TransformVertexData(std::tuple<std::size_t, std::size_t, Operations>... operations)
+			{
+				if (auto size = std::size(vertex_data_); size > 0)
+				{
+					auto apply =
+						[&](auto &&operation)
+						{
+							auto &&[offset, stride, op] = operation;
+							assert(stride > 0);
+
+							for (auto off = offset; off < size; off += stride)
+								vertex_data_[off] = op(vertex_data_[off]);
+						};
+
+					(apply(operations), ...); //Apply rest
+
+					aabb_ = render_primitive::detail::get_aabb(vertex_metrics_, vertex_data_);
+
+					data_changed_ = true;
+					world_data_changed_ = false; //Discard world changes
+					VertexDataChanged();
+				}
+			}
 
 			///@brief Sets the model matrix of this render primitive to the given matrix
 			void ModelMatrix(const Matrix4 &model_matrix) noexcept;
