@@ -24,9 +24,9 @@ namespace ion::graphics::render::vertex
 	{
 		enum class VertexBufferUsage
 		{
-			Static,		//Load/modify vertex data once
+			Static,		//Load/modify vertex data rarely
 			Dynamic,	//Load/modify vertex data occasionally
-			Stream		//Load/modify vertex data often (every frame)
+			Stream		//Load/modify vertex data every frame
 		};
 
 
@@ -149,6 +149,10 @@ namespace ion::graphics::render::vertex
 
 			///@brief Reserves the buffer data for this vertex buffer object to the given size with a new usage pattern
 			void Reserve(int size, vertex_buffer_object::VertexBufferUsage usage) noexcept;
+
+
+			///@brief Discards the buffer data for this vertex buffer object
+			void Discard() noexcept;
 
 			///@}
 

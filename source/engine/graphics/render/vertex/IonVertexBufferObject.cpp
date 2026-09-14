@@ -291,6 +291,12 @@ void VertexBufferObject::Reserve(int size, vertex_buffer_object::VertexBufferUsa
 }
 
 
+void VertexBufferObject::Discard() noexcept
+{
+	detail::set_vertex_buffer_data(*handle_, nullptr, size_, usage_); //Discard buffer in VRAM
+}
+
+
 /*
 	Vertex buffer view
 */
