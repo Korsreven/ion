@@ -320,14 +320,17 @@ Aabb Aabb::MergeCopy(const Vector2 &point) const noexcept
 
 Aabb& Aabb::Rotate(real angle) noexcept
 {
-	auto center = Center();
-	auto tl = Vector2{min_.X(), max_.Y()}.RotateCopy(angle, center);
-	auto tr = max_.RotateCopy(angle, center);
-	auto bl = min_.RotateCopy(angle, center);
-	auto br = Vector2{max_.X(), min_.Y()}.RotateCopy(angle, center);
+	auto sin_of_angle = std::abs(math::Sin(angle));
+	auto cos_of_angle = std::abs(math::Cos(angle));
 
-	min_ = tl.FloorCopy(tr).FloorCopy(bl).FloorCopy(br);
-	max_ = tl.CeilCopy(tr).CeilCopy(bl).CeilCopy(br);
+	auto [half_width, half_height] = ToHalfSize().XY();
+	auto ex = cos_of_angle * half_width + sin_of_angle * half_height;
+	auto ey = sin_of_angle * half_width + cos_of_angle * half_height;
+		//Correct for both left and right hand rotations
+
+	auto [x, y] = Center().XY();
+	min_ = {x - ex, y - ey};
+	max_ = {x + ex, y + ey};
 	return *this;
 }
 
