@@ -37,29 +37,22 @@ mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const 
 			{v1, vector3::UnitZ, {0.0_r, 1.0_r}, color}};
 }
 
+Aabb rectangle_aabb(const Vector3 &position, real rotation, const Vector2 &size)
+{
+	auto [x, y, _] = position.XYZ();
+	auto aabb = Aabb::Size(size, {x, y});
+	return rotation != 0.0_r ? aabb.RotateCopy(rotation) : aabb;	
+}
+
 } //rectangle::detail
 
 
 //Protected
 
-Rectangle::Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
-	const Vector3 &position, real rotation, const Vector2 &size,
-	const Color &color, bool visible) :
-
-	Shape{std::move(name), vertices, color, visible},
-	
-	position_{position},
-	rotation_{rotation},
-	size_{size}
-{
-	//Empty
-}
-
-Rectangle::Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
-	const Vector3 &position, real rotation, const Vector2 &size,
+Rectangle::Rectangle(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
 	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Shape{std::move(name), vertices, material, color, visible},
+	Shape{std::move(name), material, color, visible},
 	
 	position_{position},
 	rotation_{rotation},
@@ -72,6 +65,11 @@ Rectangle::Rectangle(std::optional<std::string> name, const mesh::Vertices &vert
 mesh::Vertices Rectangle::GetVertices() const noexcept
 {
 	return detail::rectangle_vertices(position_, rotation_, size_, color_);
+}
+
+Aabb Rectangle::GetAabb() const noexcept
+{
+	return detail::rectangle_aabb(position_, rotation_, size_);
 }
 
 
@@ -90,7 +88,11 @@ Rectangle::Rectangle(std::optional<std::string> name, const Vector3 &position, c
 }
 
 Rectangle::Rectangle(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Color &color, bool visible) :
-	Rectangle{std::move(name), detail::rectangle_vertices(position, rotation, size, color), position, rotation, size, color, visible}
+	Shape{std::move(name), color, visible},
+	
+	position_{position},
+	rotation_{rotation},
+	size_{size}
 {
 	//Empty
 }

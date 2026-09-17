@@ -12,7 +12,6 @@ File:	IonDrawableParticleSystem.cpp
 
 #include "IonDrawableParticleSystem.h"
 
-#include <tuple>
 #include "query/IonSceneQuery.h"
 
 namespace ion::graphics::scene
@@ -34,6 +33,11 @@ void particle_emitter_primitive::RenderPassesChanged() noexcept
 {
 	if (owner)
 		owner->NotifyRenderPassesChanged(*this);
+}
+
+Aabb particle_emitter_primitive::GetAabb() const noexcept
+{
+	return aabb::Zero;
 }
 
 
@@ -60,6 +64,28 @@ vertex_metrics get_vertex_metrics(const render::vertex::VertexDeclaration &verte
 	}
 
 	return metrics;
+}
+
+std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system) noexcept
+{
+	auto aabb = aabb::Zero;
+
+	for (auto &emitter : particle_system.Emitters())
+	{
+		switch (emitter.Type())
+		{
+			case particles::emitter::EmitterType::Point:
+			aabb.Merge(emitter.Position());
+			break;
+
+			case particles::emitter::EmitterType::Box:
+			case particles::emitter::EmitterType::Ring:
+			aabb.Merge(Aabb::Size(emitter.Size(), emitter.Position()));
+			break;
+		}
+	}
+
+	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
 }
 
 /*
@@ -235,9 +261,10 @@ void DrawableParticleSystem::Revert()
 
 void DrawableParticleSystem::Prepare()
 {
+	ReloadPrimitives(); //Always
+
 	if (reload_primitives_)
 	{
-		ReloadPrimitives();
 		reload_primitives_ = false;
 		update_bounding_volumes_ = true;
 	}
@@ -248,14 +275,14 @@ void DrawableParticleSystem::Prepare()
 
 	if (update_bounding_volumes_)
 	{
-		aabb_ = {};
-
-		//Merge all bounding boxes
-		for (auto &primitive : emitter_primitives_)
-			aabb_.Merge(primitive->AxisAlignedBoundingBox());
-
-		obb_ = aabb_;
-		sphere_ = {aabb_.ToHalfSize().Max(), aabb_.Center()};
+		if (particle_system_)
+		{
+			auto [aabb, obb, sphere] =
+				detail::generate_bounding_volumes(*particle_system_);
+			aabb_ = aabb;
+			obb_ = obb;
+			sphere_ = sphere;
+		}
 
 		update_bounding_volumes_ = false;
 	}
@@ -271,10 +298,7 @@ void DrawableParticleSystem::Prepare()
 void DrawableParticleSystem::Elapse(duration time) noexcept
 {
 	if (particle_system_)
-	{
 		particle_system_->Elapse(time);
-		reload_primitives_ = true;
-	}
 }
 
 } //ion::graphics::scene

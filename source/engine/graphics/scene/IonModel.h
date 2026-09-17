@@ -225,6 +225,7 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create<T>(std::move(name), std::forward<Args>(args)...);
+				ptr->Prepare();
 				return static_pointer_cast<T>(ptr);
 			}
 
@@ -237,6 +238,7 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create(mesh_t);
+				ptr->Prepare();
 				return static_pointer_cast<T>(ptr);
 			}
 
@@ -248,6 +250,7 @@ namespace ion::graphics::scene
 				static_assert(std::is_base_of_v<shapes::Mesh, T>);
 
 				auto ptr = Create(std::move(mesh_t));
+				ptr->Prepare();
 				return static_pointer_cast<T>(ptr);
 			}
 

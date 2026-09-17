@@ -16,6 +16,7 @@ File:	IonDrawableParticleSystem.h
 #include <cstddef>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "IonDrawableObject.h"
@@ -25,6 +26,7 @@ File:	IonDrawableParticleSystem.h
 #include "graphics/render/vertex/IonVertexBatch.h"
 #include "graphics/render/vertex/IonVertexDeclaration.h"
 #include "graphics/shaders/IonShaderLayout.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonVector2.h"
 #include "memory/IonNonOwningPtr.h"
 #include "memory/IonOwningPtr.h"
@@ -40,7 +42,10 @@ namespace ion::graphics
 
 namespace ion::graphics::scene
 {
-	class DrawableParticleSystem;
+	class DrawableParticleSystem; //Forward declaration
+
+	using utilities::Aabb;
+	using utilities::Vector2;
 
 	namespace drawable_particle_system::detail
 	{
@@ -61,6 +66,7 @@ namespace ion::graphics::scene
 				*/
 
 				void RenderPassesChanged() noexcept override;
+				Aabb GetAabb() const noexcept override;
 
 				///@}
 
@@ -108,6 +114,8 @@ namespace ion::graphics::scene
 		}
 
 		vertex_metrics get_vertex_metrics(const render::vertex::VertexDeclaration &vertex_declaration) noexcept;
+		std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::ParticleSystem &particle_system,
+			const Vector2 &position, real rotation) noexcept;
 
 
 		/**

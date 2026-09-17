@@ -18,6 +18,7 @@ File:	IonRectangle.h
 #include <utility>
 
 #include "IonShape.h"
+#include "graphics/utilities/IonAabb.h"
 #include "graphics/utilities/IonColor.h"
 #include "graphics/utilities/IonVector2.h"
 #include "graphics/utilities/IonVector3.h"
@@ -50,6 +51,7 @@ namespace ion::graphics::scene::shapes
 
 
 		mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const Vector2 &size, const Color &color);
+		Aabb rectangle_aabb(const Vector3 &position, real rotation, const Vector2 &size);
 	} //rectangle::detail
 
 
@@ -63,20 +65,14 @@ namespace ion::graphics::scene::shapes
 			Vector2 size_;
 
 
-			///@brief Constructs a new rectangle with the given name, vertices, position, rotation, size, color and visibility
+			///@brief Constructs a new texturized rectangle with the given name, position, rotation, size, material, color and visibility
 			///@details Can only be instantiated by derived
-			Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
-				const Vector3 &position, real rotation, const Vector2 &size,
-				const Color &color, bool visible = true);
-
-			///@brief Constructs a new texturized rectangle with the given name, vertices, position, rotation, size, material, color and visibility
-			///@details Can only be instantiated by derived
-			Rectangle(std::optional<std::string> name, const mesh::Vertices &vertices,
-				const Vector3 &position, real rotation, const Vector2 &size,
+			Rectangle(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
 				NonOwningPtr<materials::Material> material, const Color &color, bool visible = true);
 
 
 			virtual mesh::Vertices GetVertices() const noexcept override;
+			virtual Aabb GetAabb() const noexcept override;
 
 		public:
 		

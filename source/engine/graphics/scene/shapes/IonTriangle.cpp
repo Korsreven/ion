@@ -43,7 +43,7 @@ mesh::Vertices Triangle::GetVertices() const noexcept
 Triangle::Triangle(std::optional<std::string> name, const Vector3 &a, const Vector3 &b, const Vector3 &c,
 	const Color &color, bool visible) :
 
-	Shape{std::move(name), detail::triangle_vertices(a, b, c, color), color, visible},
+	Shape{std::move(name), color, visible},
 
 	a_{a},
 	b_{b},

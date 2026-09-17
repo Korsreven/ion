@@ -79,8 +79,7 @@ Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, const
 Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
 	const Color &color, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan,
-		  detail::ellipse_vertices(position, rotation, size, color, ellipse::detail::default_ellipse_sides), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan, color, visible},
 
 	position_{position},
 	rotation_{rotation},
@@ -109,8 +108,7 @@ Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, const
 Ellipse::Ellipse(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
 	const Color &color, int sides, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan,
-		  detail::ellipse_vertices(position, rotation, size, color, detail::ellipse_sides(sides)), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::TriangleFan, color, visible},
 
 	position_{position},
 	rotation_{rotation},

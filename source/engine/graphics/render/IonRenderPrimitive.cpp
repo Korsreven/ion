@@ -342,6 +342,16 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 }
 
 
+void RenderPrimitive::NotifyVertexDataChanged() noexcept
+{
+	aabb_ = GetAabb();
+
+	data_changed_ = true;
+	world_data_changed_ = false; //Discard world changes
+	VertexDataChanged();
+}
+
+
 //Protected
 
 /*
@@ -422,6 +432,12 @@ void RenderPrimitive::RendererChanged() noexcept
 }
 
 
+Aabb RenderPrimitive::GetAabb() const noexcept
+{
+	return detail::get_aabb(vertex_metrics_, vertex_data_);
+}
+
+
 //Public
 
 RenderPrimitive::RenderPrimitive(vertex::vertex_batch::VertexDrawMode draw_mode, vertex::VertexDeclaration vertex_declaration,
@@ -451,11 +467,7 @@ void RenderPrimitive::VertexData(VertexContainer data) noexcept
 	if (!std::empty(vertex_data_) || !std::empty(data))
 	{
 		vertex_data_ = std::move(data);
-		aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
-
-		data_changed_ = true;
-		world_data_changed_ = false; //Discard world changes
-		VertexDataChanged();
+		NotifyVertexDataChanged();
 	}
 }
 
@@ -464,24 +476,7 @@ void RenderPrimitive::CopyVertexData(const render_primitive::VertexContainer &da
 	if (!std::empty(vertex_data_) || !std::empty(data))
 	{
 		vertex_data_ = data; //Prevents unnecessary heap allocations
-		aabb_ = detail::get_aabb(vertex_metrics_, vertex_data_);
-
-		data_changed_ = true;
-		world_data_changed_ = false; //Discard world changes
-		VertexDataChanged();
-	}
-}
-
-void RenderPrimitive::AppendVertexData(const render_primitive::VertexContainer &data)
-{
-	if (!std::empty(data))
-	{
-		vertex_data_.insert(std::end(vertex_data_), std::begin(data), std::end(data));
-		aabb_.Merge(detail::get_aabb(vertex_metrics_, data));
-
-		data_changed_ = true;
-		world_data_changed_ = false; //Discard world changes
-		VertexDataChanged();
+		NotifyVertexDataChanged();
 	}
 }
 

@@ -84,6 +84,7 @@ namespace ion::graphics::scene
 				*/
 
 				void RenderPassesChanged() noexcept override;
+				Aabb GetAabb() const noexcept override;
 
 				///@}
 

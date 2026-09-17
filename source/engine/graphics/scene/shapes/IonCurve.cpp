@@ -89,8 +89,7 @@ mesh::Vertices Curve::GetVertices() const noexcept
 Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 	const Color &color, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip,
-		  detail::curve_vertices(control_points, color, detail::default_curve_smoothness), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip, color, visible},
 	control_points_{std::move(control_points)}
 {
 	//Empty
@@ -99,9 +98,7 @@ Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 	const Color &color, real thickness, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip,
-		  detail::curve_vertices(control_points, color, detail::default_curve_smoothness), color, visible},
-
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip, color, visible},
 	control_points_{std::move(control_points)}
 {
 	Thickness(thickness);
@@ -111,8 +108,7 @@ Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 	const Color &color, int smoothness, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip,
-		  detail::curve_vertices(control_points, color, detail::curve_smoothness(smoothness)), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip, color, visible},
 
 	control_points_{std::move(control_points)},
 	smoothness_{detail::curve_smoothness(smoothness)}
@@ -123,8 +119,7 @@ Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 Curve::Curve(std::optional<std::string> name, ControlPoints control_points,
 	const Color &color, real thickness, int smoothness, bool visible) :
 
-	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip,
-		  detail::curve_vertices(control_points, color, detail::curve_smoothness(smoothness)), color, visible},
+	Shape{std::move(name), vertex::vertex_batch::VertexDrawMode::LineStrip, color, visible},
 
 	control_points_{std::move(control_points)},
 	smoothness_{detail::curve_smoothness(smoothness)}

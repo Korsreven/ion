@@ -254,6 +254,13 @@ mesh::Vertices border_vertices(
 	return vertices;
 }
 
+Aabb border_aabb(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size)
+{
+	auto [x, y, _] = position.XYZ();
+	auto aabb = Aabb::Size(size + border_size * 2.0_r, {x, y});
+	return rotation != 0.0_r ? aabb.RotateCopy(rotation) : aabb;
+}
+
 } //border::detail
 
 
@@ -268,6 +275,11 @@ mesh::Vertices Border::GetVertices() const noexcept
 		left_side_color_, right_side_color_,
 		top_left_corner_color_, top_right_corner_color_,
 		bottom_left_corner_color_, bottom_right_corner_color_);
+}
+
+Aabb Border::GetAabb() const noexcept
+{
+	return detail::border_aabb(position_, rotation_, size_, border_size_);
 }
 
 
@@ -317,9 +329,7 @@ Border::Border(std::optional<std::string> name, const Vector3 &position, const V
 Border::Border(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size,
 	BorderCornerStyle corner_style, const Color &color, bool visible) :
 	
-	Rectangle{std::move(name),
-			  detail::border_vertices(position, rotation, size, border_size, corner_style, color, {}, {}, {}, {}, {}, {}, {}, {}),
-			  position, rotation, size, color, visible},
+	Rectangle{std::move(name), position, rotation, size, color, visible},
 
 	border_size_{border_size},
 	corner_style_{corner_style}

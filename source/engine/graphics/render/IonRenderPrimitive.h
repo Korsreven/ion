@@ -121,6 +121,8 @@ namespace ion::graphics::render
 			void UpdateWorldVertexData();
 			void UpdateWorldZ() noexcept;
 
+			void NotifyVertexDataChanged() noexcept;
+
 		protected:
 
 			///@brief Returns the vertex data of this render primitive
@@ -152,6 +154,8 @@ namespace ion::graphics::render
 			virtual void PointSpriteChanged() noexcept;
 			virtual void VisibleChanged() noexcept;
 			virtual void RendererChanged() noexcept;
+
+			virtual Aabb GetAabb() const noexcept;
 
 			///@}
 
@@ -195,9 +199,6 @@ namespace ion::graphics::render
 			///@brief Copies the given data to the vertex data of this render primitive
 			void CopyVertexData(const render_primitive::VertexContainer &data);
 
-			///@brief Appends the given data to the vertex data of this render primitive
-			void AppendVertexData(const render_primitive::VertexContainer &data);
-
 			///@brief Streams the given data to the vertex data of this render primitive
 			template <std::ranges::contiguous_range DataRange>
 			void StreamVertexData(const DataRange &data, size_t block_size = 0, size_t total_size = 0, size_t offset = 0)
@@ -219,13 +220,7 @@ namespace ion::graphics::render
 
 					//Final block
 					if (offset + block_size == total_size)
-					{
-						aabb_ = render_primitive::detail::get_aabb(vertex_metrics_, vertex_data_);
-
-						data_changed_ = true;
-						world_data_changed_ = false; //Discard world changes
-						VertexDataChanged();
-					}
+						NotifyVertexDataChanged();
 				}
 			}
 
@@ -246,12 +241,7 @@ namespace ion::graphics::render
 						};
 
 					(apply(operations), ...); //Apply rest
-
-					aabb_ = render_primitive::detail::get_aabb(vertex_metrics_, vertex_data_);
-
-					data_changed_ = true;
-					world_data_changed_ = false; //Discard world changes
-					VertexDataChanged();
+					NotifyVertexDataChanged();
 				}
 			}
 

@@ -49,6 +49,8 @@ namespace ion::graphics::scene::shapes
 				const std::optional<Color> &left_side_color, const std::optional<Color> &right_side_color,
 				const std::optional<Color> &top_left_corner_color, const std::optional<Color> &top_right_corner_color,
 				const std::optional<Color> &bottom_left_corner_color, const std::optional<Color> &bottom_right_corner_color);
+
+			Aabb border_aabb(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size);
 		} //detail
 	} //border
 
@@ -74,6 +76,7 @@ namespace ion::graphics::scene::shapes
 
 
 			virtual mesh::Vertices GetVertices() const noexcept override;
+			virtual Aabb GetAabb() const noexcept override;
 
 		public:
 

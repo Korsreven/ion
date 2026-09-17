@@ -50,6 +50,11 @@ void text_primitive::RenderPassesChanged() noexcept
 		owner->NotifyRenderPassesChanged(*this);
 }
 
+Aabb text_primitive::GetAabb() const noexcept
+{
+	return aabb::Zero;
+}
+
 
 //Public
 
@@ -725,15 +730,15 @@ void get_block_primitives(const fonts::text::TextBlock &text_block, const fonts:
 					auto min = Vector2{base_x, base_y - (element_size - font_size) * 0.5_r} / ppu;
 					auto max = min + Vector2{text_block.Size->X(), element_size} / ppu;
 
-					auto tl = Vector2{min.X(), max.Y()}.RotateCopy(rotation, origin);
-					auto tr = max.RotateCopy(rotation, origin);
-					auto bl = min.RotateCopy(rotation, origin);
-					auto br = Vector2{max.X(), min.Y()}.RotateCopy(rotation, origin);
+					auto aabb = Aabb{min, max};
 
-					min = tl.FloorCopy(tr).FloorCopy(bl).FloorCopy(br);
-					max = tl.CeilCopy(tr).CeilCopy(bl).CeilCopy(br);
-					
-					tooltip_elements.push_back({Aabb{min, max}, *text_block.Title});
+					if (rotation != 0.0_r)
+					{
+						auto rc = aabb.Center().RotateCopy(rotation, origin);
+						aabb.Translate(rc).Rotate(rotation);
+					}
+
+					tooltip_elements.push_back({aabb, *text_block.Title});
 				}
 
 				position.Y(base_y);

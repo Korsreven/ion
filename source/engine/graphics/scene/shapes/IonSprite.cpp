@@ -200,9 +200,7 @@ Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, const V
 Sprite::Sprite(std::optional<std::string> name, const Vector3 &position, real rotation, const Vector2 &size,
 	NonOwningPtr<materials::Material> material, const Color &color, bool visible) :
 
-	Rectangle{std::move(name),
-			  rectangle::detail::rectangle_vertices(position, rotation, size, color),
-			  position, rotation, size, material, color, visible}
+	Rectangle{std::move(name), position, rotation, size, material, color, visible}
 {
 	if (size == vector2::Zero)
 		AutoSize(true);
