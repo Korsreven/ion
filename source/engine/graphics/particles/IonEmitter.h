@@ -42,6 +42,7 @@ namespace ion::graphics::materials
 
 namespace ion::graphics::particles
 {
+	using namespace utilities;
 	using namespace types::type_literals;
 
 	using types::Cumulative;
@@ -58,6 +59,13 @@ namespace ion::graphics::particles
 			Point,
 			Box,
 			Ring
+		};
+
+		struct EmitterTransform
+		{
+			Vector3 Position;
+			real Rotation = 0.0_r;
+			Vector2 Scaling = vector2::UnitScale;
 		};
 
 		namespace detail
@@ -545,7 +553,7 @@ namespace ion::graphics::particles
 
 			///@brief Elapses emitter by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept;
+			void Elapse(duration time, const emitter::EmitterTransform &transform = {}) noexcept;
 
 			///@}
 
@@ -555,7 +563,7 @@ namespace ion::graphics::particles
 			*/
 
 			///@brief Emits the given particle count with the current emission rate
-			void Emit(int particle_count) noexcept;
+			void Emit(int particle_count, const emitter::EmitterTransform &transform = {}) noexcept;
 
 			///@}
 

@@ -123,12 +123,7 @@ namespace ion::graphics::scene
 			@{
 		*/
 
-		void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, particle_emitter_primitive &primitive) noexcept;
-		void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept;
-		void apply_node_rotation_and_scaling(const vertex_metrics &metrics, real node_rotation, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept;
-
-		void get_emitter_primitives(const particle_emitter_batches &emitter_batches, const vertex_metrics &metrics,
-			real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives);
+		void get_emitter_primitives(const particle_emitter_batches &emitter_batches, particle_emitter_primitives &emitter_primitives);
 
 		///@}
 	} //drawable_particle_system::detail

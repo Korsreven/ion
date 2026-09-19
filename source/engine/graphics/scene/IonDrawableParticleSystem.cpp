@@ -88,39 +88,12 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::Particl
 	return {aabb, aabb, {aabb.ToHalfSize().Max(), aabb.Center()}};
 }
 
+
 /*
 	Rendering
 */
 
-void apply_node_rotation(const vertex_metrics &metrics, real node_rotation, particle_emitter_primitive &primitive) noexcept
-{
-	primitive.TransformVertexData(
-		std::tuple{size_t(metrics.rotation_offset), sizeof(particles::ParticleRenderData),
-			[=](real value) { return value + node_rotation; }}
-	);
-}
-
-void apply_node_scaling(const vertex_metrics &metrics, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept
-{
-	primitive.TransformVertexData(
-		std::tuple{size_t(metrics.point_size_offset), sizeof(particles::ParticleRenderData),
-			[=](real value) { return value * ((node_scaling.X() + node_scaling.Y()) * 0.5_r); }} //Average
-	);
-}
-
-void apply_node_rotation_and_scaling(const vertex_metrics &metrics, real node_rotation, const Vector2 &node_scaling, particle_emitter_primitive &primitive) noexcept
-{
-	primitive.TransformVertexData(
-		std::tuple{size_t(metrics.rotation_offset), sizeof(particles::ParticleRenderData),
-			[=](real value) { return value + node_rotation; }},
-		std::tuple{size_t(metrics.point_size_offset), sizeof(particles::ParticleRenderData),
-			[=](real value) { return value * ((node_scaling.X() + node_scaling.Y()) * 0.5_r); }} //Average
-	);
-}
-
-
-void get_emitter_primitives(const particle_emitter_batches &emitter_batches,  const vertex_metrics &metrics,
-	real node_rotation, const Vector2 &node_scaling, particle_emitter_primitives &emitter_primitives)
+void get_emitter_primitives(const particle_emitter_batches &emitter_batches,  particle_emitter_primitives &emitter_primitives)
 {
 	for (auto &[key, emitters] : emitter_batches)
 	{
@@ -147,27 +120,6 @@ void get_emitter_primitives(const particle_emitter_batches &emitter_batches,  co
 			off += count;
 		}
 	}
-
-	//Apply both rotation and scaling from parent node
-	if (node_rotation != 0.0_r && node_scaling != vector2::UnitScale)
-	{
-		for (auto &primitive : emitter_primitives)
-			apply_node_rotation_and_scaling(metrics, node_rotation, node_scaling, *primitive);
-	}
-
-	//Apply rotation from parent node
-	else if (node_rotation != 0.0_r)
-	{
-		for (auto &primitive : emitter_primitives)
-			apply_node_rotation(metrics, node_rotation, *primitive);
-	}
-
-	//Apply scaling from parent node
-	else if (node_scaling != vector2::UnitScale)
-	{
-		for (auto &primitive : emitter_primitives)
-			apply_node_scaling(metrics, node_scaling, *primitive);
-	}
 }
 
 } //drawable_particle_system::detail
@@ -186,14 +138,14 @@ void DrawableParticleSystem::ReloadPrimitives()
 
 	if (particle_system_ && !std::empty(emitter_batches_))
 	{
-		auto parent_node = ParentNode();
-		auto node_rotation = parent_node && particle_system_->InheritNodeRotation() ?
-			parent_node->Rotation() : 0.0_r;
-		auto node_scaling = parent_node && particle_system_->InheritNodeScaling() ?
-			parent_node->Scaling() : vector2::UnitScale;
+		detail::get_emitter_primitives(emitter_batches_, emitter_primitives_);
 
-		detail::get_emitter_primitives(emitter_batches_, vertex_metrics_,
-			node_rotation, node_scaling, emitter_primitives_);
+		auto vertex_space = particle_system_->TransformSpace() == particles::particle_system::ParticleTransformSpace::Local ?
+			render::render_primitive::VertexDataSpace::Local :
+			render::render_primitive::VertexDataSpace::World;
+
+		for (auto &primitive : emitter_primitives_)
+			primitive->VertexSpace(vertex_space);
 	}
 
 	for (auto &primitive : emitter_primitives_)
@@ -298,7 +250,29 @@ void DrawableParticleSystem::Prepare()
 void DrawableParticleSystem::Elapse(duration time) noexcept
 {
 	if (particle_system_)
-		particle_system_->Elapse(time);
+	{
+		switch (particle_system_->TransformSpace())
+		{
+			case particles::particle_system::ParticleTransformSpace::Local:
+			particle_system_->Elapse(time);
+			break;
+
+			case particles::particle_system::ParticleTransformSpace::World:
+			{
+				if (auto parent_node = ParentNode(); parent_node)
+				{
+					particles::emitter::EmitterTransform transform;
+					transform.Position = parent_node->DerivedPosition();
+					transform.Rotation = parent_node->DerivedRotation();
+					transform.Scaling = parent_node->DerivedScaling();
+
+					particle_system_->Elapse(time, transform);
+				}
+
+				break;
+			}
+		}
+	}
 }
 
 } //ion::graphics::scene

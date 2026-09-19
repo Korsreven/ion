@@ -145,7 +145,7 @@ void Emitter::Restart() noexcept
 	Elapse time
 */
 
-void Emitter::Elapse(duration time) noexcept
+void Emitter::Elapse(duration time, const EmitterTransform &transform) noexcept
 {
 	if (emitting_)
 	{
@@ -154,7 +154,7 @@ void Emitter::Elapse(duration time) noexcept
 
 		else if (emission_amount_ += emission_rate_ * time.count())
 		{
-			Emit(static_cast<int>(emission_amount_.Total())); //Emit total number of particles (whole part)
+			Emit(static_cast<int>(emission_amount_.Total()), transform); //Emit total number of particles (whole part)
 			emission_amount_.Total(math::Fraction(emission_amount_.Total())); //Keep fractional part for next emission
 		}
 	}
@@ -173,15 +173,15 @@ void Emitter::Elapse(duration time) noexcept
 	Emitting
 */
 
-void Emitter::Emit(int particle_count) noexcept
+void Emitter::Emit(int particle_count, const EmitterTransform &transform) noexcept
 {
 	for (particle_count = std::min(particle_count, std::min(particle_quota_, particle_quota_limit_) - std::ssize(particles_));
 		particle_count > 0; --particle_count)
 
 		particles_.AddParticle(
-			position_ + detail::particle_position(type_, size_ * 0.5_r, inner_size_ * 0.5_r), //Position
-			detail::particle_direction(direction_, emission_angle_, particle_velocity_.first, particle_velocity_.second), //Direction + velocity
-			detail::particle_size(particle_size_.first, particle_size_.second), //Size
+			position_ + transform.Position + detail::particle_position(type_, size_ * transform.Scaling * 0.5_r, inner_size_ * transform.Scaling * 0.5_r), //Position
+			detail::particle_direction(direction_.Deviant(transform.Rotation), emission_angle_, particle_velocity_.first, particle_velocity_.second), //Direction + velocity
+			detail::particle_size(particle_size_.first * transform.Scaling, particle_size_.second * transform.Scaling), //Size
 			detail::particle_mass(particle_mass_.first, particle_mass_.second), //Mass
 			detail::particle_color(particle_color_.first, particle_color_.second), //Color
 			detail::particle_lifetime(particle_lifetime_.first, particle_lifetime_.second), //Lifetime

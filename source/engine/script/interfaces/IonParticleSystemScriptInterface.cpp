@@ -97,9 +97,8 @@ ClassDefinition get_particle_system_class()
 
 		.AddRequiredProperty("name", ParameterType::String)
 		.AddProperty("emitting", ParameterType::Boolean)
-		.AddProperty("inherit-node-rotation", ParameterType::Boolean)
-		.AddProperty("inherit-node-scaling", ParameterType::Boolean)
-		.AddProperty("render-primitive", {"point"s, "rectangle"s});
+		.AddProperty("render-primitive", {"point"s, "rectangle"s})
+		.AddProperty("transform-space", {"local"s, "world"s});
 }
 
 
@@ -305,16 +304,19 @@ void set_particle_system_properties(const script_tree::ObjectNode &object, Parti
 			else
 				particle_system.StopAll();
 		}
-		else if (property.Name() == "inherit-node-rotation")
-			particle_system.InheritNodeRotation(property[0].Get<ScriptType::Boolean>()->Get());
-		else if (property.Name() == "inherit-node-scaling")
-			particle_system.InheritNodeScaling(property[0].Get<ScriptType::Boolean>()->Get());
 		else if (property.Name() == "render-primitive")
 		{
 			if (property[0].Get<ScriptType::Enumerable>()->Get() == "point")
 				particle_system.RenderPrimitive(particle_system::ParticlePrimitive::Point);
 			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "rectangle")
 				particle_system.RenderPrimitive(particle_system::ParticlePrimitive::Rectangle);
+		}
+		else if (property.Name() == "transform-space")
+		{
+			if (property[0].Get<ScriptType::Enumerable>()->Get() == "local")
+				particle_system.TransformSpace(particle_system::ParticleTransformSpace::Local);
+			else if (property[0].Get<ScriptType::Enumerable>()->Get() == "world")
+				particle_system.TransformSpace(particle_system::ParticleTransformSpace::World);
 		}
 	}
 }

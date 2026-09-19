@@ -68,9 +68,11 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 		//Two-components (x, y)
 		case 2:
 		{
+			auto model_matrix3 = Matrix3::Transformation(model_matrix);
+
 			for (auto off = metrics.position_offset; off + 1 < size; off += stride)
 			{
-				auto [x, y] = (Matrix3::Transformation(model_matrix) * Vector2{data[off + 0], data[off + 1]}).XY();
+				auto [x, y] = (model_matrix3 * Vector2{data[off + 0], data[off + 1]}).XY();
 				data[off + 0] = x;
 				data[off + 1] = y;
 			}
@@ -305,7 +307,9 @@ void RenderPrimitive::UpdateWorldVertexData()
 	if (data_changed_ || model_matrix_changed_)
 	{
 		world_vertex_data_ = vertex_data_;
-		detail::transform_positions(vertex_metrics_, model_matrix_, world_vertex_data_);
+
+		if (vertex_space_ == VertexDataSpace::Local)
+			detail::transform_positions(vertex_metrics_, model_matrix_, world_vertex_data_);
 
 		data_changed_ = false;
 		world_data_changed_ = true;
@@ -332,8 +336,11 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 	{
 		auto z = detail::get_position_z(vertex_metrics_, vertex_data_);
 
+		if (vertex_space_ == VertexDataSpace::Local)
+			z = (model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z();
+
 		//Check if position z has changed for first vertex
-		if (z = (model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z(); world_z_ != z)
+		if (world_z_ != z)
 		{
 			world_z_ = z;
 			need_refresh_ |= world_visible_;
@@ -462,6 +469,16 @@ RenderPrimitive::~RenderPrimitive() noexcept
 	Modifiers
 */
 
+void RenderPrimitive::VertexSpace(VertexDataSpace space) noexcept
+{
+	if (vertex_space_ != space)
+	{
+		vertex_space_ = space;
+		data_changed_ = true;
+		world_data_changed_ = false; //Discard world changes
+	}
+}
+
 void RenderPrimitive::VertexData(VertexContainer data) noexcept
 {
 	if (!std::empty(vertex_data_) || !std::empty(data))
@@ -485,7 +502,7 @@ void RenderPrimitive::ModelMatrix(const Matrix4 &model_matrix) noexcept
 	if (std::memcmp(model_matrix_.M(), model_matrix.M(), 16 * sizeof(real)) != 0)
 	{
 		model_matrix_ = model_matrix;
-		model_matrix_changed_ = true;
+		model_matrix_changed_ = vertex_space_ == VertexDataSpace::Local;
 		ModelMatrixChanged();
 	}
 }

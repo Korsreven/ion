@@ -29,6 +29,12 @@ namespace ion::graphics::particles
 			Rectangle
 		};
 
+		enum class ParticleTransformSpace : bool
+		{
+			Local,
+			World
+		};
+
 		namespace detail
 		{
 		} //detail
@@ -44,8 +50,7 @@ namespace ion::graphics::particles
 		private:
 
 			particle_system::ParticlePrimitive particle_primitive_ = particle_system::ParticlePrimitive::Point;
-			bool inherit_node_rotation_ = true;
-			bool inherit_node_scaling_ = true;
+			particle_system::ParticleTransformSpace particle_transform_space_ = particle_system::ParticleTransformSpace::World;
 
 		public:
 
@@ -77,16 +82,10 @@ namespace ion::graphics::particles
 				particle_primitive_ = particle_primitive;
 			}
 
-			///@brief Sets whether or not this particle system should inherit node rotation
-			inline void InheritNodeRotation(bool inherit) noexcept
+			///@brief Sets the transform space of this particle system to the given value
+			inline void TransformSpace(particle_system::ParticleTransformSpace particle_transform_space) noexcept
 			{
-				inherit_node_rotation_ = inherit;
-			}
-
-			///@brief Sets whether or not this particle system should inherit node scaling
-			inline void InheritNodeScaling(bool inherit) noexcept
-			{
-				inherit_node_scaling_ = inherit;
+				particle_transform_space_ = particle_transform_space;
 			}
 
 			///@}
@@ -102,16 +101,10 @@ namespace ion::graphics::particles
 				return particle_primitive_;
 			}
 
-			///@brief Returns whether or not this particle system inherit node rotation
-			[[nodiscard]] inline auto InheritNodeRotation() const noexcept
+			///@brief Returns the transform space used by this particle system
+			[[nodiscard]] inline auto TransformSpace() const noexcept
 			{
-				return inherit_node_rotation_;
-			}
-
-			///@brief Returns whether or not this particle system inherit node scaling
-			[[nodiscard]] inline auto InheritNodeScaling() const noexcept
-			{
-				return inherit_node_scaling_;
+				return particle_transform_space_;
 			}
 
 			///@}
@@ -142,7 +135,7 @@ namespace ion::graphics::particles
 
 			///@brief Elapses particle system by the given time in seconds
 			///@details This function is typically called each frame, with the time in seconds since last frame
-			void Elapse(duration time) noexcept;
+			void Elapse(duration time, const emitter::EmitterTransform &transform = {}) noexcept;
 
 			///@}
 

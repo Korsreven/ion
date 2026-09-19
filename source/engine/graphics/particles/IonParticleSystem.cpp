@@ -46,8 +46,7 @@ ParticleSystem ParticleSystem::Clone() const
 {
 	auto particle_system = ParticleSystem{*name_};
 	particle_system.particle_primitive_ = particle_primitive_;
-	particle_system.inherit_node_rotation_ = inherit_node_rotation_;
-	particle_system.inherit_node_scaling_ = inherit_node_scaling_;
+	particle_system.particle_transform_space_ = particle_transform_space_;
 	
 	//Clone emitters
 	for (auto &emitter : Emitters())
@@ -94,12 +93,12 @@ void ParticleSystem::RestartAll() noexcept
 	Elapse time
 */
 
-void ParticleSystem::Elapse(duration time) noexcept
+void ParticleSystem::Elapse(duration time, const emitter::EmitterTransform &transform) noexcept
 {
 	//Elapse emitters
 	for (auto &emitter : Emitters())
 	{
-		emitter.Elapse(time);
+		emitter.Elapse(time, transform);
 
 		//Affect particles (in emitter)
 		for (auto &affector : Affectors())

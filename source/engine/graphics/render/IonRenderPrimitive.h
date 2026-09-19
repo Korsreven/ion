@@ -47,6 +47,12 @@ namespace ion::graphics::render
 
 	namespace render_primitive
 	{
+		enum class VertexDataSpace : bool
+		{
+			Local,
+			World
+		};
+
 		using VertexContainer = std::vector<real>;
 
 		namespace detail
@@ -91,6 +97,7 @@ namespace ion::graphics::render
 			vertex::VertexDeclaration vertex_declaration_;
 			render_primitive::detail::vertex_metrics vertex_metrics_;
 
+			render_primitive::VertexDataSpace vertex_space_ = render_primitive::VertexDataSpace::Local;
 			render_primitive::VertexContainer vertex_data_; //Local space
 			render_primitive::VertexContainer world_vertex_data_; //World space
 			Matrix4 model_matrix_;
@@ -192,6 +199,9 @@ namespace ion::graphics::render
 				@name Modifiers
 				@{
 			*/
+
+			///@brief Sets the vertex space of this render primitive to the given space
+			void VertexSpace(render_primitive::VertexDataSpace space) noexcept;
 
 			///@brief Sets the vertex data of this render primitive to the given data
 			void VertexData(render_primitive::VertexContainer data) noexcept;
