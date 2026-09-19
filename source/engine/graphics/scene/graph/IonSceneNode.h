@@ -78,8 +78,14 @@ namespace ion::graphics::scene::graph
 
 		namespace detail
 		{
+			struct attached_object final
+			{
+				AttachableObject object;
+				MovableObject *movable = nullptr;
+			};
+
 			using node_container = std::vector<SceneNode*>;
-			using object_container = std::vector<AttachableObject>;
+			using object_container = std::vector<attached_object>;
 			using camera_container = std::vector<Camera*>;
 			using light_container = std::vector<Light*>;
 
@@ -1130,12 +1136,8 @@ namespace ion::graphics::scene::graph
 			///@details Returns nullptr if movable object could not be found
 			[[nodiscard]] MovableObject* GetAttachedObject(int index) const noexcept;
 
-
 			///@brief Returns pointers to all attached movable objects with the given name or alias
 			[[nodiscard]] std::vector<MovableObject*> GetAttachedObjects(std::string_view name_or_alias) const noexcept;
-
-			///@brief Returns pointers to all attached movable objects
-			[[nodiscard]] std::vector<MovableObject*> GetAttachedObjects() const noexcept;
 
 
 			///@brief Gets a pointer to the first attached movable object with the given name or alias on this and all descendant nodes

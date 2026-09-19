@@ -72,7 +72,7 @@ namespace ion::graphics::scene::query
 				//Check if node is eligible
 				if (!only_visible || node.Visible())
 				{
-					for (auto &object : node.GetAttachedObjects())
+					for (auto &[_, object] : node.AttachedObjects())
 					{
 						//Check if object is eligible
 						if (is_object_eligible(*object, mask, type_mask, only_visible))

@@ -189,13 +189,11 @@ void SceneNode::NotifyUpdateZ() noexcept
 
 void SceneNode::NotifyReroot() noexcept
 {
-	for (auto &object : attached_objects_)
-		std::visit(
-			[&](auto &&object) noexcept
-			{
-				object->ParentNode(nullptr);
-				object->ParentNode(this);
-			}, object);
+	for (auto &[_, movable] : attached_objects_)
+	{
+		movable->ParentNode(nullptr);
+		movable->ParentNode(this);
+	}
 
 	for (auto &child_node : child_nodes_)
 		child_node->NotifyReroot(); //Recursive
@@ -322,7 +320,7 @@ void SceneNode::RemoveCameras(detail::camera_container &from_cameras, detail::ca
 
 void SceneNode::GatherCameras(detail::camera_container &cameras)
 {
-	for (auto &object : attached_objects_)
+	for (auto &[object, _] : attached_objects_)
 	{
 		if (auto camera = std::get_if<Camera*>(&object))
 			detail::add_object(cameras, *camera);
@@ -355,7 +353,7 @@ void SceneNode::RemoveLights(detail::light_container &from_lights, detail::light
 
 void SceneNode::GatherLights(detail::light_container &lights)
 {
-	for (auto &object : attached_objects_)
+	for (auto &[object, _] : attached_objects_)
 	{
 		if (auto light = std::get_if<Light*>(&object))
 			detail::add_object(lights, *light);
@@ -421,7 +419,7 @@ void SceneNode::DetachObjectFromNode(AttachableObject object, bool tidy) noexcep
 
 void SceneNode::DetachObjectsFromNode(detail::object_container &objects, bool tidy) noexcept
 {
-	for (auto &object : objects)
+	for (auto &[object, _] : objects)
 		DetachObjectFromNode(object, tidy);
 }
 
@@ -430,7 +428,7 @@ bool SceneNode::AttachObject(AttachableObject object)
 {
 	if (!std::visit([](auto &&object) noexcept { return object->ParentNode(); }, object))
 	{
-		attached_objects_.push_back(object);
+		attached_objects_.emplace_back(object, detail::get_movable_object(object));
 		AttachObjectToNode(object);
 		return true;
 	}
@@ -442,15 +440,16 @@ bool SceneNode::DetachObject(AttachableObject object) noexcept
 {
 	auto iter =
 		std::find_if(std::begin(attached_objects_), std::end(attached_objects_),
-			[&](auto &obj) noexcept
+			[&](auto &attached_object) noexcept
 			{
-				return detail::get_movable_object(obj) == detail::get_movable_object(object);
+				auto &[_, movable] = attached_object;
+				return movable == detail::get_movable_object(object);
 			});
 
 	//Object found
 	if (iter != std::end(attached_objects_))
 	{
-		DetachObjectFromNode(*iter);
+		DetachObjectFromNode(iter->object);
 		attached_objects_.erase(iter);
 		return true;
 	}
@@ -586,8 +585,8 @@ const Aabb& SceneNode::WorldAxisAlignedBoundingBox(bool derive, bool apply_exten
 		cached_world_aabb = {};
 
 		//Merge world AABBs
-		for (auto &object : attached_objects_)
-			cached_world_aabb.Merge(std::visit([&](auto &&object) noexcept { return object->WorldAxisAlignedBoundingBox(derive, apply_extent); }, object));
+		for (auto &[_, movable] : attached_objects_)
+			cached_world_aabb.Merge(movable->WorldAxisAlignedBoundingBox(derive, apply_extent));
 
 		for (auto &child_node : child_nodes_)
 			cached_world_aabb.Merge(child_node->WorldAxisAlignedBoundingBox(derive, apply_extent)); //Recursive
@@ -606,8 +605,8 @@ const Obb& SceneNode::WorldOrientedBoundingBox(bool derive, bool apply_extent) c
 		cached_aabb = {};
 
 		//Merge AABBs
-		for (auto &object : attached_objects_)
-			cached_aabb.Merge(std::visit([](auto &&object) noexcept { return object->AxisAlignedBoundingBox(); }, object));
+		for (auto &[_, movable] : attached_objects_)
+			cached_aabb.Merge(movable->AxisAlignedBoundingBox());
 
 		for (auto &child_node : child_nodes_)
 		{
@@ -631,8 +630,8 @@ const Sphere& SceneNode::WorldBoundingSphere(bool derive, bool apply_extent) con
 		cached_world_sphere = {};
 
 		//Merge world spheres
-		for (auto &object : attached_objects_)
-			cached_world_sphere.Merge(std::visit([&](auto &&object) noexcept { return object->WorldBoundingSphere(derive, apply_extent); }, object));
+		for (auto &[_, movable] : attached_objects_)
+			cached_world_sphere.Merge(movable->WorldBoundingSphere(derive, apply_extent));
 
 		for (auto &child_node : child_nodes_)
 			cached_world_sphere.Merge(child_node->WorldBoundingSphere(derive, apply_extent)); //Recursive
@@ -1124,7 +1123,7 @@ void SceneNode::DetachAllObjects() noexcept
 
 MovableObject* SceneNode::GetAttachedObject(std::string_view name_or_alias) const noexcept
 {
-	for (auto &object : AttachedObjects())
+	for (auto &[object, _] : AttachedObjects())
 	{
 		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)	
 			return movable_object;
@@ -1136,16 +1135,15 @@ MovableObject* SceneNode::GetAttachedObject(std::string_view name_or_alias) cons
 MovableObject* SceneNode::GetAttachedObject(int index) const noexcept
 {
 	return index < std::ssize(attached_objects_) ?
-		detail::get_movable_object(attached_objects_[index]) :
+		attached_objects_[index].movable :
 		nullptr;
 }
-
 
 std::vector<MovableObject*> SceneNode::GetAttachedObjects(std::string_view name_or_alias) const noexcept
 {
 	std::vector<MovableObject*> movable_objects;
 
-	for (auto &object : AttachedObjects())
+	for (auto &[object, _] : AttachedObjects())
 	{
 		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
 			movable_objects.push_back(movable_object);
@@ -1154,21 +1152,10 @@ std::vector<MovableObject*> SceneNode::GetAttachedObjects(std::string_view name_
 	return movable_objects;
 }
 
-std::vector<MovableObject*> SceneNode::GetAttachedObjects() const noexcept
-{
-	std::vector<MovableObject*> movable_objects;
-	movable_objects.reserve(std::size(AttachedObjects()));
-
-	for (auto &object : AttachedObjects())
-		movable_objects.push_back(detail::get_movable_object(object));
-
-	return movable_objects;
-}
-
 
 MovableObject* SceneNode::SearchAttachedObject(std::string_view name_or_alias, SearchStrategy strategy) const noexcept
 {
-	for (auto &object : AttachedObjects())
+	for (auto &[object, _] : AttachedObjects())
 	{
 		if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
 			return movable_object;
@@ -1176,7 +1163,7 @@ MovableObject* SceneNode::SearchAttachedObject(std::string_view name_or_alias, S
 
 	for (auto &node : detail::search(*this, strategy))
 	{
-		for (auto &object : node->AttachedObjects())
+		for (auto &[object, _] : node->AttachedObjects())
 		{
 			if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
 				return movable_object;
@@ -1192,7 +1179,7 @@ std::vector<MovableObject*> SceneNode::SearchAttachedObjects(std::string_view na
 
 	for (auto &node : detail::search(*this, strategy))
 	{
-		for (auto &object : node->AttachedObjects())
+		for (auto &[object, _] : node->AttachedObjects())
 		{
 			if (auto movable_object = detail::get_movable_object_if(object, name_or_alias); movable_object)
 				movable_objects.push_back(movable_object);
@@ -1204,12 +1191,15 @@ std::vector<MovableObject*> SceneNode::SearchAttachedObjects(std::string_view na
 
 std::vector<MovableObject*> SceneNode::GetAttachedObjectsRecursive(SearchStrategy strategy) const noexcept
 {
-	auto movable_objects = GetAttachedObjects();
+	std::vector<MovableObject*> movable_objects;
+
+	for (auto &[_, movable] : AttachedObjects())
+		movable_objects.push_back(movable);
 
 	for (auto &node : detail::search(*this, strategy))
 	{
-		for (auto &object : node->AttachedObjects())
-			movable_objects.push_back(detail::get_movable_object(object));
+		for (auto &[_, movable] : node->AttachedObjects())
+			movable_objects.push_back(movable);
 	}
 
 	return movable_objects;

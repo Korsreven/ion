@@ -473,7 +473,7 @@ void SceneGraph::Render(render::Viewport &viewport, duration time) noexcept
 			NotifyNodeRenderStarted(node);
 
 		//For each attached object
-		for (auto &object : node.GetAttachedObjects())
+		for (auto &[_, object] : node.AttachedObjects())
 		{
 			auto object_visible = node_visible && object->Visible();
 
