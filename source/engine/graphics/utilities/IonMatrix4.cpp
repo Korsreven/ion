@@ -300,8 +300,17 @@ real Matrix4::ToRotation() const noexcept
 
 Vector3 Matrix4::ToScaling() const noexcept
 {
-	//Same for both row and column-major
-	return {m_[0][0], m_[1][1], m_[2][2]};
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return {std::sqrt(m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1] + m_[0][2] * m_[0][2]),
+			std::sqrt(m_[1][0] * m_[1][0] + m_[1][1] * m_[1][1] + m_[1][2] * m_[1][2]),
+			std::sqrt(m_[2][0] * m_[2][0] + m_[2][1] * m_[2][1] + m_[2][2] * m_[2][2])};
+	#else
+	//Column-major layout (OpenGL)
+	return {std::sqrt(m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0] + m_[2][0] * m_[2][0]),
+			std::sqrt(m_[0][1] * m_[0][1] + m_[1][1] * m_[1][1] + m_[2][1] * m_[2][1]),
+			std::sqrt(m_[0][2] * m_[0][2] + m_[1][2] * m_[1][2] + m_[2][2] * m_[2][2])};
+	#endif
 }
 
 Vector3 Matrix4::ToShearing() const noexcept

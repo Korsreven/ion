@@ -185,8 +185,15 @@ real Matrix2::ToRotation() const noexcept
 
 Vector2 Matrix2::ToScaling() const noexcept
 {
-	//Same for both row and column-major
-	return {m_[0][0], m_[1][1]};
+	#ifdef ION_ROW_MAJOR
+	//Row-major layout (Direct3D)
+	return {std::sqrt(m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1]),
+			std::sqrt(m_[1][0] * m_[1][0] + m_[1][1] * m_[1][1])};
+	#else
+	//Column-major layout (OpenGL)
+	return {std::sqrt(m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0]),
+			std::sqrt(m_[0][1] * m_[0][1] + m_[1][1] * m_[1][1])};
+	#endif
 }
 
 Vector2 Matrix2::ToShearing() const noexcept
