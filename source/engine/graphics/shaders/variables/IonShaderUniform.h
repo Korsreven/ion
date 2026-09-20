@@ -124,14 +124,7 @@ namespace ion::graphics::shaders::variables
 			inline auto is_value_different(const glsl::uniform<T> &lhs, const glsl::uniform<T> &rhs) noexcept
 			{
 				auto count = lhs.Components() * lhs.Size();
-
-				for (auto i = 0; i < count; ++i)
-				{
-					if (lhs.Values()[i] != rhs.Values()[i])
-						return true;
-				}
-
-				return false;
+				return std::memcmp(lhs.Values(), rhs.Values(), count * sizeof(typename glsl::basic_type_t<T>)) != 0;
 			}
 		} //detail
 	} //uniform_variable
