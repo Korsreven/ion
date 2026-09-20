@@ -63,18 +63,19 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 	auto size = std::ssize(data);
 	auto stride = std::max(metrics.position_components, metrics.position_stride);
 
+	auto model_matrix2 = Matrix2::Transformation(model_matrix.ToRotation(), model_matrix.ToScaling());
+	auto [world_x, world_y, world_z] = model_matrix.ToTranslation().XYZ();
+
 	switch (metrics.position_components)
 	{
 		//Two-components (x, y)
 		case 2:
 		{
-			auto model_matrix3 = Matrix3::Transformation(model_matrix);
-
 			for (auto off = metrics.position_offset; off + 1 < size; off += stride)
 			{
-				auto [x, y] = (model_matrix3 * Vector2{data[off + 0], data[off + 1]}).XY();
-				data[off + 0] = x;
-				data[off + 1] = y;
+				auto [x, y] = (model_matrix2 * Vector2{data[off + 0], data[off + 1]}).XY();
+				data[off + 0] = x + world_x;
+				data[off + 1] = y + world_y;
 			}
 
 			break;
@@ -86,10 +87,10 @@ void transform_positions(const vertex_metrics &metrics, const Matrix4 &model_mat
 		{
 			for (auto off = metrics.position_offset; off + 2 < size; off += stride)
 			{
-				auto [x, y, z] = (model_matrix * Vector3{data[off + 0], data[off + 1], data[off + 2]}).XYZ();
-				data[off + 0] = x;
-				data[off + 1] = y;
-				data[off + 2] = z;
+				auto [x, y] = (model_matrix2 * Vector2{data[off + 0], data[off + 1]}).XY();
+				data[off + 0] = x + world_x;
+				data[off + 1] = y + world_y;
+				data[off + 2] += world_z;
 			}
 
 			break;
