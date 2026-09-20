@@ -301,13 +301,13 @@ namespace ion::graphics::utilities
 
 				#ifdef ION_ROW_MAJOR
 				//Row-major layout (Direct3D)
-				auto inv_w = 1.0_r / (m_[0][3] * x + m_[1][3] * y + m_[2][3], + m_[3][3]);
+				auto inv_w = 1.0_r / (m_[0][3] * x + m_[1][3] * y + m_[2][3] + m_[3][3]);
 				return Vector3{(m_[0][0] * x + m_[1][0] * y + m_[2][0] * z + m_[3][0]) * inv_w,
 							   (m_[0][1] * x + m_[1][1] * y + m_[2][1] * z + m_[3][1]) * inv_w,
 							   (m_[0][2] * x + m_[1][2] * y + m_[2][2] * z + m_[3][2]) * inv_w};
 				#else
 				//Column-major layout (OpenGL)
-				auto inv_w = 1.0_r / (m_[3][0] * x + m_[3][1] * y + m_[3][2], + m_[3][3]);
+				auto inv_w = 1.0_r / (m_[3][0] * x + m_[3][1] * y + m_[3][2] + m_[3][3]);
 				return Vector3{(m_[0][0] * x + m_[0][1] * y + m_[0][2] * z + m_[0][3]) * inv_w,
 							   (m_[1][0] * x + m_[1][1] * y + m_[1][2] * z + m_[1][3]) * inv_w,
 							   (m_[2][0] * x + m_[2][1] * y + m_[2][2] * z + m_[2][3]) * inv_w};
