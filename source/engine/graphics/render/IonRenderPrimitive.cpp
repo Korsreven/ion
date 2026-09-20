@@ -337,7 +337,7 @@ void RenderPrimitive::UpdateWorldZ() noexcept
 		auto z = detail::get_position_z(vertex_metrics_, vertex_data_);
 
 		if (vertex_space_ == VertexDataSpace::Local)
-			z = (model_matrix_ * Vector3{0.0_r, 0.0_r, z}).Z();
+			z += model_matrix_.ToTranslation().Z();
 
 		//Check if position z has changed for first vertex
 		if (world_z_ != z)
