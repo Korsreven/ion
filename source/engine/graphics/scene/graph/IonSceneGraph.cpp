@@ -124,7 +124,7 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 
 			if (position)
 				(*position)[i].Get<glsl::vec3>() =
-					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
+					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
 
 			if (direction)
 				(*direction)[i].Get<glsl::vec3>() =
@@ -169,13 +169,13 @@ void set_light_uniforms(const light_pointers &lights, OwningPtr<light::detail::l
 				(*quadratic)[i].Get<float>() = static_cast<float>(quadratic_attenuation); //Using 'real' could make this uniform double
 
 
-			auto [cutoff_angle, outer_cutoff_angle] = light->Cutoff();
+			auto [inner, outer] = light->Cutoff();
 
 			if (cutoff)
-				(*cutoff)[i].Get<float>() = static_cast<float>(math::Cos(cutoff_angle)); //Using 'real' could make this uniform double
+				(*cutoff)[i].Get<float>() = static_cast<float>(inner); //Using 'real' could make this uniform double
 
 			if (outer_cutoff)
-				(*outer_cutoff)[i].Get<float>() = static_cast<float>(math::Cos(outer_cutoff_angle)); //Using 'real' could make this uniform double
+				(*outer_cutoff)[i].Get<float>() = static_cast<float>(outer); //Using 'real' could make this uniform double
 
 
 			++i; //Increase light index
@@ -213,7 +213,7 @@ void set_emissive_light_uniforms(const light_pointers &lights, OwningPtr<light::
 
 			if (position)
 				(*position)[i].Get<glsl::vec3>() =
-					camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
+					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()); //View adjusted
 
 			if (radius)
 			{

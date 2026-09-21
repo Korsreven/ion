@@ -358,7 +358,7 @@ namespace ion::graphics::scene
 			}
 
 			///@brief Returns the direction of the light
-			///@details This value only applies for lights of type directional light
+			///@details This value only applies for lights of type directional and spot light
 			[[nodiscard]] inline auto& Direction() const noexcept
 			{
 				return direction_;
@@ -411,9 +411,16 @@ namespace ion::graphics::scene
 				return std::tuple{attenuation_constant_, attenuation_linear_, attenuation_quadratic_};
 			}
 
-			///@brief Returns the inner and outer cutoff angle (radians) of the light
+			///@brief Returns the inner and outer cutoff of the light
 			///@details These values only applies for lights of type spot light
 			[[nodiscard]] inline auto Cutoff() const noexcept
+			{
+				return std::pair{cutoff_, outer_cutoff_};
+			}
+
+			///@brief Returns the inner and outer cutoff angle (radians) of the light
+			///@details These values only applies for lights of type spot light
+			[[nodiscard]] inline auto CutoffAngle() const noexcept
 			{
 				return std::pair{light::detail::cutoff_to_angle(cutoff_),
 								 light::detail::cutoff_to_angle(outer_cutoff_)};

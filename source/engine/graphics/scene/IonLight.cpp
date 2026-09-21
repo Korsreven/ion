@@ -111,16 +111,21 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 
 		for (auto i = 0; auto &light : lights)
 		{
+			//Type
 			light_data[0] = static_cast<real>(light->Type());
 
+			//Position
+			if (light->Type() != light::LightType::Directional)
 			{
 				auto [x, y, z] =
-					(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
+					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()).XYZ(); //View adjusted
 				light_data[1] = x;
 				light_data[2] = y;
 				light_data[3] = z;
 			}
 
+			//Direction
+			if (light->Type() != light::LightType::Point)
 			{
 				auto [x, y, z] =
 					(light->Direction().Deviant(light->ParentNode()->DerivedRotation() -
@@ -130,9 +135,14 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[6] = z;
 			}
 
-			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-			light_data[7] = light->Radius() * std::max(sx, sy);
+			//Radius
+			if (light->Type() == light::LightType::Point)
+			{
+				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+				light_data[7] = light->Radius() * std::max(sx, sy);
+			}
 
+			//Ambient
 			{
 				auto [r, g, b, a] = light->AmbientColor().RGBA();
 				light_data[8] = r;
@@ -141,6 +151,7 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[11] = a * light->Intensity() * light->FadeIntensity();
 			}
 
+			//Diffuse
 			{
 				auto [r, g, b, a] = light->DiffuseColor().RGBA();
 				light_data[12] = r;
@@ -149,6 +160,7 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[15] = a * light->Intensity() * light->FadeIntensity();
 			}
 
+			//Specular
 			{
 				auto [r, g, b, a] = light->SpecularColor().RGBA();
 				light_data[16] = r;
@@ -157,15 +169,22 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 				light_data[19] = a * light->Intensity() * light->FadeIntensity();
 			}
 
-			auto [constant, linear, quadratic] = light->Attenuation();
-			light_data[20] = constant;
-			light_data[21] = linear;
-			light_data[22] = quadratic;
+			//Attenuation
+			if (light->Type() != light::LightType::Directional)
+			{
+				auto [constant, linear, quadratic] = light->Attenuation();
+				light_data[20] = constant;
+				light_data[21] = linear;
+				light_data[22] = quadratic;
+			}
 
-			auto [cutoff_angle, outer_cutoff_angle] = light->Cutoff();
-			light_data[24] = math::Cos(cutoff_angle);
-			light_data[25] = math::Cos(outer_cutoff_angle);
-
+			//Cutoff
+			if (light->Type() == light::LightType::Spot)
+			{
+				auto [inner, outer] = light->Cutoff();
+				light_data[24] = inner;
+				light_data[25] = outer;
+			}
 
 			//Light data has changed
 			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||
@@ -212,21 +231,29 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture
 
 		for (auto i = 0; auto &light : lights)
 		{
-			auto [x, y, z] =
-				(camera.ViewMatrix() * (light->Position() + light->ParentNode()->DerivedPosition())).XYZ(); //View adjusted
-			light_data[0] = x;
-			light_data[1] = y;
-			light_data[2] = z;
+			//Position
+			{
+				auto [x, y, z] =
+					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()).XYZ(); //View adjusted
+				light_data[0] = x;
+				light_data[1] = y;
+				light_data[2] = z;
+			}
 
-			auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-			light_data[3] = light->Radius() * std::max(sx, sy);
+			//Radius
+			{
+				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
+				light_data[3] = light->Radius() * std::max(sx, sy);
+			}
 
-			auto [r, g, b, a] = light->DiffuseColor().RGBA();
-			light_data[4] = r;
-			light_data[5] = g;
-			light_data[6] = b;
-			light_data[7] = a * light->Intensity() * light->FadeIntensity();
-
+			//Color
+			{
+				auto [r, g, b, a] = light->DiffuseColor().RGBA();
+				light_data[4] = r;
+				light_data[5] = g;
+				light_data[6] = b;
+				light_data[7] = a * light->Intensity() * light->FadeIntensity();
+			}
 
 			//Light data has changed
 			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||

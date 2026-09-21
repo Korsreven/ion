@@ -609,7 +609,7 @@ void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, du
 						{
 							for (auto &light : targets)
 							{
-								auto [inner_angle, outer_angle] = light->Cutoff();
+								auto [inner_angle, outer_angle] = light->CutoffAngle();
 								light->Cutoff(inner_angle + math::ToRadians(delta), outer_angle);
 							}
 
@@ -620,7 +620,7 @@ void elapse_motion(NodeAnimation &animation, fading_motion &m, duration time, du
 						{
 							for (auto &light : targets)
 							{
-								auto [inner_angle, outer_angle] = light->Cutoff();
+								auto [inner_angle, outer_angle] = light->CutoffAngle();
 								light->Cutoff(inner_angle, outer_angle + math::ToRadians(delta));
 							}
 
