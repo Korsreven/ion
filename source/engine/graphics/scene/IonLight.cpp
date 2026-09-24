@@ -31,17 +31,6 @@ using namespace utilities;
 namespace light::detail
 {
 
-light_texture_storage::light_texture_storage(const light_texture_data &texture_data) noexcept
-{
-	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
-}
-
-light_texture_storage::light_texture_storage(const emissive_light_texture_data &texture_data) noexcept
-{
-	std::copy(std::begin(texture_data), std::end(texture_data), std::begin(data));
-}
-
-
 std::optional<light_texture> create_texture(int width, int depth) noexcept
 {
 	if (!textures::texture_manager::detail::has_support_for_array_texture())
@@ -105,97 +94,21 @@ void upload_light_data(OwningPtr<light_texture> &texture, light_texture_map &tex
 	if (texture && texture->handle)
 	{
 		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
-
-		light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture->handle->Id);
 
 		for (auto i = 0; auto &light : lights)
 		{
-			//Type
-			light_data[0] = static_cast<real>(light->Type());
-
-			//Position
-			if (light->Type() != light::LightType::Directional)
-			{
-				auto [x, y, z] =
-					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()).XYZ(); //View adjusted
-				light_data[1] = x;
-				light_data[2] = y;
-				light_data[3] = z;
-			}
-
-			//Direction
-			if (light->Type() != light::LightType::Point)
-			{
-				auto [x, y, z] =
-					(light->Direction().Deviant(light->ParentNode()->DerivedRotation() -
-					(camera.Rotation() + camera.ParentNode()->DerivedRotation()))).XYZ(); //View adjusted
-				light_data[4] = x;
-				light_data[5] = y;
-				light_data[6] = z;
-			}
-
-			//Radius
-			if (light->Type() == light::LightType::Point)
-			{
-				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-				light_data[7] = light->Radius() * std::max(sx, sy);
-			}
-
-			//Ambient
-			{
-				auto [r, g, b, a] = light->AmbientColor().RGBA();
-				light_data[8] = r;
-				light_data[9] = g;
-				light_data[10] = b;
-				light_data[11] = a * light->Intensity() * light->FadeIntensity();
-			}
-
-			//Diffuse
-			{
-				auto [r, g, b, a] = light->DiffuseColor().RGBA();
-				light_data[12] = r;
-				light_data[13] = g;
-				light_data[14] = b;
-				light_data[15] = a * light->Intensity() * light->FadeIntensity();
-			}
-
-			//Specular
-			{
-				auto [r, g, b, a] = light->SpecularColor().RGBA();
-				light_data[16] = r;
-				light_data[17] = g;
-				light_data[18] = b;
-				light_data[19] = a * light->Intensity() * light->FadeIntensity();
-			}
-
-			//Attenuation
-			if (light->Type() != light::LightType::Directional)
-			{
-				auto [constant, linear, quadratic] = light->Attenuation();
-				light_data[20] = constant;
-				light_data[21] = linear;
-				light_data[22] = quadratic;
-			}
-
-			//Cutoff
-			if (light->Type() == light::LightType::Spot)
-			{
-				auto [inner, outer] = light->Cutoff();
-				light_data[24] = inner;
-				light_data[25] = outer;
-			}
+			light->ViewAdjust(camera);
 
 			//Light data has changed
-			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||
-				std::memcmp(std::data(light->TextureData().data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto iter = texture_map.find(i); iter == std::end(texture_map) ||
+				iter->second != light || light->IsDirty())
 			{
 				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
-					GL_RGBA, type, std::data(light_data));
+					GL_RGBA, type, &light->Data());
 
-				light->TextureData(light_data);
 				texture_map[i] = light;
 			}
 
@@ -225,46 +138,21 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture
 	if (texture && texture->handle)
 	{
 		constexpr auto type = std::is_same_v<real, float> ? GL_FLOAT : GL_DOUBLE;
-
-		emissive_light_texture_data light_data{};
 		glBindTexture(GL_TEXTURE_1D_ARRAY, texture->handle->Id);
 
 		for (auto i = 0; auto &light : lights)
 		{
-			//Position
-			{
-				auto [x, y, z] =
-					camera.ViewMatrix().TransformPoint(light->Position() + light->ParentNode()->DerivedPosition()).XYZ(); //View adjusted
-				light_data[0] = x;
-				light_data[1] = y;
-				light_data[2] = z;
-			}
-
-			//Radius
-			{
-				auto [sx, sy] = light->ParentNode()->DerivedScaling().XY();
-				light_data[3] = light->Radius() * std::max(sx, sy);
-			}
-
-			//Color
-			{
-				auto [r, g, b, a] = light->DiffuseColor().RGBA();
-				light_data[4] = r;
-				light_data[5] = g;
-				light_data[6] = b;
-				light_data[7] = a * light->Intensity() * light->FadeIntensity();
-			}
+			light->ViewAdjust(camera);
 
 			//Light data has changed
-			if (auto iter = texture_map.find(i); iter == std::end(texture_map) || iter->second != light ||
-				std::memcmp(std::data(light->TextureData().data), std::data(light_data), std::size(light_data) * sizeof(real)) != 0)
+			if (auto iter = texture_map.find(i); iter == std::end(texture_map) ||
+				iter->second != light || light->IsDirty())
 			{
 				//Upload light data to gl texture
 				glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0,
 					0, i, texture->width, 1,
-					GL_RGBA, type, std::data(light_data));
+					GL_RGBA, type, &light->EmissiveData());
 
-				light->TextureData(light_data);
 				texture_map[i] = light;
 			}
 
@@ -282,8 +170,8 @@ void upload_emissive_light_data(OwningPtr<light_texture> &texture, light_texture
 
 void Light::PrepareBoundingVolumes() noexcept
 {
-	if (type_ == LightType::Point && radius_ > 0.0_r)
-		aabb_ = Aabb::Size(radius_ * 2.0_r, position_);
+	if (data_.type == LightType::Point && data_.radius > 0.0_r)
+		aabb_ = Aabb::Size(data_.radius * 2.0_r, data_.position);
 	else
 		aabb_ = {};
 
@@ -323,21 +211,40 @@ Light::Light(std::optional<std::string> name, LightType type,
 
 	MovableObject{std::move(name), visible},
 
-	type_{type},
 	position_{position},
 	direction_{direction},
 	radius_{radius},
 
-	ambient_color_{ambient},
-	diffuse_color_{diffuse},
-	specular_color_{specular},
+	ambient_alpha_{ambient.A()},
+	diffuse_alpha_{diffuse.A()},
+	specular_alpha_{specular.A()},
 
-	attenuation_constant_{attenuation_constant},
-	attenuation_linear_{attenuation_linear},
-	attenuation_quadratic_{attenuation_quadratic},
-	
-	cutoff_{detail::angle_to_cutoff(cutoff_angle)},
-	outer_cutoff_{detail::angle_to_cutoff(outer_cutoff_angle)}
+	data_
+	{
+		type,
+		position,
+		direction,
+		radius,
+
+		ambient,
+		diffuse,
+		specular,
+
+		attenuation_constant,
+		attenuation_linear,
+		attenuation_quadratic,
+		{},
+
+		detail::angle_to_cutoff(cutoff_angle),
+		detail::angle_to_cutoff(outer_cutoff_angle)
+	},
+
+	emissive_data_
+	{
+		position,
+		radius,
+		diffuse
+	}
 {
 	query_type_flags_ |= query::scene_query::QueryType::Light;
 }
@@ -430,6 +337,56 @@ Light Light::Spot(std::optional<std::string> name,
 			ambient, diffuse, specular,
 			attenuation_constant, attenuation_linear, attenuation_quadratic,
 			cutoff_angle, outer_cutoff_angle, visible};
+}
+
+
+/*
+	Modifiers
+*/
+
+void Light::ViewAdjust(const Camera &camera)
+{
+	if (auto parent_node = ParentNode(), camera_node = camera.ParentNode();
+		parent_node && camera_node)
+	{
+		//Position
+		if (data_.type != LightType::Directional)
+		{
+			auto adjusted_position = camera.ViewMatrix().
+				TransformPoint(position_ + parent_node->DerivedPosition());
+
+			if (data_.position != adjusted_position)
+			{
+				data_.position = emissive_data_.position = adjusted_position;
+				dirty_ = true;
+			}
+		}
+
+		//Direction
+		if (data_.type != LightType::Point)
+		{
+			auto adjusted_direction = direction_.Deviant(parent_node->DerivedRotation() -
+				(camera.Rotation() + camera_node->DerivedRotation()));
+
+			if (data_.direction != adjusted_direction)
+			{
+				data_.direction = adjusted_direction;
+				dirty_ = true;
+			}
+		}
+
+		//Radius
+		if (data_.type == LightType::Point)
+		{
+			auto adjusted_radius = radius_ * parent_node->DerivedScaling().Max();
+
+			if (data_.radius != adjusted_radius)
+			{
+				data_.radius = emissive_data_.radius = adjusted_radius;
+				dirty_ = true;
+			}
+		}
+	}
 }
 
 

@@ -14,6 +14,7 @@ File:	IonLight.h
 #define ION_LIGHT_H
 
 #include <array>
+#include <bit>
 #include <cmath>
 #include <optional>
 #include <string>
@@ -50,51 +51,26 @@ namespace ion::graphics::scene
 
 	namespace light
 	{
-		enum class LightType
+		enum class LightType : uint32
 		{
-			Point,
-			Directional,
-			Spot
+			Point		= std::bit_cast<uint32>(0.0_r),
+			Directional = std::bit_cast<uint32>(1.0_r),
+			Spot		= std::bit_cast<uint32>(2.0_r)
 		};
 
 		namespace detail
 		{
-			using light_pointers = std::vector<Light*>;	
-
-			constexpr auto light_float_components = 25;
+			constexpr auto light_float_components = 25 + 1;
 			constexpr auto emissive_light_float_components = 8;
 			constexpr auto min_texture_depth = 8;
-
-			constexpr auto default_cutoff_angle = math::ToRadians(45.0_r);
-			constexpr auto default_outer_cutoff_angle = math::ToRadians(55.0_r);
-
+			
 			constexpr auto light_texture_width =
 				std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(light_float_components)), 4) / 4;
 			constexpr auto emissive_light_texture_width =
 				std::max(static_cast<int>(textures::texture_manager::detail::upper_power_of_two(emissive_light_float_components)), 4) / 4;
 
-			
-			struct light_texture
-			{
-				std::optional<textures::texture::TextureHandle> handle;
-				int width = 0;
-				int depth = 0;
-			};
-
-			using light_texture_data = std::array<real, light_texture_width * 4>; //RGBA
-			using emissive_light_texture_data = std::array<real, emissive_light_texture_width * 4>; //RGBA
-
-			struct light_texture_storage
-			{
-				light_texture_data data{};
-					//Enough space to store light or emissive light data
-
-				light_texture_storage() = default;
-				light_texture_storage(const light_texture_data &texture_data) noexcept;
-				light_texture_storage(const emissive_light_texture_data &texture_data) noexcept;
-			};
-
-			using light_texture_map = adaptors::FlatMap<int, Light*>;
+			constexpr auto default_cutoff_angle = math::ToRadians(45.0_r);
+			constexpr auto default_outer_cutoff_angle = math::ToRadians(55.0_r);
 
 
 			inline auto angle_to_cutoff(real angle) noexcept
@@ -106,6 +82,48 @@ namespace ion::graphics::scene
 			{
 				return std::acos(cutoff);
 			}
+
+
+			struct light_render_data
+			{
+				static_assert(sizeof(light::LightType) == sizeof(real));
+
+				light::LightType type = light::LightType::Point;
+				Vector3 position;
+				Vector3 direction;
+				real radius = 0.0_r;
+
+				Color ambient_color = color::White;
+				Color diffuse_color = color::White;
+				Color specular_color = color::DarkGray;
+
+				real attenuation_constant = 1.0_r;
+				real attenuation_linear = 0.0_r;
+				real attenuation_quadratic = 0.0_r;
+				real _padding{};
+
+				real cutoff = angle_to_cutoff(default_cutoff_angle);
+				real outer_cutoff = angle_to_cutoff(default_outer_cutoff_angle);
+				real _tail_padding[light_texture_width * 4 - light_float_components]{};
+			};
+
+			struct emissive_light_render_data
+			{
+				Vector3 position;
+				real radius = 0.0_r;
+				Color diffuse_color = color::White;
+			};
+
+
+			struct light_texture
+			{
+				std::optional<textures::texture::TextureHandle> handle;
+				int width = 0;
+				int depth = 0;
+			};
+
+			using light_texture_map = adaptors::FlatMap<int, Light*>;
+			using light_pointers = std::vector<Light*>;
 
 
 			std::optional<light_texture> create_texture(int width, int depth) noexcept;
@@ -126,27 +144,22 @@ namespace ion::graphics::scene
 	{
 		private:
 
-			light::LightType type_ = light::LightType::Point;
 			Vector3 position_;
 			Vector3 direction_;
 			real radius_ = 0.0_r;
 
-			Color ambient_color_ = color::White;
-			Color diffuse_color_ = color::White;
-			Color specular_color_ = color::DarkGray;
+			real ambient_alpha_ = 1.0_r;
+			real diffuse_alpha_ = 1.0_r;
+			real specular_alpha_ = 1.0_r;
 			real intensity_ = 1.0_r;
 			real fade_intensity_ = 1.0_r;
 
-			real attenuation_constant_ = 1.0_r;
-			real attenuation_linear_ = 0.0_r;
-			real attenuation_quadratic_ = 0.0_r;
+			light::detail::light_render_data data_;
+			light::detail::emissive_light_render_data emissive_data_;
 			
-			real cutoff_ = light::detail::angle_to_cutoff(light::detail::default_cutoff_angle);
-			real outer_cutoff_ = light::detail::angle_to_cutoff(light::detail::default_outer_cutoff_angle);
-
 			bool cast_shadows_ = true;
 			bool update_bounding_volumes_ = true;
-			light::detail::light_texture_storage texture_data_;
+			bool dirty_ = true;
 
 
 			void PrepareBoundingVolumes() noexcept;
@@ -229,10 +242,11 @@ namespace ion::graphics::scene
 			///@brief Sets the type of light given off by this light source to the given type
 			inline void Type(light::LightType type) noexcept
 			{
-				if (type_ != type)
+				if (data_.type != type)
 				{
-					type_ = type;
+					data_.type = type;
 					update_bounding_volumes_ = true;
+					dirty_ = true;
 				}
 			}
 
@@ -240,21 +254,29 @@ namespace ion::graphics::scene
 			///@details This value only applies for lights of type point and spot light
 			inline void Position(const Vector3 &position) noexcept
 			{
-				position_ = position;
+				if (position_ != position)
+				{
+					position_ = data_.position = emissive_data_.position = position;
+					dirty_ = true;
+				}
 			}
 
 			///@brief Sets the position of the light to the given position
 			///@details This value only applies for lights of type point and spot light
 			inline void Position(const Vector2 &position) noexcept
 			{
-				Position({position.X(), position.Y(), position_.Z()});
+				Position({position.X(), position.Y(), data_.position.Z()});
 			}
 
 			///@brief Sets the direction of the light to the given direction
 			///@details This value only applies for lights of type directional light
 			inline void Direction(const Vector3 &direction) noexcept
 			{
-				direction_ = direction;
+				if (direction_ != direction)
+				{
+					direction_ = data_.direction = direction;
+					dirty_ = true;
+				}
 			}
 
 			///@brief Sets the radius of the light to the given value
@@ -264,8 +286,9 @@ namespace ion::graphics::scene
 			{
 				if (radius_ != radius)
 				{
-					radius_ = radius;
+					radius_ = data_.radius = emissive_data_.radius = radius;
 					update_bounding_volumes_ = true;
+					dirty_ = true;
 				}
 			}
 
@@ -273,29 +296,52 @@ namespace ion::graphics::scene
 			///@brief Sets the color of the ambient light given off by this light source to the given color
 			inline void AmbientColor(const Color &ambient) noexcept
 			{
-				ambient_color_ = ambient;
+				if (data_.ambient_color != ambient)
+				{
+					data_.ambient_color = ambient;
+					ambient_alpha_ = ambient.A();
+					dirty_ = true;
+				}
 			}
 			
 			///@brief Sets the color of the diffuse light given off by this light source to the given color
 			///@details Also sets the ambient color if equal to the diffuse color
 			inline void DiffuseColor(const Color &diffuse) noexcept
 			{
-				if (diffuse_color_ == ambient_color_)
-					ambient_color_ = diffuse;
+				if (data_.diffuse_color != diffuse)
+				{
+					if (data_.diffuse_color == data_.ambient_color)
+						AmbientColor(diffuse);
 
-				diffuse_color_ = diffuse;
+					data_.diffuse_color = emissive_data_.diffuse_color = diffuse;
+					diffuse_alpha_ = diffuse.A();
+					dirty_ = true;
+				}
 			}
 			
 			///@brief Sets the color of the specular light given off by this light source to the given color
 			inline void SpecularColor(const Color &specular) noexcept
 			{
-				specular_color_ = specular;
+				if (data_.specular_color != specular)
+				{
+					data_.specular_color = specular;
+					specular_alpha_ = specular.A();
+					dirty_ = true;
+				}
 			}
 
 			///@brief Sets the intensity of the light given off by this light source to the given value
 			inline void Intensity(real intensity) noexcept
 			{
-				intensity_ = intensity;
+				if (intensity_ != intensity)
+				{
+					intensity_ = intensity;
+					data_.ambient_color.A(ambient_alpha_ * intensity * fade_intensity_);
+					data_.diffuse_color.A(diffuse_alpha_ * intensity * fade_intensity_);
+					data_.specular_color.A(specular_alpha_ * intensity * fade_intensity_);
+					emissive_data_.diffuse_color.A(data_.diffuse_color.A());
+					dirty_ = true;
+				}
 			}
 
 			///@brief Sets the fade intensity of the light given off by this light source to the given value
@@ -303,7 +349,15 @@ namespace ion::graphics::scene
 			///To set a custom user intensity, consider calling Light::Intensity instead
 			inline void FadeIntensity(real intensity) noexcept
 			{
-				fade_intensity_ = intensity;
+				if (fade_intensity_ != intensity)
+				{
+					fade_intensity_ = intensity;
+					data_.ambient_color.A(ambient_alpha_ * intensity_ * intensity);
+					data_.diffuse_color.A(diffuse_alpha_ * intensity_ * intensity);
+					data_.specular_color.A(specular_alpha_ * intensity_ * intensity);
+					emissive_data_.diffuse_color.A(data_.diffuse_color.A());
+					dirty_ = true;
+				}
 			}
 
 
@@ -311,17 +365,30 @@ namespace ion::graphics::scene
 			///@details These values only applies for lights of type point and spot light
 			inline void Attenuation(real constant, real linear, real quadratic) noexcept
 			{
-				attenuation_constant_ = constant;
-				attenuation_linear_ = linear;
-				attenuation_quadratic_ = quadratic;
+				if (data_.attenuation_constant != constant ||
+					data_.attenuation_linear != linear ||
+					data_.attenuation_quadratic != quadratic)
+				{
+					data_.attenuation_constant = constant;
+					data_.attenuation_linear = linear;
+					data_.attenuation_quadratic = quadratic;
+					dirty_ = true;
+				}
 			}
 
 			///@brief Sets the inner and outer cutoff values of the light to the given angles (radians)
 			///@details These values only applies for lights of type spot light
 			inline void Cutoff(real inner_angle, real outer_angle) noexcept
 			{
-				cutoff_ = light::detail::angle_to_cutoff(inner_angle);
-				outer_cutoff_ = light::detail::angle_to_cutoff(outer_angle);
+				if (auto cutoff = light::detail::angle_to_cutoff(inner_angle),
+					outer_cutoff = light::detail::angle_to_cutoff(outer_angle);
+					data_.cutoff != cutoff ||
+					data_.outer_cutoff != outer_cutoff)
+				{
+					data_.cutoff = cutoff;
+					data_.outer_cutoff = outer_cutoff;
+					dirty_ = true;
+				}
 			}
 
 
@@ -331,11 +398,10 @@ namespace ion::graphics::scene
 				cast_shadows_ = enabled;
 			}
 
-			///@brief Sets the texture data of this light to the given texture data
-			inline void TextureData(const light::detail::light_texture_storage &texture_data) noexcept
-			{
-				texture_data_ = texture_data;
-			}
+
+			///@brief View adjust this light for the given camera
+			///@details This function is typically called before uploading data
+			void ViewAdjust(const Camera &camera);
 
 			///@}
 
@@ -347,7 +413,7 @@ namespace ion::graphics::scene
 			///@brief Returns the type of light given off by this light source 
 			[[nodiscard]] inline auto Type() const noexcept
 			{
-				return type_;
+				return data_.type;
 			}
 
 			///@brief Returns the position of the light
@@ -376,19 +442,19 @@ namespace ion::graphics::scene
 			///@brief Returns the color of the ambient light given off by this light source
 			[[nodiscard]] inline auto& AmbientColor() const noexcept
 			{
-				return ambient_color_;
+				return data_.ambient_color;
 			}
 			
 			///@brief Returns the color of the diffuse light given off by this light source
 			[[nodiscard]] inline auto& DiffuseColor() const noexcept
 			{
-				return diffuse_color_;
+				return data_.diffuse_color;
 			}
 			
 			///@brief Returns the color of the specular light given off by this light source
 			[[nodiscard]] inline auto& SpecularColor() const noexcept
 			{
-				return specular_color_;
+				return data_.specular_color;
 			}
 
 			///@brief Returns the intensity of the light given off by this light source
@@ -408,22 +474,35 @@ namespace ion::graphics::scene
 			///@details These values only applies for lights of type point and spot light
 			[[nodiscard]] inline auto Attenuation() const noexcept
 			{
-				return std::tuple{attenuation_constant_, attenuation_linear_, attenuation_quadratic_};
+				return std::tuple{data_.attenuation_constant, data_.attenuation_linear, data_.attenuation_quadratic};
 			}
 
 			///@brief Returns the inner and outer cutoff of the light
 			///@details These values only applies for lights of type spot light
 			[[nodiscard]] inline auto Cutoff() const noexcept
 			{
-				return std::pair{cutoff_, outer_cutoff_};
+				return std::pair{data_.cutoff, data_.outer_cutoff};
 			}
 
 			///@brief Returns the inner and outer cutoff angle (radians) of the light
 			///@details These values only applies for lights of type spot light
 			[[nodiscard]] inline auto CutoffAngle() const noexcept
 			{
-				return std::pair{light::detail::cutoff_to_angle(cutoff_),
-								 light::detail::cutoff_to_angle(outer_cutoff_)};
+				return std::pair{light::detail::cutoff_to_angle(data_.cutoff),
+								 light::detail::cutoff_to_angle(data_.outer_cutoff)};
+			}
+
+
+			///@brief Returns the data for this light
+			[[nodiscard]] inline auto& Data() const noexcept
+			{
+				return data_;
+			}
+
+			///@brief Returns the emissive data for this light
+			[[nodiscard]] inline auto& EmissiveData() const noexcept
+			{
+				return emissive_data_;
 			}
 
 
@@ -433,10 +512,17 @@ namespace ion::graphics::scene
 				return cast_shadows_;
 			}
 
-			///@brief Returns the texture data of this light
-			[[nodiscard]] inline auto& TextureData() const noexcept
+			///@brief Returns true if this light is dirty
+			///@details Resets dirty flag when accessed
+			[[nodiscard]] inline auto IsDirty() noexcept
 			{
-				return texture_data_;
+				return std::exchange(dirty_, false);
+			}
+
+			///@brief Returns true if this light is dirty
+			[[nodiscard]] inline auto IsDirty() const noexcept
+			{
+				return dirty_;
 			}
 
 			///@}
