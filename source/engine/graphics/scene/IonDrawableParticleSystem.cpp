@@ -266,8 +266,8 @@ void DrawableParticleSystem::Elapse(duration time) noexcept
 				{
 					particles::emitter::EmitterTransform transform;
 					transform.Position = parent_node->DerivedPosition();
-					transform.Rotation = parent_node->DerivedRotation();
-					transform.Scaling = parent_node->DerivedScaling();
+					transform.Rotation = particle_system_->InheritNodeRotation() ? parent_node->DerivedRotation() : 0.0_r;
+					transform.Scaling = particle_system_->InheritNodeScaling() ? parent_node->DerivedScaling() : vector2::UnitScale;
 
 					particle_system_->Elapse(time, transform);
 				}

@@ -51,6 +51,8 @@ namespace ion::graphics::particles
 
 			particle_system::ParticlePrimitive particle_primitive_ = particle_system::ParticlePrimitive::Point;
 			particle_system::ParticleTransformSpace particle_transform_space_ = particle_system::ParticleTransformSpace::World;
+			bool inherit_node_rotation_ = true;
+			bool inherit_node_scaling_ = true;
 
 		public:
 
@@ -88,6 +90,20 @@ namespace ion::graphics::particles
 				particle_transform_space_ = particle_transform_space;
 			}
 
+			///@brief Sets whether or not this particle system should inherit node rotation
+			///@details Only for world transform space
+			inline void InheritNodeRotation(bool inherit) noexcept
+			{
+				inherit_node_rotation_ = inherit;
+			}
+
+			///@brief Sets whether or not this particle system should inherit node scaling
+			///@details Only for world transform space
+			inline void InheritNodeScaling(bool inherit) noexcept
+			{
+				inherit_node_scaling_ = inherit;
+			}
+
 			///@}
 
 			/**
@@ -105,6 +121,20 @@ namespace ion::graphics::particles
 			[[nodiscard]] inline auto TransformSpace() const noexcept
 			{
 				return particle_transform_space_;
+			}
+
+			///@brief Returns whether or not this particle system inherit node rotation
+			///@details Only for world transform space
+			[[nodiscard]] inline auto InheritNodeRotation() const noexcept
+			{
+				return inherit_node_rotation_;
+			}
+
+			///@brief Returns whether or not this particle system inherit node scaling
+			///@details Only for world transform space
+			[[nodiscard]] inline auto InheritNodeScaling() const noexcept
+			{
+				return inherit_node_scaling_;
 			}
 
 			///@}
