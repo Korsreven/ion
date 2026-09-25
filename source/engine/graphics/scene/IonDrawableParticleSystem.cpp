@@ -163,10 +163,13 @@ void DrawableParticleSystem::UpdateBatches()
 	for (auto &batch : emitter_batches_)
 		batch.second.clear(); //Keep batch capacity
 
-	for (auto &emitter : particle_system_->Emitters())
+	if (particle_system_)
 	{
-		if (emitter.HasActiveParticles())
-			emitter_batches_[{emitter.Position().Z(), emitter.ParticleMaterial().get()}].push_back(&emitter);
+		for (auto &emitter : particle_system_->Emitters())
+		{
+			if (emitter.HasActiveParticles())
+				emitter_batches_[{emitter.Position().Z(), emitter.ParticleMaterial().get()}].push_back(&emitter);
+		}
 	}
 
 	//Remove unused batches
