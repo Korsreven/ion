@@ -40,8 +40,8 @@ mesh::Vertices rectangle_vertices(const Vector3 &position, real rotation, const 
 Aabb rectangle_aabb(const Vector3 &position, real rotation, const Vector2 &size)
 {
 	auto [x, y, _] = position.XYZ();
-	auto aabb = Aabb::Size(size, {x, y});
-	return rotation != 0.0_r ? aabb.RotateCopy(rotation) : aabb;	
+	auto aabb = Aabb::Size(size.AbsCopy(), {x, y});
+	return rotation != 0.0_r ? aabb.RotateCopy(rotation) : aabb;
 }
 
 } //rectangle::detail

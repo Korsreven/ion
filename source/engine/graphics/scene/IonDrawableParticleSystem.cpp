@@ -80,7 +80,7 @@ std::tuple<Aabb, Obb, Sphere> generate_bounding_volumes(const particles::Particl
 
 			case particles::emitter::EmitterType::Box:
 			case particles::emitter::EmitterType::Ring:
-			aabb.Merge(Aabb::Size(emitter.Size(), emitter.Position()));
+			aabb.Merge(Aabb::Size(emitter.Size().AbsCopy(), emitter.Position()));
 			break;
 		}
 	}

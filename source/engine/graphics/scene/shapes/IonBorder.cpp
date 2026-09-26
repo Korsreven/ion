@@ -32,7 +32,7 @@ mesh::Vertices border_vertices(
 	const std::optional<Color> &top_left_corner_color, const std::optional<Color> &top_right_corner_color,
 	const std::optional<Color> &bottom_left_corner_color, const std::optional<Color> &bottom_right_corner_color)
 {
-	auto [half_width, half_height] = (size * 0.5_r).XY();
+	auto [half_width, half_height] = (size * 0.5_r).AbsCopy().XY();
 	auto [border_width, border_height] = border_size.XY();
 
 	auto v1 = position + Vector2{-half_width, half_height};
@@ -257,7 +257,10 @@ mesh::Vertices border_vertices(
 Aabb border_aabb(const Vector3 &position, real rotation, const Vector2 &size, const Vector2 &border_size)
 {
 	auto [x, y, _] = position.XYZ();
-	auto aabb = Aabb::Size(size + border_size * 2.0_r, {x, y});
+	auto [half_width, half_height] = (size * 0.5_r).AbsCopy().XY(); //Normalized
+	auto [border_width, border_height] = border_size.XY();
+	auto aabb = Aabb::Size({std::max(half_width, std::abs(half_width + border_width)) * 2.0_r,
+							std::max(half_height, std::abs(half_height + border_height)) * 2.0_r}, {x, y});
 	return rotation != 0.0_r ? aabb.RotateCopy(rotation) : aabb;
 }
 
