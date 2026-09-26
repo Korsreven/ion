@@ -23,6 +23,16 @@ namespace emitter::detail
 } //emitter::detail
 
 
+//Private
+
+void Emitter::UpdateParticleQuotaLimit() noexcept
+{
+	particle_quota_limit_ = static_cast<int>(std::ceil(emission_rate_ * particle_lifetime_.second.count()));
+}
+
+
+//Public
+
 Emitter::Emitter(std::string name) noexcept :
 	managed::ManagedObject<EmitterManager>{std::move(name)}
 {

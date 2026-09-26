@@ -196,6 +196,9 @@ namespace ion::graphics::particles
 			std::pair<duration, duration> particle_lifetime_;
 			NonOwningPtr<materials::Material> particle_material_;
 
+
+			void UpdateParticleQuotaLimit() noexcept;
+
 		public:
 
 			///@brief Constructs a new emitter with the given name
@@ -287,7 +290,7 @@ namespace ion::graphics::particles
 			inline void EmissionRate(real rate) noexcept
 			{
 				emission_rate_ = rate;
-				particle_quota_limit_ = static_cast<int>(std::ceil(emission_rate_ * particle_lifetime_.second.count())); //Update
+				UpdateParticleQuotaLimit();
 			}
 
 			///@brief Sets the emission angle of the emitter to the given value in range [0.0, pi]
@@ -467,13 +470,14 @@ namespace ion::graphics::particles
 			inline void ParticleLifetime(duration lifetime) noexcept
 			{
 				particle_lifetime_ = std::pair(lifetime, lifetime);
+				UpdateParticleQuotaLimit();
 			}
 
 			///@brief Sets the lifetime range of each new particle to the given range
 			inline void ParticleLifetime(duration min_lifetime, duration max_lifetime) noexcept
 			{
 				particle_lifetime_ = std::minmax(min_lifetime, max_lifetime);
-				particle_quota_limit_ = static_cast<int>(std::ceil(emission_rate_ * particle_lifetime_.second.count())); //Update
+				UpdateParticleQuotaLimit();
 			}
 
 			///@brief Sets the material of each new particle to the given material
