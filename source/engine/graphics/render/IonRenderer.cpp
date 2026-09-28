@@ -243,30 +243,19 @@ detail::groupable_status Renderer::IsGroupable(const RenderPrimitive &primitive,
 
 void Renderer::RefreshPrimitives()
 {
-	//Collect all primitives in batches
+	//Refresh all primitives in batches
 	for (auto &batch : batches_)
 	{
 		for (auto &slot : batch->slots)
 		{
 			if (slot.primitive)
-				pending_primitives_.push_back(slot.primitive);
+				slot.primitive->Refresh();
 		}
 	}
 
-	//Collect all primitives just added
+	//Refresh all primitives just added
 	for (auto &primitive : added_primitives_)
-		pending_primitives_.push_back(primitive);
-
-	//Collect all hidden primitives
-	for (auto &primitive : hidden_primitives_)
-		pending_primitives_.push_back(primitive);
-
-
-	//Refresh all primitives
-	for (auto &primitive : pending_primitives_)
 		primitive->Refresh();
-	
-	pending_primitives_.clear();
 }
 
 void Renderer::GroupAddedPrimitives()

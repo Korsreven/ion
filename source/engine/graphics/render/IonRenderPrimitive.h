@@ -367,14 +367,7 @@ namespace ion::graphics::render
 			}
 
 			///@brief Sets whether or not this render primitive is visible in world space
-			inline void WorldVisible(bool visible) noexcept
-			{
-				if (world_visible_ != visible)
-				{
-					world_visible_ = visible;
-					need_refresh_ = true;
-				}
-			}
+			void WorldVisible(bool visible);
 
 			///@brief Sets the parent renderer of this render primitive to the given renderer
 			inline void ParentRenderer(Renderer *parent_renderer) noexcept

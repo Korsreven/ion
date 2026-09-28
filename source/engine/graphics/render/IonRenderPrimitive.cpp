@@ -553,6 +553,20 @@ void RenderPrimitive::BaseOpacity(real opacity) noexcept
 	}
 }
 
+void RenderPrimitive::WorldVisible(bool visible)
+{
+	if (world_visible_ != visible)
+	{
+		world_visible_ = visible;
+		
+		//Eager
+		if (parent_renderer_)
+			parent_renderer_->RefreshPrimitive(*this);
+
+		need_refresh_ = false;
+	}
+}
+
 
 /*
 	Observers
@@ -609,6 +623,7 @@ void RenderPrimitive::Refresh()
 		MaterialChanged();
 	}
 
+	//Lacy
 	if (need_refresh_)
 	{
 		if (parent_renderer_)
