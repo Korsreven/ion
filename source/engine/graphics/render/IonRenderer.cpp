@@ -549,12 +549,47 @@ int Renderer::TotalPrimitivesToDraw() const noexcept
 	Batches
 */
 
-//
+
 void Renderer::ClearBatches() noexcept
 {
 	ClearPrimitives();
 	batches_.clear();
 	batches_.shrink_to_fit();
+	clear_unused_batches_ = false;
+}
+
+void Renderer::ClearUnusedBatches(bool eager) noexcept
+{
+	if (!eager)
+	{
+		clear_unused_batches_ = true;
+		return;
+	}
+
+	auto unused_capacity = 0;
+
+	for (auto &batch : batches_)
+	{
+		if (std::empty(batch->slots))
+			unused_capacity += batch->capacity;
+		else if (unused_capacity > 0)
+		{
+			std::copy(std::begin(vertex_data_) + batch->offset,
+				std::begin(vertex_data_) + batch->offset + batch->used_capacity,
+				std::begin(vertex_data_) + batch->offset - unused_capacity);
+
+			batch->offset -= unused_capacity;
+			batch->need_update = detail::update_status::YesSuccessive;
+		}
+	}
+
+	if (unused_capacity > 0)
+	{
+		std::erase_if(batches_, [](auto &batch) { return std::empty(batch->slots); });
+		used_capacity_ -= unused_capacity;
+	}
+
+	clear_unused_batches_ = false;
 }
 
 
@@ -742,6 +777,9 @@ void Renderer::Prepare()
 		if (batch->used_capacity > 0)
 			batch->vertex_batch.Prepare();
 	}
+
+	if (clear_unused_batches_)
+		ClearUnusedBatches(true);
 }
 
 void Renderer::Draw() noexcept

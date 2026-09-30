@@ -122,6 +122,7 @@ namespace ion::graphics::render
 			render_primitive::VertexContainer vertex_data_; //Data (RAM)
 			std::optional<vertex::VertexBufferObject> vbo_; //Stream buffer (VRAM)
 			bool need_update_ = true;
+			bool clear_unused_batches_ = false;
 
 
 			NonOwningPtr<renderer::detail::render_batch> InsertBatch(renderer::detail::render_batches::iterator where, const RenderPrimitive &primitive);
@@ -232,6 +233,9 @@ namespace ion::graphics::render
 
 			///@brief Clears all batches from this renderer
 			void ClearBatches() noexcept;
+
+			///@brief Clears all unused batches from this renderer
+			void ClearUnusedBatches(bool eager = false) noexcept;
 
 			///@}
 
