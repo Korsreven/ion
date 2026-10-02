@@ -1,6 +1,6 @@
 ![logo](docs/logo.png?raw=true)
 
-# ION Engine 1.0
+# ION Engine 1.1
 
 ## Main features
 Here is an updated list with most of the main features of ION engine.
@@ -40,7 +40,7 @@ Here is an updated list with most of the main features of ION engine.
 * Orthographic and perspective projections
 * Adjustable FOV
 * Different aspect ratio formats
-	* Pan and scan
+	* Fill
 	* Letterbox
 	* Windowbox
 
@@ -133,6 +133,7 @@ Here is an updated list with most of the main features of ION engine.
 	* sampler1DArray and sampler2DArray
 
 ### Particle systems
+* Local and world
 * Box, point and ring emitters
 * Different built-in affectors
 	* Color faders
@@ -237,6 +238,7 @@ Here is an updated list with most of the main features of ION engine.
 * File system
 * Math functions
 * Matrix primitives
+* Noise functions
 * Random numbers
 * String functions
 * System functions
