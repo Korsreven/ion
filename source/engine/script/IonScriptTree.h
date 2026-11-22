@@ -472,6 +472,20 @@ namespace ion::script
 				///@}
 		};
 
+		///@brief A base class representing a tree node
+		struct TreeNode final
+		{
+			const ObjectNode &Object;
+			const ObjectNode *const Parent = nullptr;
+			const int Depth = 0;
+
+			///@brief Constructs a new tree node containing the given root object
+			TreeNode(const ObjectNode &object) noexcept;
+
+			///@brief Constructs a new tree node containing the given child object, parent object and depth
+			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
+		};
+
 		///@brief A class representing an object node in the tree
 		///@details An object node is child of another object node and the parent of property nodes and other object nodes
 		class ObjectNode final
@@ -656,20 +670,6 @@ namespace ion::script
 				}
 
 				///@}
-		};
-
-		///@brief A base class representing a tree node
-		struct TreeNode final
-		{
-			const ObjectNode &Object;
-			const ObjectNode *const Parent = nullptr;
-			const int Depth = 0;
-
-			///@brief Constructs a new tree node containing the given root object
-			TreeNode(const ObjectNode &object) noexcept;
-
-			///@brief Constructs a new tree node containing the given child object, parent object and depth
-			TreeNode(const ObjectNode &object, const ObjectNode &parent, int depth) noexcept;
 		};
 	} //script_tree
 
